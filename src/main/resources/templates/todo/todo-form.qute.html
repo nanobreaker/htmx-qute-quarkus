@@ -1,0 +1,23 @@
+<form hx-post="/todo"
+      hx-target="#todo-grid"
+      hx-swap="beforeend"
+      class="pure-form pure-form-stacked">
+    <fieldset>
+        <legend>
+            <a class="text-light c-white">Todo Form</a>
+        </legend>
+        <p>
+            <label for="title">[title: string]</label>
+            <input type="text" id="title" name="title" placeholder="Yoga practice"/>
+        </p>
+        <p>
+            <label for="description">[description: string]</label>
+            <input type="text" id="description" name="description" placeholder="These weekends in Surya Yoga Studio"/>
+        </p>
+        <p>
+            <label for="target">[target: yyyy-mm-dd]</label>
+            <input type="text" id="target" name="target" placeholder="2023-01-01"/>
+        </p>
+        <button type="submit" class="button big">Create</button>
+    </fieldset>
+</form>

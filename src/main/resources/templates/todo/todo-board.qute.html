@@ -1,0 +1,15 @@
+<div id="todo-board">
+    <button hx-get="/todo/todo-form"
+            hx-target="#todo-form">
+        Create To-Do
+    </button>
+    <div id="todo-form">
+    </div>
+    <button hx-get="/todo/todo-form"
+            hx-target="#todo-grid">
+        Load Grid
+    </button>
+    <div id="todo-grid"
+         class="grid grid-even-rows">
+    </div>
+</div>

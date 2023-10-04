@@ -1,0 +1,27 @@
+<form hx-post="/registration"
+      hx-target="#content-container"
+      hx-target-5*="#error-container"
+      hx-target-4*="#error-container"
+      hx-trigger="submit"
+      class="pure-form pure-form-stacked">
+    <fieldset>
+        <legend>
+            <a class="text-light c-white">Registration Form</a>
+        </legend>
+        <p>
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username">
+        </p>
+        <p>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+        </p>
+        <p>
+            <label for="repeat-password">Repeat password</label>
+            <input type="password" name="repeat-password" id="repeat-password">
+        </p>
+        <button type="submit" class="button big">Register</button>
+    </fieldset>
+</form>
+<div id="error-container" hx-swap-oob="true">
+</div>
