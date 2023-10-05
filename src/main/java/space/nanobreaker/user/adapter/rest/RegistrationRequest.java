@@ -3,6 +3,7 @@ package space.nanobreaker.user.adapter.rest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
 import space.nanobreaker.dto.validation.PasswordsMatch;
+import space.nanobreaker.jpa.user.UserEntity;
 
 @PasswordsMatch(message = "passwords should match")
 public class RegistrationRequest {
@@ -40,5 +41,12 @@ public class RegistrationRequest {
 
     public void setRepeatPassword(String repeatPassword) {
         this.repeatPassword = repeatPassword;
+    }
+
+    public UserEntity mapToUserEntity() {
+        final UserEntity user = new UserEntity();
+        user.setUsername(getUsername());
+        user.setPassword(getPassword());
+        return user;
     }
 }

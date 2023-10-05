@@ -36,7 +36,7 @@ public class RegistrationResource {
     @Produces(MediaType.TEXT_HTML)
     public Uni<TemplateInstance> create(@Valid @BeanParam RegistrationRequest registrationRequest) {
         LOG.infov("processing registration request for user[{0}]", registrationRequest.getUsername());
-        return userService.createUser(registrationRequest)
+        return userService.createUser(registrationRequest.mapToUserEntity())
                 .invoke(u -> LOG.infov("successfully registered new user[{0}]", u.getUsername()))
                 .map(u -> signInForm.data("username", u.getUsername()));
     }

@@ -7,7 +7,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import space.nanobreaker.jpa.user.UserEntity;
 import space.nanobreaker.jpa.user.UserRepository;
-import space.nanobreaker.user.adapter.rest.RegistrationRequest;
 
 @ApplicationScoped
 public class UserService {
@@ -30,11 +29,7 @@ public class UserService {
     }
 
     @WithTransaction
-    public Uni<UserEntity> createUser(final RegistrationRequest registrationRequest) {
-        final UserEntity user = new UserEntity();
-        user.setUsername(registrationRequest.getUsername());
-        user.setPassword(registrationRequest.getPassword());
-
+    public Uni<UserEntity> createUser(final UserEntity user) {
         return userRepository.persist(user);
     }
 
