@@ -5,8 +5,8 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import space.nanobreaker.jpa.todo.TodoEntity;
-import space.nanobreaker.jpa.todo.TodoRepository;
+import space.nanobreaker.todo.jpa.TodoEntity;
+import space.nanobreaker.todo.jpa.TodoRepository;
 import space.nanobreaker.todo.adapter.rest.CreateTodoRequest;
 
 import java.util.List;

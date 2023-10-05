@@ -1,4 +1,4 @@
-package space.nanobreaker.jpa.user;
+package space.nanobreaker.user.jpa;
 
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.smallrye.mutiny.Uni;

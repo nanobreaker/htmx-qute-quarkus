@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>htmx-qute-quarkus</title>
 
@@ -10,7 +10,8 @@
     <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/preload.js"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+          integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
     <link href="https://fonts.bunny.net/css?family=fira-code:500" rel="stylesheet">
     <style>
@@ -36,27 +37,26 @@
 </header>
 <main id="main"
       hx-ext="response-targets">
-    <div id="content-container" class="center">
-        <p class="text-align:center box info">
-            Before you start using the application you need a <span class="bold allcaps">user</span><br>
-            So we can keep track of your todo(s) in <span class="bold allcaps">database</span><br>
-            If you have one just simply <span class="bold allcaps">authenticate</span>
-        </p>
-        <div id="authentication-container">
-            <button class="big"
-                    hx-get="/authentication/authentication-form"
-                    hx-target="#authentication-container">
-                Authenticate
-            </button>
-            <button class="big"
-                    hx-get="/registration"
-                    hx-target="#authentication-container">
-                Register
-            </button>
+    <div id="content-container">
+        <div class="text-align:center box info">
+            Before you start using the application you need to
+            <a class="<button>"
+               hx-get="/registration"
+               hx-target="#authentication-container">
+                register
+            </a>
+            new user<br>
+            So we can keep track of your todo(s)<br>
+            Otherwise
+            <a class="<button>"
+               hx-get="/authentication/authentication-form"
+               hx-target="#authentication-container">
+                authenticate
+            </a>
         </div>
+        <div id="authentication-container" class="center"></div>
     </div>
-    <div id="error-container">
-    </div>
+    <div id="error-container"></div>
 </main>
 </body>
 </html>

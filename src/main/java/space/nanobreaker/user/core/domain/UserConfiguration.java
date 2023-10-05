@@ -4,7 +4,7 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import space.nanobreaker.jpa.user.UserEntity;
+import space.nanobreaker.user.jpa.UserEntity;
 
 @ApplicationScoped
 public class UserConfiguration {

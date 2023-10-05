@@ -2,8 +2,8 @@ package space.nanobreaker.user.adapter.rest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
-import space.nanobreaker.dto.validation.PasswordsMatch;
-import space.nanobreaker.jpa.user.UserEntity;
+import space.nanobreaker.user.adapter.rest.validation.PasswordsMatch;
+import space.nanobreaker.user.jpa.UserEntity;
 
 @PasswordsMatch(message = "passwords should match")
 public class RegistrationRequest {

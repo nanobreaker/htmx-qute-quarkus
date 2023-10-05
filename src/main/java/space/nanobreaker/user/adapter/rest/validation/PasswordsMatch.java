@@ -1,4 +1,4 @@
-package space.nanobreaker.dto.validation;
+package space.nanobreaker.user.adapter.rest.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

@@ -1,4 +1,4 @@
-package space.nanobreaker.jpa.todo;
+package space.nanobreaker.todo.jpa;
 
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;

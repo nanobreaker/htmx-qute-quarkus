@@ -5,8 +5,8 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import space.nanobreaker.jpa.user.UserEntity;
-import space.nanobreaker.jpa.user.UserRepository;
+import space.nanobreaker.user.jpa.UserEntity;
+import space.nanobreaker.user.jpa.UserRepository;
 
 @ApplicationScoped
 public class UserService {

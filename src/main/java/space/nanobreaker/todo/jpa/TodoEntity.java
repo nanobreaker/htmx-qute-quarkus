@@ -1,4 +1,4 @@
-package space.nanobreaker.jpa.todo;
+package space.nanobreaker.todo.jpa;
 
 
 import jakarta.persistence.Entity;

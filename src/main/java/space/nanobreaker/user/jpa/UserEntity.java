@@ -1,4 +1,4 @@
-package space.nanobreaker.jpa.user;
+package space.nanobreaker.user.jpa;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
