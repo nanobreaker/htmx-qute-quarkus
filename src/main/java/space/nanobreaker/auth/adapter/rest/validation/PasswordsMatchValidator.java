@@ -1,9 +1,9 @@
-package space.nanobreaker.user.adapter.rest.validation;
+package space.nanobreaker.auth.adapter.rest.validation;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import space.nanobreaker.user.adapter.rest.RegistrationRequest;
+import space.nanobreaker.auth.adapter.rest.RegistrationRequest;
 
 @ApplicationScoped
 public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMatch, RegistrationRequest> {

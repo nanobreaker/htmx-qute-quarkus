@@ -1,7 +1,10 @@
+<div>
+    <h1>Welcome {user.getName() ?: 'Anonymous'}</h1>
+</div>
 <div id="todo-board">
     <button hx-get="/todo/todo-form"
             hx-target="#todo-form">
-        Create To-Do
+        create To-Do
     </button>
     <div id="todo-form">
     </div>
@@ -12,5 +15,6 @@
     <div id="todo-grid"
          class="grid grid-even-rows">
     </div>
+
 </div>
 <div id="error-container" hx-swap-oob="true"></div>

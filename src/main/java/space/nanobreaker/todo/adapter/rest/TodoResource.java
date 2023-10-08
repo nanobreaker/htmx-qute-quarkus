@@ -4,10 +4,12 @@ import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.logging.Logger;
 import space.nanobreaker.todo.core.domain.TodoService;
 
@@ -15,6 +17,9 @@ import space.nanobreaker.todo.core.domain.TodoService;
 public class TodoResource {
 
     private static final Logger LOG = Logger.getLogger(TodoResource.class);
+
+    @Inject
+    JsonWebToken jwt;
 
     @Location("todo/todo-form.qute.html")
     Template todoForm;
@@ -31,13 +36,16 @@ public class TodoResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("todo-form")
+    @RolesAllowed({"User"})
     public Uni<TemplateInstance> get() {
         LOG.info("requesting board");
+        LOG.info(jwt);
         return Uni.createFrom().item(() -> todoForm.instance());
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
+    @RolesAllowed({"User"})
     public Uni<TemplateInstance> getAll() {
         return todoService.listAll()
                 .map(todoEntities -> todoGrid.data("todos", todoEntities));
@@ -46,6 +54,7 @@ public class TodoResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
+    @RolesAllowed({"User"})
     public Uni<TemplateInstance> create(@Valid @BeanParam CreateTodoRequest createTodoRequest) {
         LOG.infov("request to create a new todo with details [title:{0}, description:{1}], untilDate:{2}]",
                 createTodoRequest.getTitle(),

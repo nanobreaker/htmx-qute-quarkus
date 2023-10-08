@@ -1,4 +1,4 @@
-package space.nanobreaker.user.adapter.rest;
+package space.nanobreaker.auth.adapter.rest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;

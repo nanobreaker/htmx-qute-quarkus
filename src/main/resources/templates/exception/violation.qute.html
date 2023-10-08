@@ -1,7 +1,11 @@
-<div class="box bad">
-    <strong class="block titlebar">Violation(s)</strong>
+<div class="box bad top right sticky">
+    <strong class="block titlebar allcaps">Violation(s)</strong>
     {#for violation in violations}
-        <p>{violation.propertyPath()}</p>
-        <p>{violation.message()}</p>
+        <h4>
+        {violation.propertyPath()}
+        <sub-title>
+        <code>{violation.message()}</code>
+        </sub-title>
+        </h4>
     {/for}
 </div>

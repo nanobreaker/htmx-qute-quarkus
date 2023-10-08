@@ -1,4 +1,4 @@
-package space.nanobreaker.user.adapter.rest.validation;
+package space.nanobreaker.auth.adapter.rest.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

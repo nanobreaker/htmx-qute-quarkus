@@ -1,24 +1,24 @@
-<form hx-post="/registration"
+<form hx-post="/auth/register"
       hx-target="#content-container"
       hx-target-5*="#error-container"
       hx-target-4*="#error-container"
-      hx-trigger="submit"
+      hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
       class="pure-form pure-form-aligned">
     <fieldset>
         <div class="pure-control-group">
-            <label for="username">username</label>
+            <label class="allcaps" for="username">username</label>
             <input type="text" name="username" id="username">
         </div>
         <div class="pure-control-group">
-            <label for="password">password</label>
+            <label class="allcaps" for="password">password</label>
             <input type="password" name="password" id="password">
         </div>
         <div class="pure-control-group">
-            <label for="repeat-password">repeat password</label>
+            <label class="allcaps" for="repeat-password">repeat password</label>
             <input type="password" name="repeat-password" id="repeat-password">
         </div>
         <div class="pure-controls">
-            <button type="submit" class="button big">register</button>
+            <button type="submit" class="button big"><span class="allcaps">Sign Up</span></button>
         </div>
     </fieldset>
 </form>

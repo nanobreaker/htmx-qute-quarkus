@@ -1,7 +1,11 @@
 package space.nanobreaker.user.core.domain;
 
+import io.quarkus.runtime.StartupEvent;
+import io.quarkus.vertx.VertxContextSupport;
 import io.smallrye.mutiny.Uni;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import space.nanobreaker.user.jpa.UserEntity;
@@ -15,8 +19,8 @@ public class UserConfiguration {
     @Inject
     UserService userService;
 
-    public Uni<Void> execute() {
-        return defaultUserEnabled ? createDefaultUser().replaceWithVoid() : Uni.createFrom().nullItem();
+    void onStart(@Observes StartupEvent startupEvent) throws Throwable {
+        VertxContextSupport.subscribeAndAwait(() -> defaultUserEnabled ? createDefaultUser().replaceWithVoid() : Uni.createFrom().nullItem());
     }
 
     private Uni<UserEntity> createDefaultUser() {

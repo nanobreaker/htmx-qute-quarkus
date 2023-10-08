@@ -2,6 +2,7 @@ package space.nanobreaker.user.core.domain;
 
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.smallrye.jwt.build.Jwt;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -33,4 +34,10 @@ public class UserService {
         return userRepository.persist(user);
     }
 
+    public String buildJwtForUser(final UserEntity user) {
+        return Jwt.issuer("https://example.com/issuer")
+                .upn(user.getUsername())
+                .groups("User")
+                .sign();
+    }
 }

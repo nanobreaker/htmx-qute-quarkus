@@ -1,0 +1,25 @@
+{#include entry/base}
+    {#header}
+        <ul role="list">
+            <li><a hx-get="/auth/authenticate" hx-target="#content-container">Sign In</a></li>
+            <li><a hx-get="/auth/register" hx-target="#content-container">Sign Up</a></li>
+        </ul>
+    {/header}
+    <h2>
+        Hey Yo!
+        <sub-title>Welcome wonderful person!</sub-title>
+    </h2>
+    <p>This is a demonstration app that shines light on a modern approach to web development, combining the
+        efficiency of reactive server-side rendering with the power of HTMX for dynamic client interactions. In an
+        era where
+        client-server communication often dominates the conversation, this application takes a different route.</p>
+    <p>The integration of HTMX further elevates this approach. By leveraging HTML attributes, it enables dynamic
+        updates to web pages without the need for extensive JavaScript. This not only streamlines the development
+        process but also contributes to a more efficient and maintainable codebase.</p>
+    <p>By placing the emphasis on server-side operations, it embraces the idea that the server can play a pivotal
+        role in crafting responsive and interactive web applications. This methodology empowers the server to handle
+        the heavy lifting, allowing the client to remain lightweight and focused on delivering a seamless user
+        experience.</p>
+    <p>Fell free to explore it on your own, use <a>Sign In</a> or <a>Sign Up</a> to start.</p>
+    </div>
+{/include}

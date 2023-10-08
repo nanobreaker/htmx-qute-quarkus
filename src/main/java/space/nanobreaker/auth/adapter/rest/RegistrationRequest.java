@@ -1,8 +1,8 @@
-package space.nanobreaker.user.adapter.rest;
+package space.nanobreaker.auth.adapter.rest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
-import space.nanobreaker.user.adapter.rest.validation.PasswordsMatch;
+import space.nanobreaker.auth.adapter.rest.validation.PasswordsMatch;
 import space.nanobreaker.user.jpa.UserEntity;
 
 @PasswordsMatch(message = "passwords should match")
