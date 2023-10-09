@@ -18,8 +18,7 @@ public class UserService {
     @WithSession
     public Uni<UserEntity> authenticate(final String username, final String password) {
         return userRepository.findByUsername(username)
-                .onItem()
-                .ifNull().failWith(() -> new IllegalArgumentException("user not found"))
+                .onItem().ifNull().failWith(() -> new IllegalArgumentException("authentication failed: no user with such username"))
                 .invoke(user -> authenticate(user, password));
     }
 

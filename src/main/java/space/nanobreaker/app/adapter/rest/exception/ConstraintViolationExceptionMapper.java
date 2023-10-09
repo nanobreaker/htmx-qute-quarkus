@@ -13,7 +13,7 @@ import java.util.List;
 @Provider
 public class ConstraintViolationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
 
-    @Location("exception/violation.qute.html")
+    @Location("v1/exception/violation.qute.html")
     Template violationTemplate;
 
     @Override

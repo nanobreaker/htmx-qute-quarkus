@@ -2,13 +2,13 @@
     <h1>Welcome {user.getName() ?: 'Anonymous'}</h1>
 </div>
 <div id="todo-board">
-    <button hx-get="/todo/todo-form"
+    <button hx-get="/api/v1/todo/todo-form"
             hx-target="#todo-form">
         create To-Do
     </button>
     <div id="todo-form">
     </div>
-    <button hx-get="/todo/todo-form"
+    <button hx-get="/api/v1/todo/todo-form"
             hx-target="#todo-grid">
         Load Grid
     </button>

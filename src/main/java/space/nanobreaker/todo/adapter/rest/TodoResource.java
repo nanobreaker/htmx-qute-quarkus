@@ -18,16 +18,13 @@ public class TodoResource {
 
     private static final Logger LOG = Logger.getLogger(TodoResource.class);
 
-    @Inject
-    JsonWebToken jwt;
-
-    @Location("todo/todo-form.qute.html")
+    @Location("v1/todo/todo-form.qute.html")
     Template todoForm;
 
-    @Location("todo/todo-grid.qute.html")
+    @Location("v1/todo/todo-grid.qute.html")
     Template todoGrid;
 
-    @Location("todo/todo.qute.html")
+    @Location("v1/todo/todo.qute.html")
     Template todo;
 
     @Inject
@@ -39,7 +36,6 @@ public class TodoResource {
     @RolesAllowed({"User"})
     public Uni<TemplateInstance> get() {
         LOG.info("requesting board");
-        LOG.info(jwt);
         return Uni.createFrom().item(() -> todoForm.instance());
     }
 

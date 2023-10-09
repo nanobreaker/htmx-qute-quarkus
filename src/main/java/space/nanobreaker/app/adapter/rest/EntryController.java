@@ -24,10 +24,10 @@ public class EntryController {
     @Inject
     JWTParser jwtParser;
 
-    @Location("entry/anonymous.qute.html")
+    @Location("v1/entry/anonymous.qute.html")
     Template anonymousTemplate;
 
-    @Location("entry/authorized.qute.html")
+    @Location("v1/entry/authorized.qute.html")
     Template authorizedTemplate;
 
     @GET

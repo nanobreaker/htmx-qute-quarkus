@@ -20,10 +20,10 @@ public class AuthenticationResource {
     @Inject
     UserService userService;
 
-    @Location("auth/authentication.qute.html")
+    @Location("v1/auth/authentication.qute.html")
     Template authenticationTemplate;
 
-    @Location("auth/registration.qute.html")
+    @Location("v1/auth/registration.qute.html")
     Template registrationTemplate;
 
     @GET
