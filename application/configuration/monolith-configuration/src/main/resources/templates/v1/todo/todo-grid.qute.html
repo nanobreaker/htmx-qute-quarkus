@@ -1,0 +1,19 @@
+{#for todo in todos}
+    <div data-cols="1 3" data-rows="1 3">
+    <form class="pure-form pure-form-stacked">
+    <fieldset>
+    <legend>
+        <a class="text-light c-white">{todo.getTitle()}</a>
+    </legend>
+    <p>
+        <label for="description">[description: string]</label>
+        <input type="text" id="description" name="description" value="{todo.getDescription()}" readonly=""/>
+    </p>
+    <p>
+    <label for="target">[target: dd-mm-yyyy]</label>
+    <input type="text" id="target" name="target" value="{todo.getTarget()}" readonly=""/>
+    </p>
+    </fieldset>
+    </form>
+    </div>
+{/for}
