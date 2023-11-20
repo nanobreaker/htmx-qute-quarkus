@@ -20,14 +20,24 @@ public class InMemoryTodoRepository implements TodoRepository {
     }
 
     @Override
+    public Uni<Integer> complete(UUID id) {
+        return null;
+    }
+
+    @Override
     public Uni<Todo> findByTodoId(UUID id) {
         return Uni.createFrom()
                 .item(() -> todoEntityConcurrentHashMap.get(id));
     }
 
     @Override
-    public Uni<List<Todo>> listAll() {
+    public Uni<List<Todo>> listAllTodos() {
         return Uni.createFrom()
                 .item(() -> todoEntityConcurrentHashMap.values().stream().toList());
+    }
+
+    @Override
+    public Uni<Boolean> deleteByTodoId(UUID id) {
+        return null;
     }
 }

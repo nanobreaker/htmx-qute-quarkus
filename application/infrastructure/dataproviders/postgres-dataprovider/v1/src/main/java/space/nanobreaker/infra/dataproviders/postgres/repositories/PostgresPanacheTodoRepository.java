@@ -16,12 +16,24 @@ public class PostgresPanacheTodoRepository implements TodoRepository, PanacheRep
     }
 
     @Override
+    public Uni<Integer> complete(UUID id) {
+        return this.update("completed = TRUE WHERE id = ?1", id);
+    }
+
+    @Override
     public Uni<Todo> findByTodoId(UUID id) {
         return findById(id);
     }
 
     @Override
-    public Uni<List<Todo>> listAll() {
-        return PanacheRepositoryBase.super.listAll();
+    public Uni<List<Todo>> listAllTodos() {
+        return this.listAll();
     }
+
+    @Override
+    public Uni<Boolean> deleteByTodoId(UUID id) {
+        return this.deleteById(id);
+    }
+
+
 }

@@ -1,25 +1,39 @@
-<form hx-post="/todo"
-      hx-target="#todo-grid"
-      hx-swap="beforeend"
-      class="pure-form pure-form-aligned">
-    <fieldset>
-        <legend>
-            <a class="text-light c-white">Todo Form</a>
-        </legend>
-        <div class="pure-control-group">
-            <label for="title">[*title: string]</label>
-            <input type="text" id="title" name="title"/>
-        </div>
-        <div class="pure-control-group">
-            <label for="description">[description: string]</label>
-            <textarea id="description" name="description"></textarea>
-        </div>
-        <div class="pure-control-group">
-            <label for="target">[target: yyyy-mm-dd]</label>
-            <input type="text" id="target" name="target"/>
-        </div>
-        <div class="pure-controls">
-            <button type="submit" class="button big">Create</button>
-        </div>
-    </fieldset>
-</form>
+<div id="modal" _="on closeModal add .closing then wait for animationend then remove me">
+    <div class="modal-underlay" _="on click trigger closeModal"></div>
+    <div class="modal-content">
+        <p class="compact center"><span class="allcaps bold">what are you planning?</span></p>
+        <hr>
+        <form hx-post="/api/v1/todo"
+              hx-target="#todo-grid"
+              hx-swap="beforeend"
+              hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
+              class="pure-form pure-form-aligned">
+            <fieldset>
+                <div class="pure-control-group">
+                    <label class="allcaps" for="title">title</label>
+                    <input class="pure-input-1-2" type="text" id="title" name="title"/>
+                </div>
+                <div class="pure-control-group">
+                    <label class="allcaps" for="description">description</label>
+                    <textarea class="pure-input-1-2" id="description" name="description"></textarea>
+                </div>
+                <div class="pure-control-group">
+                    <label class="allcaps" for="target">target</label>
+                    <input class="pure-input-1-2" type="date" id="target" name="target"/>
+                </div>
+                <div class="center margin">
+                    <div class="block">
+                        <button class="width:100 button big info bg" type="submit">
+                            <span class="allcaps">create</span>
+                        </button>
+                        <button class="width:100 button big warn bg" _="on click trigger closeModal">
+                            <span class="allcaps">cancel</span>
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <br>
+        <br>
+    </div>
+</div>

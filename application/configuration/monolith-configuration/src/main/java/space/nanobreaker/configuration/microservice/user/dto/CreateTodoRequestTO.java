@@ -2,7 +2,7 @@ package space.nanobreaker.configuration.microservice.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
-import space.nanobreaker.core.usecases.v1.todo.CreateTodoUseCase;
+import space.nanobreaker.core.usecases.v1.todo.command.CreateTodoCommand;
 
 import java.time.LocalDate;
 
@@ -41,8 +41,8 @@ public class CreateTodoRequestTO {
         this.target = target;
     }
 
-    public CreateTodoUseCase.CreateTodoRequest createRequest() {
-        return new CreateTodoUseCase.CreateTodoRequest(title, description, target);
+    public CreateTodoCommand mapToCreateTodoCommand() {
+        return new CreateTodoCommand(title, description, target);
     }
 }
 

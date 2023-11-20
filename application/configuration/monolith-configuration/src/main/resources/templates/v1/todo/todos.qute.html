@@ -1,0 +1,39 @@
+<div id="todo-grid" class="pure-g fullbleed" hx-ext="remove-me">
+    {#for todo in todos}
+    {#fragment id = todo}
+    <div id="todo-{todo.id}" class="fade-me-out pure-u-1-6 margin">
+        <div class="box todo-card {todo:color(todo)}">
+            <div class="todo-header">
+                <h3 class="center">
+                    <span class="allcaps">{todo.getTitle()}</span>
+                    <sub-title>{todo.getDescription()}</sub-title>
+                </h3>
+            </div>
+            <div class="todo-body center">
+                <div class="block">
+                    {#if todo.completed is true}
+                    <chip class="ok">COMPLETED</chip>
+                    {#else}
+                    <chip>{todo.getTarget()}</chip>
+                    <button hx-post="/api/v1/todo/{todo.id}/complete"
+                            hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
+                            hx-target="#todo-{todo.id}"
+                            hx-swap="outerHTML"
+                            type="button" class="small iconbutton">
+                        ✔
+                    </button>
+                    <button hx-delete="/api/v1/todo/{todo.id}"
+                            hx-swap="outerHTML swap:1s"
+                            hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
+                            hx-target="#todo-{todo.id}"
+                            type="button" class="small iconbutton">
+                        ✘
+                    </button>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+    {/fragment}
+    {/for}
+</div>

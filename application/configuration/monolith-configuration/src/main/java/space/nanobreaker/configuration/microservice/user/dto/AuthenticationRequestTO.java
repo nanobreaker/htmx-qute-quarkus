@@ -2,7 +2,7 @@ package space.nanobreaker.configuration.microservice.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
-import space.nanobreaker.core.usecases.v1.user.AuthenticateUserUseCase;
+import space.nanobreaker.core.usecases.v1.user.command.AuthenticateUserCommand;
 
 public class AuthenticationRequestTO {
 
@@ -30,7 +30,7 @@ public class AuthenticationRequestTO {
         this.password = password;
     }
 
-    public AuthenticateUserUseCase.AuthenticateUserUseCaseRequest createRequest() {
-        return new AuthenticateUserUseCase.AuthenticateUserUseCaseRequest(username, password);
+    public AuthenticateUserCommand toCommand() {
+        return new AuthenticateUserCommand(username, password);
     }
 }

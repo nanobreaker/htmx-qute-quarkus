@@ -16,6 +16,7 @@ public class Todo {
     private String title;
     private String description;
     private LocalDate target;
+    private Boolean completed;
 
     public UUID getId() {
         return id;
@@ -49,11 +50,20 @@ public class Todo {
         this.target = target;
     }
 
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
     public static final class TodoBuilder {
         private UUID id;
         private String title;
         private String description;
         private LocalDate target;
+        private Boolean completed;
 
         private TodoBuilder() {
         }
@@ -82,12 +92,18 @@ public class Todo {
             return this;
         }
 
+        public TodoBuilder withCompleted(Boolean completed) {
+            this.completed = completed;
+            return this;
+        }
+
         public Todo build() {
             Todo todo = new Todo();
             todo.setId(id);
             todo.setTitle(title);
             todo.setDescription(description);
             todo.setTarget(target);
+            todo.setCompleted(completed);
             return todo;
         }
     }

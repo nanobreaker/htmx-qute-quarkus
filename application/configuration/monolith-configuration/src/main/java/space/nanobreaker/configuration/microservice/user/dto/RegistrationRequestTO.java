@@ -3,7 +3,7 @@ package space.nanobreaker.configuration.microservice.user.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
 import space.nanobreaker.configuration.microservice.user.dto.validation.PasswordsMatch;
-import space.nanobreaker.core.usecases.v1.user.RegisterUserUseCase;
+import space.nanobreaker.core.usecases.v1.user.command.RegisterUserCommand;
 
 @PasswordsMatch(message = "passwords should match")
 public class RegistrationRequestTO {
@@ -43,8 +43,7 @@ public class RegistrationRequestTO {
         this.repeatPassword = repeatPassword;
     }
 
-    public RegisterUserUseCase.RegisterUserUseCaseRequest createRequest() {
-        return new RegisterUserUseCase.RegisterUserUseCaseRequest(username, password);
+    public RegisterUserCommand toCommand() {
+        return new RegisterUserCommand(username, password);
     }
-
 }

@@ -10,8 +10,12 @@ public interface TodoRepository {
 
     Uni<Todo> persist(Todo Todo);
 
+    Uni<Integer> complete(UUID id);
+
     Uni<Todo> findByTodoId(UUID id);
 
-    Uni<List<Todo>> listAll();
+    Uni<List<Todo>> listAllTodos();
+
+    Uni<Boolean> deleteByTodoId(UUID id);
 
 }
