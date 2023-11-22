@@ -1,4 +1,4 @@
-package space.nanobreaker.configuration.microservice.user.dto;
+package space.nanobreaker.configuration.microservice.user.dto.todo;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;

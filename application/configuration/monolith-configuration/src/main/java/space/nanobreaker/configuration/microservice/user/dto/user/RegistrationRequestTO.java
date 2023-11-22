@@ -1,8 +1,8 @@
-package space.nanobreaker.configuration.microservice.user.dto;
+package space.nanobreaker.configuration.microservice.user.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
-import space.nanobreaker.configuration.microservice.user.dto.validation.PasswordsMatch;
+import space.nanobreaker.configuration.microservice.user.dto.user.validation.PasswordsMatch;
 import space.nanobreaker.core.usecases.v1.user.command.RegisterUserCommand;
 
 @PasswordsMatch(message = "passwords should match")

@@ -1,5 +1,5 @@
 <form id="authentication-form"
-      hx-post="/api/v1/auth/authenticate"
+      hx-post="/api/v1/user/authenticate"
       hx-target-5*="#error-container"
       hx-target-4*="#error-container"
       hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'

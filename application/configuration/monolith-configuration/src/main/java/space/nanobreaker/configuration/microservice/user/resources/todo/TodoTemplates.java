@@ -1,4 +1,4 @@
-package space.nanobreaker.configuration.microservice.user.resources;
+package space.nanobreaker.configuration.microservice.user.resources.todo;
 
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;

@@ -1,4 +1,4 @@
-package space.nanobreaker.configuration.microservice.user.resources;
+package space.nanobreaker.configuration.microservice.user.resources.todo;
 
 import io.quarkus.qute.TemplateExtension;
 import space.nanobreaker.core.domain.v1.Todo;

@@ -1,4 +1,4 @@
-package space.nanobreaker.configuration.microservice.user.resources;
+package space.nanobreaker.configuration.microservice.user.resources.entry;
 
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
@@ -19,7 +19,7 @@ import java.util.Objects;
 
 @Path("/")
 @Produces(MediaType.TEXT_HTML)
-public class EntryController {
+public class EntryResource {
 
     @Inject
     JWTParser jwtParser;

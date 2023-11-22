@@ -1,4 +1,4 @@
-package space.nanobreaker.configuration.microservice.user.dto.validation;
+package space.nanobreaker.configuration.microservice.user.dto.user.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
