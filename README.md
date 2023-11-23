@@ -22,4 +22,4 @@
 * Write **README.md**
   * Project scope
   * Architectural overview
-  * How to run locally
+  * How to run locallymvn

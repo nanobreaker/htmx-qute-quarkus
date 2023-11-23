@@ -123,9 +123,7 @@
                 <module>application/configuration/microservice-user-configuration</module>
                 <module>application/core/domain/v1</module>
                 <module>application/core/usecases/v1</module>
-                <module>application/infrastructure/dataproviders/core-dataprovider</module>
                 <module>application/infrastructure/dataproviders/postgres-dataprovider/v1</module>
-                <module>application/infrastructure/dataproviders/inmemory-dataprovider/v1</module>
             </modules>
             <dependencyManagement>
                 <dependencies>
@@ -148,9 +146,7 @@
                 <module>application/configuration/microservice-todo-configuration</module>
                 <module>application/core/domain/v1</module>
                 <module>application/core/usecases/v1</module>
-                <module>application/infrastructure/dataproviders/core-dataprovider</module>
                 <module>application/infrastructure/dataproviders/postgres-dataprovider/v1</module>
-                <module>application/infrastructure/dataproviders/inmemory-dataprovider/v1</module>
             </modules>
             <dependencyManagement>
                 <dependencies>
@@ -173,9 +169,7 @@
                 <module>application/configuration/monolith-configuration</module>
                 <module>application/core/domain/v1</module>
                 <module>application/core/usecases/v1</module>
-                <module>application/infrastructure/dataproviders/core-dataprovider</module>
                 <module>application/infrastructure/dataproviders/postgres-dataprovider/v1</module>
-                <module>application/infrastructure/dataproviders/inmemory-dataprovider/v1</module>
             </modules>
             <dependencyManagement>
                 <dependencies>

@@ -1,4 +1,4 @@
-package space.nanobreaker.infra.dataproviders.postgres.repositories;
+package space.nanobreaker.infra.dataproviders.inmemory.repositories;
 
 import io.smallrye.mutiny.Uni;
 import space.nanobreaker.core.domain.v1.Todo;
