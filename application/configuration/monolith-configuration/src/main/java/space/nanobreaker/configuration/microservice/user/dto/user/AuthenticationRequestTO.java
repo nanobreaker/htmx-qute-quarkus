@@ -2,8 +2,10 @@ package space.nanobreaker.configuration.microservice.user.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
+import lombok.Data;
 import space.nanobreaker.core.usecases.v1.user.command.AuthenticateUserCommand;
 
+@Data
 public class AuthenticationRequestTO {
 
     @FormParam("username")
@@ -13,22 +15,6 @@ public class AuthenticationRequestTO {
     @FormParam("password")
     @NotBlank(message = "password can not be blank")
     String password;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public AuthenticateUserCommand toCommand() {
         return new AuthenticateUserCommand(username, password);

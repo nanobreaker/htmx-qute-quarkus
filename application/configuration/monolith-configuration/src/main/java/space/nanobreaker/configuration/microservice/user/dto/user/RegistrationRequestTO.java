@@ -2,9 +2,11 @@ package space.nanobreaker.configuration.microservice.user.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
+import lombok.Data;
 import space.nanobreaker.configuration.microservice.user.dto.user.validation.PasswordsMatch;
 import space.nanobreaker.core.usecases.v1.user.command.RegisterUserCommand;
 
+@Data
 @PasswordsMatch(message = "passwords should match")
 public class RegistrationRequestTO {
 
@@ -18,30 +20,6 @@ public class RegistrationRequestTO {
     @FormParam("repeat-password")
     @NotBlank(message = "repeat password can not be blank")
     String repeatPassword;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRepeatPassword() {
-        return repeatPassword;
-    }
-
-    public void setRepeatPassword(String repeatPassword) {
-        this.repeatPassword = repeatPassword;
-    }
 
     public RegisterUserCommand toCommand() {
         return new RegisterUserCommand(username, password);

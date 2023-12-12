@@ -1,0 +1,74 @@
+version: "1.0"
+
+services:
+  keycloak-db:
+    image: postgres:10.5
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=password
+      - PGPORT=5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U quarkus" ]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+    ports:
+      - "5432:5432"
+
+  keycloak-service:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      DB_VENDOR: postgres
+      DB_PORT: 5433
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+    ports:
+      - 8090:8080
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - quarkus
+
+  quarkus-db:
+    image: postgres:10.5
+    mem_limit: 128m
+    environment:
+      - POSTGRES_USER=quarkus
+      - POSTGRES_PASSWORD=quarkus
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U quarkus" ]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+    ports:
+      - "5433:5433"
+    networks:
+      - quarkus
+
+  quarkus-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nanospace/reactive-todos:native
+    environment:
+      - "QUARKUS_DATASOURCE_URL=jdbc:postgresql://quarkus-db:5433/quarkus"
+    ports:
+      - 8080:8080  # the HTTP endpoint
+      - 8443:8443  # the HTTPS endpoint
+    depends_on:
+      quarkus-db:
+        condition: service_healthy
+      keycloak-service:
+        condition: service_started
+    networks:
+      - quarkus
+
+networks:
+  quarkus:
+    driver: bridge

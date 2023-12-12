@@ -1,6 +1,7 @@
 package space.nanobreaker.infra.dataproviders.postgres.repositories;
 
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
 import space.nanobreaker.core.domain.v1.Todo;
 import space.nanobreaker.core.usecases.repositories.v1.TodoRepository;
@@ -27,7 +28,7 @@ public class PostgresPanacheTodoRepository implements TodoRepository, PanacheRep
 
     @Override
     public Uni<List<Todo>> listAllTodos() {
-        return this.listAll();
+        return this.listAll(Sort.ascending("target"));
     }
 
     @Override

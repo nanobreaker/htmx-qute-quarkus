@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("todo")
+@RolesAllowed({"user"})
 public class TodoResource {
 
     @Inject
@@ -27,7 +28,6 @@ public class TodoResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("todo-form")
-    @RolesAllowed({"User"})
     public Uni<String> getTodoForm() {
         return TodoTemplates.todoForm()
                 .createUni()
@@ -36,11 +36,8 @@ public class TodoResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @RolesAllowed({"User"})
     @Path("all")
     public Uni<String> listAll() {
-        // TODO: Make it possible to use advantage of reactive multi processing
-        //       For instance we could try to process each item separately and merge them together and the end
         return eventBus.<List<Todo>>request("getTodosQuery", new GetTodosQuery())
                 .onItem()
                 .transformToUni(response -> TodoTemplates.todos(response.body()).createUni())
@@ -50,7 +47,6 @@ public class TodoResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    @RolesAllowed({"User"})
     public Uni<String> create(@Valid @BeanParam CreateTodoRequestTO createTodoRequest) {
         return eventBus.<UUID>request("createTodoCommand", createTodoRequest.mapToCreateTodoCommand())
                 .onItem()
@@ -63,7 +59,6 @@ public class TodoResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    @RolesAllowed({"User"})
     @Path("{id}/complete")
     public Uni<String> complete(@PathParam("id") UUID id) {
         return eventBus.<UUID>request("completeTodoCommand", new CompleteTodoCommand(id))
@@ -76,7 +71,6 @@ public class TodoResource {
 
     @DELETE
     @Produces(MediaType.TEXT_HTML)
-    @RolesAllowed({"User"})
     @Path("{id}")
     public Uni<Response> delete(@PathParam("id") UUID id) {
         return eventBus.<UUID>request("deleteTodoCommand", new DeleteTodoCommand(id))
