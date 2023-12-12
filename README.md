@@ -2,8 +2,6 @@
 
 ### Active challenges
 
-* Externalize user authentication with external Identity Provider
-    * Keyclock is a good open source option, easy to integrate with Quarkus
 * Add calendar functionality 
     * Calendar domain model
     * Calendar repository
@@ -31,7 +29,6 @@
 * Improve performance of **getTodosQuery**
 * Write **README.md**
     * Project scope
-    * Architectural overview
     * How to run locally
 
 ### Spikes

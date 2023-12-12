@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'berkeley-font';
+    src: url('fonts/secret.woff') format('woff');
+}
+
+:root {
+    --main-font: 'berkeley-font', 'Source Sans 3', 'Fira Code', -apple-system, system-ui, sans-serif;
+}
+
 /***** MODAL DIALOG ****/
 #modal {
     /* Underlay covers entire screen. */

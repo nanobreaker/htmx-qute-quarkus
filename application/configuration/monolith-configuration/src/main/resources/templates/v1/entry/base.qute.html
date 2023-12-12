@@ -3,38 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>htmx-qute-quarkus</title>
-
-    {! HTMX libraries !}
+    <title>reactive-todos</title>
+    {! HTMX !}
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/multi-swap.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/response-targets.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/preload.js"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.11"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/remove-me.js"></script>
-    {! CSS libraries !}
+    {! HyperScript !}
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    {! CSS !}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
           integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
-    {! Fonts !}
-    <link href="https://fonts.bunny.net/css?family=fira-code:500" rel="stylesheet">
-    <link href="https://fonts.bunny.net/css?family=source-sans-3:400,700|m-plus-code-latin:400,700" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-    <style>
-        :root {
-            --main-font: 'Source Sans 3', 'Fira Code', -apple-system, system-ui, sans-serif;
-        }
-    </style>
+    <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1/prism">
+    <link rel="stylesheet" href="styles.css">
+    {! FAVICON !}
+    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 </head>
 <body>
 <header class="navbar">
     <nav class="contents">
-        <h3 class="allcaps packed center">
-            <a href="/api/v1">Reactive To-Do Application</a>
-            <sub-title>
-                powered by htmx + quarkus
-            </sub-title>
+        <h3 class="allcaps italic packed center">
+            <a href="/api/v1">reactive todos</a>
         </h3>
         {#insert header}{/}
     </nav>

@@ -30,11 +30,11 @@ public class CreateTodoCommandHandler implements CommandHandler<CreateTodoComman
     }
 
     private Todo mapCreateTodoRequestToTodoModel(final CreateTodoCommand createTodoCommand) {
-        return Todo.TodoBuilder.aTodo()
-                .withTitle(createTodoCommand.title())
-                .withDescription(createTodoCommand.description())
-                .withTarget(createTodoCommand.target())
-                .withCompleted(false)
+        return Todo.builder()
+                .title(createTodoCommand.title())
+                .description(createTodoCommand.description())
+                .target(createTodoCommand.target())
+                .completed(false)
                 .build();
     }
 
