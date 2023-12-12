@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'berkeley-font';
-    src: url('fonts/secret.woff') format('woff');
+    src: url('../fonts/secret.woff') format('woff');
 }
 
 :root {
