@@ -16,21 +16,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
           integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
-    <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1/prism">
-    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="/styles/styles.css">
     {! FAVICON !}
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.ico">
 </head>
 <body>
-<header class="navbar">
-    <nav class="contents">
-        <h3 class="allcaps italic packed center">
-            <a href="/api/v1">reactive todos</a>
-        </h3>
-        {#insert header}{/}
-    </nav>
-</header>
 <main id="main"
       hx-ext="response-targets">
     <div id="content-container">
@@ -38,8 +29,5 @@
     </div>
     <div id="error-container"></div>
 </main>
-<footer>
-    <p>version 1.0.0</p>
-</footer>
 </body>
 </html>

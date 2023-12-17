@@ -1,5 +1,6 @@
 package space.nanobreaker.core.usecases.v1.todo.handler;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
@@ -19,6 +20,7 @@ public class DeleteTodoCommandHandler implements CommandHandler<DeleteTodoComman
     @Any
     TodoRepository todoRepository;
 
+    @WithSpan("deleteTodoCommandHandler execute")
     @ConsumeEvent(value = "deleteTodoCommand")
     @WithTransaction
     public Uni<UUID> execute(final DeleteTodoCommand deleteTodoCommand) {

@@ -1,5 +1,6 @@
 package space.nanobreaker.core.usecases.v1.todo.handler;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
@@ -19,6 +20,7 @@ public class CompleteTodoCommandHandler implements CommandHandler<CompleteTodoCo
     @Any
     TodoRepository todoRepository;
 
+    @WithSpan("completeTodoCommandHandler execute")
     @ConsumeEvent(value = "completeTodoCommand")
     @WithTransaction
     public Uni<UUID> execute(final CompleteTodoCommand completeTodoCommand) {

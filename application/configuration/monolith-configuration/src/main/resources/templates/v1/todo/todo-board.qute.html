@@ -1,0 +1,84 @@
+{#include v1/entry/base}
+    <form style="padding-top: 4em"
+          hx-post="/todo"
+          hx-target="#todo-grid"
+          hx-swap="beforeend"
+          hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'>
+        <div class="f-row packed">
+            <div class="f-col flex-grow:6">
+                <label class="allcaps" for="title">title</label>
+                <input type=text id="title" name="title">
+            </div>
+            <div class="f-col flex-grow:3">
+                <label class="allcaps" for="start">start</label>
+                <input type=date id="start" name="start">
+            </div>
+            <div class="f-col flex-grow:3">
+                <label class="allcaps" for="target">finish</label>
+                <input type=date id="target" name="target">
+            </div>
+        </div>
+        <div class="f-row packed">
+            <div class="f-col flex-grow:12">
+                <label class="allcaps" for="description">description</label>
+                <input type=text id="description" name="description">
+            </div>
+        </div>
+        <div class="f-row" style="padding-top: 1rem">
+            <button class="button big color ok" type="submit">SUBMIT</button>
+        </div>
+    </form>
+
+    <div id="todo-board" class="fullbleed center">
+        <div id="todo-grid" class="pure-g" hx-ext="remove-me">
+            {#for todo in todos}
+                {#fragment id = todo}
+                <div id="todo-{todo.id}" class="todo fade-me-out pure-u-1-6 margin">
+                    <div class="f-row packed">
+                        <div class="f-col flex-grow:12" style="width: 100%">
+                            <label class="allcaps" for="title-{todo.id}">title</label>
+                            <input type=text id="title-{todo.id}" name="title" readonly value="{todo.getTitle()}">
+                        </div>
+                    </div>
+                    <div class="f-row packed">
+                        <div class="f-col flex-grow:6" style="width: 50%">
+                            <label class="allcaps" for="start-{todo.id}">start</label>
+                            <input style="font-size: smaller" type=date id="start-{todo.id}" name="start" readonly>
+                        </div>
+                        <div class="f-col flex-grow:6" style="width: 50%">
+                            <label class="allcaps" for="target-{todo.id}">finish</label>
+                            <input style="font-size: smaller" type=date id="target-{todo.id}" name="target" readonly value="{todo.getTarget()}">
+                        </div>
+                    </div>
+                    <div class="f-row packed">
+                        <div class="f-col flex-grow:12" style="width: 100%">
+                            <label class="allcaps" for="description-{todo.id}">description</label>
+                            <input type=text id="description-{todo.id}" name="description" readonly value="{todo.getDescription()}">
+                        </div>
+                    </div>
+                    <div class="f-row">
+                        <div class="f-col flex-grow:6 center">
+                            <button hx-delete="/todo/{todo.id}"
+                                    hx-swap="outerHTML swap:1s"
+                                    hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
+                                    hx-target="#todo-{todo.id}"
+                                    type="button" class="small color bad">
+                                ABORT
+                            </button>
+                        </div>
+                        <div class="f-col flex-grow:6 center">
+                            <button hx-post="/todo/{todo.id}/complete"
+                                    hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
+                                    hx-target="#todo-{todo.id}"
+                                    hx-swap="outerHTML"
+                                    type="button" class="small color ok">
+                                COMPLETE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {/fragment}
+                {/for}
+        </div>
+    </div>
+{/include}

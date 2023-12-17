@@ -9,10 +9,8 @@ import java.util.List;
 @CheckedTemplate(basePath = "v1/todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
 public class TodoTemplates {
 
-    static native TemplateInstance todoForm();
+    static native TemplateInstance todoBoard(List<Todo> todos);
 
-    static native TemplateInstance todos(List<Todo> todos);
-
-    static native TemplateInstance todos$todo(Todo todo);
+    static native TemplateInstance todoBoard$todo(Todo todo);
 
 }

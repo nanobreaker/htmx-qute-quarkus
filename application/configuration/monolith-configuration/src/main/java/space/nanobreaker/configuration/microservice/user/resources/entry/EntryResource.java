@@ -24,18 +24,21 @@ public class EntryResource {
     @Location("v1/entry/authorized.qute.html")
     Template authorizedTemplate;
 
-    @GET
-    @RolesAllowed({"user"})
-    public Uni<TemplateInstance> getAuthorized() {
-        return Uni.createFrom().item(authorizedTemplate.data("username", idToken.getClaim("preferred_username")));
+    @Location("v1/entry/entry.qute.html")
+    Template entryTemplate;
 
+    @GET
+    public Uni<String> getEntry() {
+        return Uni.createFrom()
+                .completionStage(entryTemplate.instance().renderAsync());
     }
 
     @GET
     @RolesAllowed({"user"})
     @Path("entry")
     public Uni<TemplateInstance> get() {
-        return Uni.createFrom().item(authorizedTemplate.data("username", idToken.getClaim("preferred_username")));
+        return Uni.createFrom()
+                .item(authorizedTemplate.data("username", idToken.getClaim("preferred_username")));
     }
 
 }

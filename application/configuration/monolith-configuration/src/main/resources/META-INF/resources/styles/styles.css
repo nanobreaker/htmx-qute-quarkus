@@ -7,75 +7,96 @@
     --main-font: 'berkeley-font', 'Source Sans 3', 'Fira Code', -apple-system, system-ui, sans-serif;
 }
 
-/***** MODAL DIALOG ****/
-#modal {
-    /* Underlay covers entire screen. */
-    position: fixed;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    z-index: 1000;
+button {
+    min-height: unset;
+    background: var(--bg);
+    border: 2px solid var(--warn-faded-fg);
+    border-radius: unset;
+}
 
-    /* Flexbox centers the .modal-content vertically and horizontally */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+#todo-grid {
+    width: 80vw;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+}
 
-    /* Animate when opening */
-    animation-name: fadeIn;
-    animation-duration: 150ms;
-    animation-timing-function: ease;
+.todo {
+    max-width: 20vw;
+    box-sizing: border-box;
+    border: 2px solid var(--graphical-fg);
+    border-radius: unset;
+}
+
+.todo:hover {
+    background: var(--bg);
+    border: 2px solid var(--fg);
+}
+
+.todo button {
+    min-height: var(--rhythm);
+    background: var(--bg);
+    box-shadow: unset;
+    border: unset;
+    border-radius: unset;
+}
+
+.todo :is(button,.\<button\>):hover, :is(button,.\<button\>):focus-visible {
+    filter: brightness(1.1);
+    box-shadow: 0 3px 6px -2px var(--accent);
+    text-decoration: none;
+}
+
+input {
+    height: 40px;
+}
+
+input[type=text] {
+    box-sizing: border-box;
+    border: 2px solid var(--graphical-fg);
+    border-radius: unset;
+}
+
+input[type=text]:hover {
+    box-sizing: border-box;
+    border: 2px solid var(--fg);
+    border-radius: unset;
+}
+
+input[type=text]:hover + label {
+    color: var(--accent);
+}
+
+input[type=date]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+input[type=date] {
+    box-sizing: border-box;
+    border: 2px solid var(--graphical-fg);
+    border-radius: unset;
+}
+
+input[type=date]:hover {
+    box-sizing: border-box;
+    border: 2px solid var(--fg);
+    border-radius: unset;
+}
+
+.hover {
+    box-sizing: border-box;
+    border: 2px solid var(--fg);
+    border-radius: unset;
+}
+
+label[for] {
+    padding-left: 0.5rem;
+    font-size: small;
 }
 
 .fade-me-out.htmx-swapping {
     opacity: 0;
     transition: opacity 1s ease-out;
-}
-
-#modal > .modal-underlay {
-    /* underlay takes up the entire viewport. This is only
-    required if you want to click to dismiss the popup */
-    position: absolute;
-    z-index: -1;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-}
-
-#modal > .modal-content {
-    /* Position visible dialog near the top of the window */
-    margin-top: 20vh;
-
-    /* Sizing for visible dialog */
-    width: 80%;
-    max-width: max-content;
-
-    /* Display properties for visible dialog*/
-    border: solid 1px #999;
-    border-radius: 8px;
-    background-color: #121210;
-    padding: 10px;
-
-    /* Animate when opening */
-    animation-name: zoomIn;
-    animation-duration: 150ms;
-    animation-timing-function: ease;
-}
-
-#modal.closing {
-    /* Animate when closing */
-    animation-name: fadeOut;
-    animation-duration: 150ms;
-    animation-timing-function: ease;
-}
-
-#modal.closing > .modal-content {
-    /* Animate when closing */
-    animation-name: zoomOut;
-    animation-duration: 150ms;
-    animation-timing-function: ease;
 }
 
 .todo-content {
@@ -87,11 +108,13 @@
 }
 
 .todo-content > .input {
-    background-color: #121210; !important;
+    background-color: #121210;
+!important;
 }
 
 .todo-content > .textarea {
-    background-color: #121210; !important;
+    background-color: #121210;
+!important;
 }
 
 @keyframes fadeIn {

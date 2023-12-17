@@ -1,5 +1,6 @@
 package space.nanobreaker.core.usecases.v1.todo.handler;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
@@ -19,6 +20,7 @@ public class GetTodoQueryHandler implements QueryHandler<GetTodoQuery, Todo> {
     TodoRepository todoRepository;
 
     @Override
+    @WithSpan("getTodoQueryHandler execute")
     @ConsumeEvent(value = "getTodoQuery")
     @WithSession
     public Uni<Todo> execute(GetTodoQuery query) {

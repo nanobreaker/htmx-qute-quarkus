@@ -1,7 +1,9 @@
 package space.nanobreaker.configuration.microservice.user.resources.todo;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
+import io.vertx.mutiny.core.eventbus.Message;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -13,7 +15,6 @@ import space.nanobreaker.core.domain.v1.Todo;
 import space.nanobreaker.core.usecases.v1.todo.command.CompleteTodoCommand;
 import space.nanobreaker.core.usecases.v1.todo.command.DeleteTodoCommand;
 import space.nanobreaker.core.usecases.v1.todo.query.GetTodoQuery;
-import space.nanobreaker.core.usecases.v1.todo.query.GetTodosQuery;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,21 +28,9 @@ public class TodoResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Path("todo-form")
-    public Uni<String> getTodoForm() {
-        return TodoTemplates.todoForm()
-                .createUni()
-                .log("get todo form");
-    }
-
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    @Path("all")
-    public Uni<String> listAll() {
-        return eventBus.<List<Todo>>request("getTodosQuery", new GetTodosQuery())
-                .onItem()
-                .transformToUni(response -> TodoTemplates.todos(response.body()).createUni())
-                .log("get all todos");
+    @Path("board")
+    public Uni<String> getBoard() {
+        return renderTodoBoard();
     }
 
     @POST
@@ -52,7 +41,7 @@ public class TodoResource {
                 .onItem()
                 .transformToUni(response -> eventBus.<Todo>request("getTodoQuery", new GetTodoQuery(response.body())))
                 .onItem()
-                .transformToUni(response -> TodoTemplates.todos$todo(response.body()).createUni())
+                .transformToUni(this::renderTodo)
                 .log("create todo request");
     }
 
@@ -65,7 +54,7 @@ public class TodoResource {
                 .onItem()
                 .transformToUni(response -> eventBus.<Todo>request("getTodoQuery", new GetTodoQuery(response.body())))
                 .onItem()
-                .transformToUni(response -> TodoTemplates.todos$todo(response.body()).createUni())
+                .transformToUni(this::renderTodo)
                 .log("complete todo request");
     }
 
@@ -76,6 +65,16 @@ public class TodoResource {
         return eventBus.<UUID>request("deleteTodoCommand", new DeleteTodoCommand(id))
                 .map(deletedId -> Response.ok().build())
                 .log("delete todo request");
+    }
+
+    @WithSpan("renderTodoBoardTemplate")
+    public Uni<String> renderTodoBoard() {
+        return TodoTemplates.todoBoard(List.of()).createUni();
+    }
+
+    @WithSpan("renderTodoTemplate")
+    public Uni<String> renderTodo(Message<Todo> response) {
+        return TodoTemplates.todoBoard$todo(response.body()).createUni();
     }
 
 }
