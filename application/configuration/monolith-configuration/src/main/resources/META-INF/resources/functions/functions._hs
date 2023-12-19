@@ -1,0 +1,18 @@
+def navigation.navigateByCode(code)
+    js(code)
+        console.log(code)
+    end
+end
+
+def navigation.focusById(id)
+    js(id)
+        document.getElementById(id).focus()
+    end
+end
+
+def navigation.focusByClass(a)
+    js(a)
+        document.getElementsByClassName(a)[0].focus()
+        document.querySelector('[id^="title-"]').focus();
+    end
+end

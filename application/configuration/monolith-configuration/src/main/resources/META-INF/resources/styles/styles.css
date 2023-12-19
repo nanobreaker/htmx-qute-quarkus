@@ -4,7 +4,97 @@
 }
 
 :root {
-    --main-font: 'berkeley-font', 'Source Sans 3', 'Fira Code', -apple-system, system-ui, sans-serif;
+    --main-font: 'berkeley-font', 'Source Sans 3', 'Fira Code', -apple-system, system-ui;
+}
+
+.todo-form-grid {
+    display: grid;
+    grid-template:   [primary-fields-top] "t t s f" [primary-fields-bottom]
+                   [secondary-fields-top] "d d d d" [secondary-fields-bottom]
+                            [buttons-top] "b . . ." [buttons-bottom];
+}
+
+@media screen and (max-width: 80rem) {
+    .todo-form-grid {
+        display: grid;
+        grid-template:    [primary-fields-top] "t t" [primary-fields-bottom]
+                        [secondary-fields-top] "s f" [secondary-fields-bottom]
+                             [third-field-top] "d d" [third-field-bottom]
+                                 [buttons-top] "b ." [buttons-bottom];
+    }
+}
+
+@media screen and (max-width: 40rem) {
+    .todo-form-grid {
+        display: grid;
+        grid-template:    [primary-fields-top] "t" [primary-fields-bottom]
+                        [secondary-fields-top] "s" [secondary-fields-bottom]
+                             [third-field-top] "f" [third-field-bottom]
+                              [four-field-top] "d" [four-field-bottom]
+                                 [buttons-top] "b" [buttons-bottom];
+    }
+}
+
+.todo-form-title {
+    grid-area: t;
+}
+
+.todo-form-start {
+    grid-area: s;
+}
+
+.todo-form-target {
+    grid-area: f;
+}
+
+.todo-form-description {
+    grid-area: d;
+}
+
+.todo-form-submit-button {
+    grid-area: b;
+}
+
+.todo-grid {
+    display: grid;
+    max-width: 100%;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, 19em);
+}
+
+.todo-item {
+    display: grid;
+    grid-template: [title-top] "t    t    t    t" [title-bottom]
+                   [dates-top] "s    s    f    f" [dates-bottom]
+             [description-top] "d    d    d    d" [description-bottom]
+                 [buttons-top] "c    c    e    e" [buttons-bottom]
+                             /  1fr  1fr  1fr  1fr;
+}
+
+.title-field {
+    grid-area: t;
+}
+
+.start-field {
+    grid-area: s;
+}
+
+.target-field {
+    grid-area: f;
+}
+
+.description-field {
+    grid-area: d;
+}
+
+.abort-button {
+    justify-self: center;
+    grid-area: c;
+}
+
+.complete-button {
+    justify-self: center;
+    grid-area: e;
 }
 
 button {
@@ -14,23 +104,54 @@ button {
     border-radius: unset;
 }
 
-#todo-grid {
-    width: 80vw;
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
+label[for] {
+    padding-left: 0.5rem;
+    font-size: small;
+}
+
+input {
+    height: 40px;
+    width: -webkit-fill-available;
+}
+
+input[type=text] {
+    box-sizing: border-box;
+    border-width: thick;
+    border-style: double solid double solid;
+    border-color: var(--graphical-fg);
+    border-radius: unset;
+}
+
+input[type=text]:hover {
+    border-color: var(--fg);
+}
+
+input[type=date]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+input[type=date] {
+    box-sizing: border-box;
+    border-width: thick;
+    border-style: double solid double solid;
+    border-color: var(--graphical-fg);
+    border-radius: unset;
+}
+
+input[type=date]:hover {
+    border-color: var(--fg);
 }
 
 .todo {
-    max-width: 20vw;
     box-sizing: border-box;
-    border: 2px solid var(--graphical-fg);
+    border-width: thick;
+    border-style: double solid double solid;
+    border-color: var(--graphical-fg);
     border-radius: unset;
 }
 
 .todo:hover {
-    background: var(--bg);
-    border: 2px solid var(--fg);
+    border-color: var(--fg);
 }
 
 .todo button {
@@ -47,108 +168,7 @@ button {
     text-decoration: none;
 }
 
-input {
-    height: 40px;
-}
-
-input[type=text] {
-    box-sizing: border-box;
-    border: 2px solid var(--graphical-fg);
-    border-radius: unset;
-}
-
-input[type=text]:hover {
-    box-sizing: border-box;
-    border: 2px solid var(--fg);
-    border-radius: unset;
-}
-
-input[type=text]:hover + label {
-    color: var(--accent);
-}
-
-input[type=date]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-}
-
-input[type=date] {
-    box-sizing: border-box;
-    border: 2px solid var(--graphical-fg);
-    border-radius: unset;
-}
-
-input[type=date]:hover {
-    box-sizing: border-box;
-    border: 2px solid var(--fg);
-    border-radius: unset;
-}
-
-.hover {
-    box-sizing: border-box;
-    border: 2px solid var(--fg);
-    border-radius: unset;
-}
-
-label[for] {
-    padding-left: 0.5rem;
-    font-size: small;
-}
-
 .fade-me-out.htmx-swapping {
     opacity: 0;
     transition: opacity 1s ease-out;
-}
-
-.todo-content {
-    /* Display properties for visible dialog*/
-    border: solid 1px #999;
-    border-radius: 8px;
-    background-color: #121210;
-    padding: 10px;
-}
-
-.todo-content > .input {
-    background-color: #121210;
-!important;
-}
-
-.todo-content > .textarea {
-    background-color: #121210;
-!important;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeOut {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-@keyframes zoomIn {
-    0% {
-        transform: scale(0.9);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-@keyframes zoomOut {
-    0% {
-        transform: scale(1);
-    }
-    100% {
-        transform: scale(0.9);
-    }
 }
