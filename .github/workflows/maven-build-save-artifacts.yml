@@ -19,7 +19,7 @@ jobs:
           distribution: 'liberica'
           cache: maven
       - name: Maven build
-        run: ./mvnw clean install -Pmonolith
+        run: ./mvnw clean package -Pmonolith
       - run: mvn --batch-mode --update-snapshots verify
       - uses: actions/upload-artifact@v3
         with:
@@ -48,6 +48,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: {{defaultContext}}
           push: true
           tags: nanobreaker/reactive-todos-service:1.0.0-SNAPSHOT
