@@ -45,10 +45,19 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: quarkus-app
-      - run: ls -l
-      - run: ls -l quarkus-app
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: nanobreaker/reactive-todos-service:1.0.0-SNAPSHOT
+
+  deploy:
+    name: docker compose up
+    needs: push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: isbang/compose-action@v1.5.1
+        with:
+          compose-file: "./docker-compose.yml"
+          down-flags: "--volumes"
