@@ -21,15 +21,10 @@ jobs:
       - name: Maven build
         run: ./mvnw clean install -Pmonolith
       - run: mvn --batch-mode --update-snapshots verify
-      - run: mkdir deployments
-      - run: cp -r application/configuration/monolith-configuration/target/quarkus-app/lib/ deployments/lib
-      - run: cp application/configuration/monolith-configuration/target/quarkus-app/*.jar deployments
-      - run: cp -r application/configuration/monolith-configuration/target/quarkus-app/app/ deployments/app/
-      - run: cp -r application/configuration/monolith-configuration/target/quarkus-app/quarkus/ deployments/quarkus/
       - uses: actions/upload-artifact@v3
         with:
-          name: quarkus-artifacts
-          path: deployments
+          name: quarkus-app
+          path: application/configuration/monolith-configuration/target/quarkus-app/
 
   push:
     name: docker build and push image
@@ -44,6 +39,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v3
+        with:
+          name: quarkus-app
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
