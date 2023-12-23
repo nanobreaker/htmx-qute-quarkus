@@ -16,6 +16,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <dependencies>
+        <!-- DOMAIN -->
         <dependency>
             <groupId>space.nanobreaker</groupId>
             <artifactId>core-domain-v1</artifactId>
@@ -32,6 +33,7 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- LIBRARIES -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-docker</artifactId>
@@ -91,15 +93,14 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-vertx</artifactId>
-            <version>3.5.3</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.smallrye.reactive/smallrye-mutiny-vertx-core -->
         <dependency>
             <groupId>io.smallrye.reactive</groupId>
             <artifactId>smallrye-mutiny-vertx-core</artifactId>
             <version>3.7.2</version>
         </dependency>
 
+        <!-- AUTHENTICATION/AUTHORIZATION -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-oidc</artifactId>
@@ -108,7 +109,8 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-keycloak-authorization</artifactId>
         </dependency>
-        
+
+        <!-- TRACING -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-opentelemetry</artifactId>
@@ -118,7 +120,7 @@
             <artifactId>opentelemetry-jdbc</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <!-- PROCESSOR -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -126,6 +128,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- TESTS -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-test-keycloak-server</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
@@ -141,8 +149,26 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <maven.home>${maven.home}</maven.home>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

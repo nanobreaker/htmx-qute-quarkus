@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf_header" content="{inject:csrf.token}"/>
     <title>reactive todos</title>
     {! HTMX !}
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
@@ -14,8 +15,6 @@
     <script type="text/hyperscript" src="/functions/functions._hs"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     {! CSS !}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
-          integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
     <link rel="stylesheet" href="/styles/styles.css">
     {! FAVICON !}

@@ -4,7 +4,6 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("todo")
-@RolesAllowed({"user"})
 public class TodoResource {
 
     @Inject

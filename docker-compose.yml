@@ -20,7 +20,7 @@ services:
     image: quay.io/keycloak/keycloak:latest
     volumes:
       - ./application/configuration/monolith-configuration/src/main/resources/keycloak:/opt/keycloak/data/import
-      - ./application/configuration/monolith-configuration/src/main/resources/healthcheck/health-check.sh:/opt/keycloak/health-check.sh
+      - ./application/configuration/monolith-configuration/src/main/resources/keycloak/health-check.sh:/opt/keycloak/health-check.sh
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: localhost
