@@ -44,13 +44,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v3
-      - run: ls -l
-      - run: ls -l quarkus-artifacts
-      - run: ls -l quarkus-artifacts/deployments
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG_VERSION }}
-            ${{ env.DOCKER_IMAGE_NAME }}:latest
+          tags: nanobreaker/reactive-todos-service:1.0.0-SNAPSHOT
