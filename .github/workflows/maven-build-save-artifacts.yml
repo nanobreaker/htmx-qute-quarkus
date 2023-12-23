@@ -21,10 +21,10 @@ jobs:
         run: ./mvnw clean install -Pmonolith
       - run: mvn --batch-mode --update-snapshots verify
       - run: mkdir deployments
-      - run: cp application/configuration/monolith-configuration/target/quarkus-app/lib/ deployments/lib
+      - run: cp -r application/configuration/monolith-configuration/target/quarkus-app/lib/ deployments/lib
       - run: cp application/configuration/monolith-configuration/target/quarkus-app/*.jar deployments
-      - run: cp application/configuration/monolith-configuration/target/quarkus-app/app/ deployments/app/
-      - run: cp application/configuration/monolith-configuration/target/quarkus-app/quarkus/ deployments/quarkus/
+      - run: cp -r application/configuration/monolith-configuration/target/quarkus-app/app/ deployments/app/
+      - run: cp -r application/configuration/monolith-configuration/target/quarkus-app/quarkus/ deployments/quarkus/
       - uses: actions/upload-artifact@v3
         with:
           name: quarkus-artifacts

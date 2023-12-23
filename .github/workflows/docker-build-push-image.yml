@@ -1,6 +1,11 @@
 name: Docker Build and Push Image
 
 on:
+  workflow_run:
+    workflows:
+      - Maven Build and Save Artifacts
+    types:
+      - completed
   push:
     branches: [ "master" ]
   pull_request:
