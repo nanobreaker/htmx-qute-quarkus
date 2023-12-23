@@ -82,7 +82,7 @@ FROM registry.access.redhat.com/ubi9/openjdk-21:latest
 ENV LANGUAGE='en_US:en'
 
 # We make four distinct layers so if there are application changes the library layers can be re-used
-COPY --chown=185 quarkus-artifacts/ /deployments/
+COPY --chown=185 quarkus-app/ /deployments/
 
 EXPOSE 8080
 USER 185
