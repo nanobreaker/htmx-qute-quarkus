@@ -59,7 +59,7 @@
     display: grid;
     max-width: 100%;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, 19em);
+    grid-template-columns: repeat(auto-fill, minmax(30ch, 1fr));
 }
 
 .todo-item {

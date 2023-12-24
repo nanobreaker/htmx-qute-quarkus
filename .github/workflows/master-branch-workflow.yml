@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: maven build and upload artifacts
+    name: build app and test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
           path: application/configuration/monolith-configuration/target/quarkus-app/
 
   push:
-    name: docker build and push image
+    name: build image and push
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -54,7 +54,7 @@ jobs:
           tags: nanobreaker/reactive-todos-service:1.0.0-SNAPSHOT
 
   deploy:
-    name: docker compose up
+    name: deploy cluster
     needs: push
     runs-on: ubuntu-latest
     steps:
