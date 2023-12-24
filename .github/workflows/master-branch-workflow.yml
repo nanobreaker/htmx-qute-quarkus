@@ -46,8 +46,6 @@ jobs:
         with:
           name: quarkus-app
           path: quarkus-app
-      - run: ls -l
-      - run: ls -R quarkus-app
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
