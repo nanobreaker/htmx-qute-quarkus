@@ -45,6 +45,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: quarkus-app
+          path: quarkus-app
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
