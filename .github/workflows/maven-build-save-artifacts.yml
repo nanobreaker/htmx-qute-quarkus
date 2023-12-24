@@ -42,10 +42,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: quarkus-app
           path: quarkus-app
+          merge-multiple: true
+      - run: ls -l
+      - run: ls -R quarkus-app
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
