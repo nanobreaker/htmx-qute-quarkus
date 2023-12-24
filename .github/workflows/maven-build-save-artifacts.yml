@@ -51,6 +51,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: .
           push: true
           tags: nanobreaker/reactive-todos-service:1.0.0-SNAPSHOT
 
