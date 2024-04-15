@@ -25,75 +25,75 @@ import java.util.UUID;
 @Produces(MediaType.TEXT_HTML)
 public class UserResource {
 
-    @Location("v1/user/authentication.qute.html")
-    Template authenticationTemplate;
+  @Location("v1/user/authentication.qute.html")
+  Template authenticationTemplate;
 
-    @Location("v1/user/registration.qute.html")
-    Template registrationTemplate;
+  @Location("v1/user/registration.qute.html")
+  Template registrationTemplate;
 
-    @Inject
-    EventBus eventBus;
+  @Inject
+  EventBus eventBus;
 
-    @GET
-    @PermitAll
-    @Path("authenticate")
-    public Uni<TemplateInstance> getAuthenticationTemplate() {
-        return Uni.createFrom().item(authenticationTemplate.instance());
-    }
+  @GET
+  @PermitAll
+  @Path("authenticate")
+  public Uni<TemplateInstance> getAuthenticationTemplate() {
+    return Uni.createFrom().item(authenticationTemplate.instance());
+  }
 
-    @GET
-    @PermitAll
-    @Path("register")
-    public Uni<TemplateInstance> getRegistrationTemplate() {
-        return Uni.createFrom().item(registrationTemplate.instance());
-    }
+  @GET
+  @PermitAll
+  @Path("register")
+  public Uni<TemplateInstance> getRegistrationTemplate() {
+    return Uni.createFrom().item(registrationTemplate.instance());
+  }
 
-    @POST
-    @PermitAll
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("register")
-    public Uni<TemplateInstance> register(@Valid @BeanParam RegistrationRequestTO registrationRequestTO) {
-        return eventBus.<UUID>request("registerUserCommand", registrationRequestTO.toCommand())
-                .onItem()
-                .transformToUni(response -> eventBus.<User>request("getUserQuery", new GetUserQuery(response.body())))
-                .onItem()
-                .transform(response -> authenticationTemplate.data("username", response.body().getId()))
-                .log("registration request");
-    }
+  @POST
+  @PermitAll
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Path("register")
+  public Uni<TemplateInstance> register(@Valid @BeanParam RegistrationRequestTO registrationRequestTO) {
+    return eventBus.<UUID>request("registerUserCommand", registrationRequestTO.toCommand())
+        .onItem()
+        .transformToUni(response -> eventBus.<User>request("getUserQuery", new GetUserQuery(response.body())))
+        .onItem()
+        .transform(response -> authenticationTemplate.data("username", response.body().getId()))
+        .log("registration request");
+  }
 
-    @POST
-    @PermitAll
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("authenticate")
-    public Uni<Response> authenticate(@Valid @BeanParam AuthenticationRequestTO authenticationRequestTO) {
-        return eventBus.<UUID>request("authenticateUserCommand", authenticationRequestTO.toCommand())
-                .onItem()
-                .transformToUni(response -> eventBus.<User>request("getUserQuery", new GetUserQuery(response.body())))
-                .onItem()
-                .transform(this::buildAuthenticationResponse)
-                .log("authentication request");
-    }
+  @POST
+  @PermitAll
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Path("authenticate")
+  public Uni<Response> authenticate(@Valid @BeanParam AuthenticationRequestTO authenticationRequestTO) {
+    return eventBus.<UUID>request("authenticateUserCommand", authenticationRequestTO.toCommand())
+        .onItem()
+        .transformToUni(response -> eventBus.<User>request("getUserQuery", new GetUserQuery(response.body())))
+        .onItem()
+        .transform(this::buildAuthenticationResponse)
+        .log("authentication request");
+  }
 
-    private Response buildAuthenticationResponse(final Message<User> response) {
-        final String token = buildJWT(response);
-        return Response.ok()
-                .header("HX-Refresh", true)
-                .cookie(new NewCookie.Builder("access-token")
-                        .path("/")
-                        .domain("localhost")
-                        .maxAge(86400)
-                        .value(String.valueOf(token))
-                        .comment("jwt access token used for authorization")
-                        .httpOnly(true)
-                        .build())
-                .build();
-    }
+  private Response buildAuthenticationResponse(final Message<User> response) {
+    final String token = buildJWT(response);
+    return Response.ok()
+        .header("HX-Refresh", true)
+        .cookie(new NewCookie.Builder("access-token")
+            .path("/")
+            .domain("localhost")
+            .maxAge(86400)
+            .value(String.valueOf(token))
+            .comment("jwt access token used for authorization")
+            .httpOnly(true)
+            .build())
+        .build();
+  }
 
-    private String buildJWT(final Message<User> message) {
-        return Jwt.issuer("https://example.com/issuer")
-                .upn(message.body().getUsername())
-                .groups("User")
-                .sign();
-    }
+  private String buildJWT(final Message<User> message) {
+    return Jwt.issuer("https://example.com/issuer")
+        .upn(message.body().getUsername())
+        .groups("User")
+        .sign();
+  }
 
 }

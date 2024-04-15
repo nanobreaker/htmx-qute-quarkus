@@ -1,0 +1,25 @@
+@import "missing.css";
+
+
+@font-face {
+  font-family: 'nerdkeley-regular';
+  src: url("/static/fonts/nerdkeley-regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'nerdkeley-bold';
+  src: url("/static/fonts/nerdkeley-bold.ttf") format("truetype");
+}
+
+:root {
+  --main-font: 'nerdkeley-regular';
+}
+
+html,
+body {
+  font-family: 'nerdkeley-regular';
+}
+
+.test {
+  font-family: 'berkeley-bold';
+}
