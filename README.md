@@ -16,7 +16,6 @@ exploratory journey into building distributed systems, providing valuable insigh
 
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
@@ -127,3 +126,8 @@ For this project I've implemented CQRS based on VertX EventBus which can act as 
 ### Change-Data-Capture Flow Diagram
 
 ![CDC Diagram](documentation/diagrams/cdc.png)
+
+
+## Licensing
+
+The code in this project is licensed under MIT license. Check [LICENSE](LICENSE) for further details.
