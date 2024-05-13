@@ -7,6 +7,7 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.inject.Inject;
+import space.nanobreaker.core.domain.v1.TodoId;
 import space.nanobreaker.core.usecases.repositories.v1.TodoRepository;
 import space.nanobreaker.core.usecases.v1.CommandHandler;
 import space.nanobreaker.core.usecases.v1.todo.command.CompleteTodoCommand;
@@ -14,7 +15,7 @@ import space.nanobreaker.core.usecases.v1.todo.command.CompleteTodoCommand;
 import java.util.UUID;
 
 @ApplicationScoped
-public class CompleteTodoCommandHandler implements CommandHandler<CompleteTodoCommand, UUID> {
+public class CompleteTodoCommandHandler implements CommandHandler<CompleteTodoCommand, TodoId> {
 
     @Inject
     @Any
@@ -23,8 +24,8 @@ public class CompleteTodoCommandHandler implements CommandHandler<CompleteTodoCo
     @WithSpan("completeTodoCommandHandler execute")
     @ConsumeEvent(value = "completeTodoCommand")
     @WithTransaction
-    public Uni<UUID> execute(final CompleteTodoCommand completeTodoCommand) {
-        return todoRepository.complete(completeTodoCommand.id())
+    public Uni<TodoId> execute(final CompleteTodoCommand completeTodoCommand) {
+        return todoRepository.findByTodoId(completeTodoCommand.id())
                 .replaceWith(completeTodoCommand.id());
     }
 

@@ -1,0 +1,95 @@
+@font-face {
+  font-family: 'nerdkeley-regular';
+  src: url("/fonts/nerdkeley-regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'nerdkeley-bold';
+  src: url("/fonts/nerdkeley-bold.ttf") format("truetype");
+}
+
+:root {
+  /* Lengths */
+  --rhythm: 1.8rem; /* Vertical rhythm, line height. */
+  --line-length: 42rem; /* Maximum line length for prose. */
+  --border-radius: .0rem;
+
+  /* Fonts */
+  --main-font: 'nerdkeley-regular';
+  --secondary-font: 'nerdkeley-bold';
+  --mono-font: 'nerdkeley-regular';
+
+  /* Colors */
+  --night: #0a0c0fff;
+  --french-gray: #bec3cbff;
+  --antiflash-white: #f0f3f5ff;
+  --fire-engine-red: #c42021ff;
+  --tangerine: #f18701ff;
+  --xanthous: #f0b72fff;
+  --mint: #68a27aff;
+  --true-blue: #576ca8ff;
+  --magenta: #e36588ff;
+
+  --bg: var(--night);
+  --fg: var(--antiflash-white);
+  --faded-fg: var(--french-gray);
+  --graphical-fg: var(--antiflash-white);
+  --box-bg: var(--night);
+  --interactive-bg: var(--night);
+  --accent: var(--tangerine);
+  --muted-accent: var(--xanthous);
+
+  --plain-fg: var(--antiflash-white);
+  --plain-bg: var(--night);
+  --plain-graphical-fg: var(--night);
+
+  --info-fg: var(--antiflash-white);
+  --info-bg: var(--true-blue);
+  --info-graphical-fg: var(--true-blue);
+
+  --ok-fg: var(--night);
+  --ok-bg: var(--mint);
+  --ok-graphical-fg: var(--mint);
+
+  --bad-fg: var(--antiflash-white);
+  --bad-bg: var(--fire-engine-red);
+  --bad-graphical-fg: var(--fire-engine-red);
+
+  --warn-fg: var(--night);
+  --warn-bg: var(--tangerine);
+  --warn-graphical-fg: var(--tangerine);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.-no-dark-theme) {
+
+    --bg: var(--night);
+    --fg: var(--antiflash-white);
+    --faded-fg: var(--french-gray);
+    --graphical-fg: var(--antiflash-white);
+    --box-bg: var(--night);
+    --interactive-bg: var(--night);
+    --accent: var(--tangerine);
+    --muted-accent: var(--xanthous);
+
+    --plain-fg: var(--antiflash-white);
+    --plain-bg: var(--night);
+    --plain-graphical-fg: var(--night);
+
+    --info-fg: var(--antiflash-white);
+    --info-bg: var(--true-blue);
+    --info-graphical-fg: var(--true-blue);
+
+    --ok-fg: var(--night);
+    --ok-bg: var(--mint);
+    --ok-graphical-fg: var(--mint);
+
+    --bad-fg: var(--antiflash-white);
+    --bad-bg: var(--fire-engine-red);
+    --bad-graphical-fg: var(--fire-engine-red);
+
+    --warn-fg: var(--night);
+    --warn-bg: var(--tangerine);
+    --warn-graphical-fg: var(--tangerine);
+  }
+}

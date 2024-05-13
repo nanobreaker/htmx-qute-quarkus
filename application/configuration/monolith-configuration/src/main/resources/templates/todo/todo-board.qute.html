@@ -1,0 +1,85 @@
+{#include base}
+    <form id="query-form"
+          hx-post="/todo/command">
+        <label class="allcaps" for="query">query</label>
+        <input id="query"
+               name="query"
+               type=text
+               maxlength="42"
+               class="query">
+    </form>
+
+    {!<form id="todo-form"
+          class="todo-form-grid"
+          style="padding-top: 4em"
+          hx-post="/todo"
+          hx-target="#todo-grid"
+          hx-swap="beforeend"
+          hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'>
+        <div class="todo-form-title">
+            <label class="allcaps" for="title">title</label>
+            <input type=text id="title" name="title">
+        </div>
+        <div class="todo-form-start">
+            <label class="allcaps" for="start">start</label>
+            <input type=date id="start" name="start">
+        </div>
+        <div class="todo-form-target">
+            <label class="allcaps" for="target">finish</label>
+            <input type=date id="target" name="target">
+        </div>
+        <div class="todo-form-description">
+            <label class="allcaps" for="description">description</label>
+            <input type=text id="description" name="description">
+        </div>
+        <div class="todo-form-submit-button margin-block-start">
+            <button class="big warn color bg fg" type="submit">CREATE</button>
+        </div>
+    </form>!}
+
+    <div class="fullbleed center">
+        <div id="todo-grid"
+             style="padding-top: 5rem"
+             class="todo-grid"
+             hx-ext="remove-me">
+            {#for todo in todos}
+                {#fragment id = todo}
+                    <div id="todo-{todo.id}" class="todo-item todo fade-me-out">
+                        <div class="start-field">
+                            <label class="allcaps" for="start-{todo.id}">start</label>
+                            <input style="font-size: smaller" type=date id="start-{todo.id}" name="start" readonly>
+                        </div>
+                        <div class="target-field">
+                            <label class="allcaps" for="target-{todo.id}">finish</label>
+                            <input style="font-size: smaller" type=date id="target-{todo.id}" name="target" readonly
+                                   value="{todo.getEndDateTime()}">
+                        </div>
+                        <div class="description-field">
+                            <label class="allcaps" for="description-{todo.id}">description</label>
+                            <input type=text id="description-{todo.id}" name="description" readonly
+                                   value="{todo.getDescription()}">
+                        </div>
+                        <div class="abort-button">
+                            <button hx-delete="/todo/{todo.id}"
+                                    hx-target="#todo-{todo.id}"
+                                    hx-swap="outerHTML swap:1s"
+                                    type="button"
+                                    class="small color bad">
+                                ABORT
+                            </button>
+                        </div>
+                        <div class="complete-button">
+                            <button hx-post="/todo/{todo.id}/complete"
+                                    hx-target="#todo-{todo.id}"
+                                    hx-swap="outerHTML"
+                                    type="button"
+                                    class="small color ok">
+                                COMPLETE
+                            </button>
+                        </div>
+                    </div>
+                {/fragment}
+            {/for}
+        </div>
+    </div>
+{/include}

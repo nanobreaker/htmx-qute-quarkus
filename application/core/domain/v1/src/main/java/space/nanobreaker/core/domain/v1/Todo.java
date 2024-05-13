@@ -1,11 +1,10 @@
 package space.nanobreaker.core.domain.v1;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -16,12 +15,10 @@ import java.util.UUID;
 @Builder
 public class Todo {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
-    private String title;
+    @EmbeddedId
+    private TodoId id;
     private String description;
-    private LocalDate target;
-    private Boolean completed;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
 
 }

@@ -1,11 +1,107 @@
-@font-face {
-    font-family: 'berkeley-font';
-    src: url('../fonts/secret.woff') format('woff');
+@import url(variables.css);
+
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    height: 1em;
+    width: 1em;
+    border-radius: 50em;
+    background: url(https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times-circle.svg) no-repeat 50% 50%;
+    background-size: contain;
+    color: var(--fg);
+    opacity: 0;
+    pointer-events: none;
 }
 
-:root {
-    --main-font: 'berkeley-font', 'Source Sans 3', 'Fira Code', -apple-system, system-ui;
+input[type="search"]:focus::-webkit-search-cancel-button {
+    opacity: .3;
+    pointer-events: all;
+    filter: invert(1);
 }
+
+html {
+    cursor: text;
+}
+
+.command-line-interface {
+    width: 100%;
+    display: grid;
+    grid-template:  [prompt] "c" [prompt]
+                      [info] "i" [info];
+
+    .command-line {
+        display: grid;
+        grid-area: c;
+        grid-template:   [prompt] "p c" [prompt];
+        grid-template-columns: auto 1fr;
+        grid-column-gap: 0.2em;
+
+        border-color: var(--faded-fg);
+
+        .command-prompt {
+            padding-top: 0.1rem;
+            grid-area: p;
+        }
+
+        .command-prompt:hover {
+            color: var(--magenta);
+        }
+
+        .command-input {
+            grid-area: c;
+            height: 2em;
+            border: unset;
+
+            caret-color: var(--magenta);
+        }
+
+        .command-input:focus {
+            outline: none;
+
+            border-bottom-style: solid;
+            border-bottom-width: 0.01rem;
+            border-bottom-color: var(--magenta);
+        }
+    }
+}
+
+.command-line-interface:has(.command-prompt:hover) {
+    .legend {
+        color: var(--accent);
+    }
+
+    border-color: var(--accent);
+}
+
+.command-line-interface:has(.command-input:hover) {
+    .legend {
+        color: var(--accent);
+    }
+
+    border-color: var(--accent);
+}
+
+.command-line-parser:has(.command-prompt:hover) {
+}
+
+.command-line-parser {
+
+    .command-parser-output {
+        white-space: pre-wrap; /* Since CSS 2.1 */
+        white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+        white-space: -pre-wrap; /* Opera 4-6 */
+        white-space: -o-pre-wrap; /* Opera 7 */
+        word-wrap: break-word; /* Internet Explorer 5.5+ */
+    }
+}
+
+.command-line-parser:hover {
+    .legend {
+        color: var(--accent);
+    }
+
+    border-color: var(--accent);
+}
+
 
 .todo-form-grid {
     display: grid;
@@ -83,69 +179,10 @@
     grid-area: f;
 }
 
-.description-field {
-    grid-area: d;
-}
-
-.abort-button {
-    justify-self: center;
-    grid-area: c;
-}
-
-.complete-button {
-    justify-self: center;
-    grid-area: e;
-}
-
-button {
-    min-height: unset;
-    background: var(--bg);
-    border: 2px solid var(--warn-faded-fg);
-    border-radius: unset;
-}
-
-label[for] {
-    padding-left: 0.5rem;
-    font-size: small;
-}
-
-input {
-    height: 40px;
-    width: -webkit-fill-available;
-}
-
-input[type=text] {
-    box-sizing: border-box;
-    border-width: thick;
-    border-style: double solid double solid;
-    border-color: var(--graphical-fg);
-    border-radius: unset;
-}
-
-input[type=text]:hover {
-    border-color: var(--fg);
-}
-
-input[type=date]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-}
-
-input[type=date] {
-    box-sizing: border-box;
-    border-width: thick;
-    border-style: double solid double solid;
-    border-color: var(--graphical-fg);
-    border-radius: unset;
-}
-
-input[type=date]:hover {
-    border-color: var(--fg);
-}
-
 .todo {
     box-sizing: border-box;
-    border-width: thick;
-    border-style: double solid double solid;
+    border-width: medium;
+    border-style: solid;
     border-color: var(--graphical-fg);
     border-radius: unset;
 }

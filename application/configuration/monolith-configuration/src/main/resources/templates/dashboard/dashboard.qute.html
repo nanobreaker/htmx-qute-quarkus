@@ -1,0 +1,40 @@
+{#include base}
+    <div class="padding-block-end">
+        <label class="padding info bg fg float:left">{applicationName ?: 'HTMX QUTE QUARKUS'}</label>
+        <label class="padding ok bg fg float:right">VERSION {applicationVersion ?: 'UNKNOWN'}</label>
+    </div>
+
+    <fieldset class="command-line-interface crowded">
+        <legend class="legend">command line interface</legend>
+        <div class="command-line">
+            <label class="command-prompt"
+                   for="command">
+                {username ?: 'root'}$
+            </label>
+            <input id="command"
+                   class="command-input"
+                   name="command"
+                   type="search"
+                   hx-post="/cli/execute-command"
+                   _='on keyup
+                        fetch /cli/process-command
+                            with
+                                body: my value,
+                                method: "POST"'
+            >
+        </div>
+    </fieldset>
+
+    <fieldset class="command-line-parser crowded"
+              hx-ext="sse"
+              sse-connect="/cli/feedback">
+        <legend class="legend">command line feedback</legend>
+        <div class="command-parser-output"
+             sse-swap="feedback">
+        </div>
+    </fieldset>
+
+    <div id="result-div">
+
+    </div>
+{/include}

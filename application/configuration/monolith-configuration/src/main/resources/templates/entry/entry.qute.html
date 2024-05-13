@@ -1,0 +1,30 @@
+{#include base}
+    <div style="padding-top: 8em">
+        <h1>
+            HTMX QUTE QUARKUS
+        </h1>
+        <p>
+            Welcome to HTMX QUTE QUARKUS demo application!
+            It's not just any task manager – it's your ultimate productivity buddy.
+            This app keeps things super easy and organized, focusing on making your life simpler.
+            Create, update, or delete tasks hassle-free in a clean, user-friendly setup.
+        </p>
+        list of available commands
+        <div class="box crowded">
+            <pre>todo create "&lt;description&gt;" [end] [start] [priority]</pre>
+            <pre>todo list</pre>
+            <pre>todo update &lt;id ids&gt; [-d description] [-e end] [-s start] [-p priority]</pre>
+            <pre>todo delete &lt;id ids&gt;</pre>put changed delay:300ms, search"
+                   hx-target="#command-parser-output">
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend class="legend">command line parser</legend>
+        <pre id="command-parser-output">%
+        </div>
+        <div class="block">
+            <a class="<button> big color plain" href="/dashboard">LET'S GO</a>
+        </div>
+    </div>
+{/include}

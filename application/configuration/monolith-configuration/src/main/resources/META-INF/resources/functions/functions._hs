@@ -10,9 +10,6 @@ def navigation.focusById(id)
     end
 end
 
-def navigation.focusByClass(class)
-    js(class)
-        document.getElementsByClassName(class)[0].focus()
-        document.querySelector('[id^="title-"]').focus();
-    end
+def executeCommand()
+
 end

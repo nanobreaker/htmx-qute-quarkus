@@ -1,8 +1,53 @@
-# Reactive TODOs
+<div align="center">
+    <img src="/logo/logo.png">
+</div>
 
-### Active challenges
+<h3 align="center">HTMX QUTE QUARKUS</h3>
 
-* Add calendar functionality 
+## About The Project
+
+The 'htmx-qute-quarkus' project demonstrates how to efficiently build a web application using the Quarkus framework with
+HTMX for hypermedia driven UI interactions and the Qute template engine for HTML rendering. This project leverages Java 21's
+latest features, including pattern matching, structured concurrency, and advanced garbage collection. It incorporates
+the Ports & Adapters architecture to facilitate the transition from monolithic structures to microservices, enhancing
+maintainability and scalability. Additionally, the project includes CI/CD configurations to simplify setting up a local
+environment with a single command, complete with E2E testing and GitHub pipelines integration. This project is an
+exploratory journey into building distributed systems, providing valuable insights for similar endeavors.
+
+## Getting Started
+
+This is an example of how you may give instructions on setting up your project locally.
+To get a local copy up and running follow these simple example steps.
+
+### Prerequisites
+
+* java 21+
+* docker
+
+### Installation
+
+1. Clone the repo
+   ```shell
+   git clone git@github.com:nanobreaker/htmx-qute-quarkus.git
+   ```
+
+## Usage
+
+### Build
+
+```shell
+./mvnw clean install -Pmonolith
+```
+
+### Run
+
+```shell
+./mvnw quarkus:dev -Pmonolith 
+```
+
+### Roadmap
+
+* Add calendar functionality
     * Calendar domain model
     * Calendar repository
     * Calendar commands & queries
@@ -16,20 +61,12 @@
     * User microservice
     * Todo microservice
     * Calendar microservice
-* Create docker-swarm script to set-up local development cluster
+* Create script to set up local development cluster
 * Create GitHub actions
     * Run E2E tests
     * Build project artifacts and publish to public nexus repository
     * Build docker images and publish to public repository
-    * Deploy application to development cluster
-    * Deploy application to production cluster
-
-### Additional challenges
-
-* Improve performance of **getTodosQuery**
-* Write **README.md**
-    * Project scope
-    * How to run locally
+    * Deploy application to dev cluster
 
 ### Spikes
 
