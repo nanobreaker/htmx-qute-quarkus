@@ -1,13 +1,48 @@
 package space.nanobreaker.configuration.monolith.extension;
 
-public sealed interface Result<T, E>
+import java.util.function.Function;
+
+public sealed interface Result<V, E>
         permits Ok, Err {
 
-    static <T, E> Result<T, E> ok(T value) {
+    static <V, E> Result<V, E> ok(V value) {
         return new Ok<>(value);
     }
 
-    static <T, E> Result<T, E> err(E error) {
+    static <V, E> Result<V, E> err(E error) {
         return new Err<>(error);
     }
+
+    default V unwrap() {
+        return switch (this) {
+            case Ok(V v) -> v;
+            case Err(_) -> throw new IllegalStateException("Err can not be unwrapped");
+        };
+    }
+
+    default <NV> Result<NV, E> map(Function<? super V, ? extends NV> valueMapper) {
+        return switch (this) {
+            case Ok(V v) -> Result.ok(valueMapper.apply(v));
+            case Err(E e) -> Result.err(e);
+        };
+    }
+
+    default <NV> Result<NV, E> flatMap(Function<? super V, ? extends Result<NV, E>> valueMapper) {
+        return switch (this) {
+            case Ok(V v) -> valueMapper.apply(v);
+            case Err(E e) -> Result.err(e);
+        };
+    }
+
+    static <F, S, E> Result<Tuple<F, S>, E> merge(Result<F, E> first, Result<S, E> second) {
+        final var tuple = new Tuple<>(first, second);
+        return switch (tuple) {
+            case Tuple(Ok(F f), Ok(S s)) -> Result.ok(new Tuple<F, S>(f, s));
+            case Tuple(Ok(F _), Err(E e)) -> Result.err(e);
+            case Tuple(Err(E e), Ok(S _)) -> Result.err(e);
+            case Tuple(Err(E e), Err(E _)) -> Result.err(e);
+        };
+    }
+
+
 }

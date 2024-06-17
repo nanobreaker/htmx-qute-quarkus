@@ -3,7 +3,7 @@ package space.nanobreaker.configuration.monolith.cli.program;
 public enum OPTION {
 
     DESCRIPTION("-d", "description"),
-    START_DATE_TIME("-s", "start date time"),
+    START_DATE_TIME("-second", "start date time"),
     END_DATE_TIME("-e", "end date time"),
     ;
 

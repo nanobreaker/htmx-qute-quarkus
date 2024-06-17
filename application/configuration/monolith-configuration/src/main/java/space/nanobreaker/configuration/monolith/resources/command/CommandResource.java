@@ -9,11 +9,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
-import space.nanobreaker.configuration.monolith.cli.command.*;
+import space.nanobreaker.configuration.monolith.cli.command.CliCommand;
 import space.nanobreaker.configuration.monolith.cli.parser.CommandParser;
 import space.nanobreaker.configuration.monolith.extension.Err;
 import space.nanobreaker.configuration.monolith.extension.Ok;
-import space.nanobreaker.configuration.monolith.extension.Result;
 import space.nanobreaker.configuration.monolith.sse.SSEService;
 
 @Path("cli")
@@ -39,6 +38,7 @@ public class CommandResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_HTML)
     public Response process(String command) {
+        // todo: rework, handle new type of Errors and make explicit handling of each of them
         final String result = switch (commandParser.parse(command)) {
             case Ok(CliCommand cliCommand) -> cliCommand.help();
             case Err(Exception exception) -> exception.getMessage();

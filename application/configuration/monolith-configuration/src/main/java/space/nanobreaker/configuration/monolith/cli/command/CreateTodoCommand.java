@@ -1,12 +1,10 @@
 package space.nanobreaker.configuration.monolith.cli.command;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public record CreateTodoCommand(
         String description,
-        LocalDateTime start,
-        LocalDateTime end
+        Range range
 ) implements TodoCommand {
 
     public CreateTodoCommand {
@@ -24,3 +22,4 @@ public record CreateTodoCommand(
                 """;
     }
 }
+

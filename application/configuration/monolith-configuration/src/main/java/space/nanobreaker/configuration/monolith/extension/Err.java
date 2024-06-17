@@ -1,4 +1,5 @@
 package space.nanobreaker.configuration.monolith.extension;
 
-public record Err<T, E>(E error) implements Result<T, E> {
+public record Err<V, E>(E error) implements Result<V, E> {
+
 }
