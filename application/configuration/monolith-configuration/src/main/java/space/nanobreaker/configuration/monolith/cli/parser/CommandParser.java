@@ -2,6 +2,7 @@ package space.nanobreaker.configuration.monolith.cli.parser;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import space.nanobreaker.configuration.monolith.cli.command.*;
+import space.nanobreaker.configuration.monolith.extension.Err;
 import space.nanobreaker.configuration.monolith.extension.Ok;
 import space.nanobreaker.configuration.monolith.extension.Result;
 import space.nanobreaker.configuration.monolith.extension.Tuple;
@@ -176,7 +177,10 @@ public class CommandParser {
                                     return new CreateTodoCommand(description, Range.of(null, null));
                                 }
                             }))
-                    .map(result -> result.unwrap());
+                    .flatMap(result -> switch (result) {
+                        case Ok(CreateTodoCommand v) -> Result.ok(v);
+                        case Err(Exception e) -> Result.err(e);
+                    });
 
             case TodoList() -> Result.ok(new ListTodoCommand());
             case TodoUpdate(Set<Option> opts) when opts.isEmpty() -> Result.err(new IllegalStateException());

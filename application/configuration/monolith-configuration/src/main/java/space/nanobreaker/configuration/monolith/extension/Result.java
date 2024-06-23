@@ -6,6 +6,7 @@ public sealed interface Result<V, E>
         permits Ok, Err {
 
     static <V, E> Result<V, E> ok(V value) {
+
         return new Ok<>(value);
     }
 
@@ -31,6 +32,22 @@ public sealed interface Result<V, E>
         return switch (this) {
             case Ok(V v) -> valueMapper.apply(v);
             case Err(E e) -> Result.err(e);
+        };
+    }
+
+    // Result<Result<IV, E>, E>
+    //        V = Result<IV, E>
+    default Result<V, E> flatten() {
+        if(this instanceof Result<V extends Result<V, E>, E>){
+
+        }
+
+        return switch (this) {
+            case Ok(V v)  -> {
+                final Result<V, E> v1 = (Result<V, E>) v;
+                yield v1;
+            }
+            case Err(E e) -> e;
         };
     }
 
