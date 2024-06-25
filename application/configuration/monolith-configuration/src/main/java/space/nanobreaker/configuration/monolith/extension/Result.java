@@ -38,17 +38,7 @@ public sealed interface Result<V, E>
     // Result<Result<IV, E>, E>
     //        V = Result<IV, E>
     default Result<V, E> flatten() {
-        if(this instanceof Result<V extends Result<V, E>, E>){
-
-        }
-
-        return switch (this) {
-            case Ok(V v)  -> {
-                final Result<V, E> v1 = (Result<V, E>) v;
-                yield v1;
-            }
-            case Err(E e) -> e;
-        };
+        throw new IllegalStateException("not implemented");
     }
 
     static <F, S, E> Result<Tuple<F, S>, E> merge(Result<F, E> first, Result<S, E> second) {
