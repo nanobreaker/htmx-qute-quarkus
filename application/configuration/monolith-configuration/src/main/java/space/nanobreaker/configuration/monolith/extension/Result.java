@@ -6,7 +6,6 @@ public sealed interface Result<V, E>
         permits Ok, Err {
 
     static <V, E> Result<V, E> ok(V value) {
-
         return new Ok<>(value);
     }
 
@@ -43,10 +42,18 @@ public sealed interface Result<V, E>
         };
     }
 
-    // Result<Result<IV, E>, E>
-    //        V = Result<IV, E>
+    // todo:        implement flatten somehow
+    // example:     Ok(Ok(value))   ->  Ok(value)
+    //              Ok(Err(value))  ->  Err(value)
+    //              Err(Ok(value))  ->  Ok(value)
+    //              Err(Err(value)  ->  Err(value)
     default Result<V, E> flatten() {
-        throw new IllegalStateException("not implemented");
+        return switch (this) {
+            case Ok(Ok(Object ok)) -> (Result<V, E>) Result.ok(ok);
+            case Ok(Err(Object err)) -> (Result<V, E>) Result.err(err);
+            case Err(E e) -> Result.err(e);
+            case Ok<V, E> v -> v;
+        };
     }
 
     static <F, S, E> Result<Tuple<F, S>, E> merge(Result<F, E> first, Result<S, E> second) {

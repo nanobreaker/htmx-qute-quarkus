@@ -1,13 +1,13 @@
 package space.nanobreaker.configuration.monolith.cli.parser;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import space.nanobreaker.configuration.monolith.cli.command.CliCommand;
 import space.nanobreaker.configuration.monolith.cli.command.CreateTodoCommand;
 import space.nanobreaker.configuration.monolith.cli.parser.token.*;
 import space.nanobreaker.configuration.monolith.extension.Err;
 import space.nanobreaker.configuration.monolith.extension.Result;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;

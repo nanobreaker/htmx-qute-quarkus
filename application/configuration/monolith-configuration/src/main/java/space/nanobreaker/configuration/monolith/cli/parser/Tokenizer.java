@@ -49,6 +49,12 @@ public class Tokenizer {
         record EndOptionValue() implements State {
         }
 
+        record UknownOption() implements State {
+        }
+
+        record UknownOptionValue() implements State {
+        }
+
         record FinalizeToken() implements State {
         }
 
@@ -123,7 +129,10 @@ public class Tokenizer {
                 }
 
                 case State.ArgumentValue _ -> {
-                    if (character != '"') {
+                    if (character == CharacterIterator.DONE) {
+                        currentToken = new Unknown(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
@@ -149,6 +158,10 @@ public class Tokenizer {
                             }
                             case 'e' -> {
                                 stateNext = new State.EndOption();
+                                character = iterator.next();
+                            }
+                            default -> {
+                                stateNext = new State.UknownOption();
                                 character = iterator.next();
                             }
                         }
@@ -183,8 +196,18 @@ public class Tokenizer {
                     }
                 }
 
+                case State.UknownOption _ -> {
+                    if (character == '"') {
+                        character = iterator.next();
+                        stateNext = new State.UknownOptionValue();
+                    }
+                }
+
                 case State.TitleOptionValue _ -> {
-                    if (character != '"') {
+                    if (character == CharacterIterator.DONE) {
+                        currentToken = new Unknown(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
@@ -194,7 +217,10 @@ public class Tokenizer {
                 }
 
                 case State.DescriptionOptionValue _ -> {
-                    if (character != '"') {
+                    if (character == CharacterIterator.DONE) {
+                        currentToken = new Unknown(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
@@ -204,7 +230,10 @@ public class Tokenizer {
                 }
 
                 case State.StartOptionValue _ -> {
-                    if (Character.isDigit(character) || character == '/') {
+                    if (character == CharacterIterator.DONE) {
+                        currentToken = new Unknown(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    } else if (Character.isDigit(character) || character == '/') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else if (character == '"') {
@@ -214,11 +243,27 @@ public class Tokenizer {
                 }
 
                 case State.EndOptionValue _ -> {
-                    if (Character.isDigit(character) || character == '/') {
+                    if (character == CharacterIterator.DONE) {
+                        currentToken = new Unknown(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    } else if (Character.isDigit(character) || character == '/') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else if (character == '"') {
                         currentToken = new Option.End(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    }
+                }
+
+                case State.UknownOptionValue _ -> {
+                    if (character == CharacterIterator.DONE) {
+                        currentToken = new Unknown(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    } else if (character != '"') {
+                        currentTokenString.append(character);
+                        character = iterator.next();
+                    } else {
+                        currentToken = new Unknown(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
