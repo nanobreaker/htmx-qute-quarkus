@@ -14,6 +14,14 @@ public sealed interface Result<V, E>
         return new Err<>(error);
     }
 
+    default boolean isOk() {
+        return this instanceof Ok;
+    }
+
+    default boolean isErr() {
+        return this instanceof Err;
+    }
+
     default V unwrap() {
         return switch (this) {
             case Ok(V v) -> v;
@@ -50,6 +58,5 @@ public sealed interface Result<V, E>
             case Tuple(Err(E e), Err(E _)) -> Result.err(e);
         };
     }
-
 
 }

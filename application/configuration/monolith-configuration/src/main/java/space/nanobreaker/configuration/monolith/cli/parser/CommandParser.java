@@ -1,226 +1,113 @@
 package space.nanobreaker.configuration.monolith.cli.parser;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import space.nanobreaker.configuration.monolith.cli.command.*;
+import space.nanobreaker.configuration.monolith.cli.command.CliCommand;
+import space.nanobreaker.configuration.monolith.cli.command.CreateTodoCommand;
+import space.nanobreaker.configuration.monolith.cli.parser.token.*;
 import space.nanobreaker.configuration.monolith.extension.Err;
-import space.nanobreaker.configuration.monolith.extension.Ok;
 import space.nanobreaker.configuration.monolith.extension.Result;
-import space.nanobreaker.configuration.monolith.extension.Tuple;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
+import javax.inject.Inject;
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.SequencedCollection;
 
 @ApplicationScoped
 public class CommandParser {
 
-    /*
-        structure of commands
-
-        todo
-            create
-                options
-                    description
-                    start
-                    end
-            list
-            update
-                options
-                    description
-                    start
-                    end
-            delete
-                argument
-                    id
-        user
-            show
-
-        calendar
-            show
-     */
-
-    // @formatter:off
-    sealed interface Error {}
-    record TokenizerError(String description) implements Error {}
-
-    sealed interface Spec permits CalendarShow,TodoCreate,TodoDelete,TodoList,TodoUpdate,Unknown,UserShow { }
-    record TodoCreate(Set<Option> options) implements Spec { }
-    record TodoList() implements Spec { }
-    record TodoUpdate(Set<Option> options) implements Spec { }
-    record TodoDelete(Set<Argument> arguments) implements Spec { }
-    record UserShow() implements Spec { }
-    record CalendarShow() implements Spec { }
-    record Unknown(Program program, Command command) implements Spec { }
-
-    sealed interface Token { }
-
-    record Argument(String value) implements Token { }
-
-    sealed interface Option extends Token { }
-    record Description(String value) implements Option { }
-
-    record Start(String value) implements Option {
-        // todo: rework using Result, handle unchecked exception
-        LocalDateTime toDate() {
-            return LocalDateTime.parse(value);
-        }
-    }
-    record End(String value) implements Option {
-        // todo: rework using Result, handle unchecked exception
-        LocalDateTime toDate() {
-            return LocalDateTime.parse(value);
-        }
-    }
-
-    sealed interface Program extends Token { }
-    record Todo() implements Program { }
-    record Calendar() implements Program { }
-
-    record User() implements Program { }
-    sealed interface Command extends Token { }
-    record Create() implements Command { }
-    record List() implements Command { }
-    record Update() implements Command { }
-    record Delete() implements Command { }
-
-    record Show() implements Command { }
-    // @formatter:on
-
-    // todo: rework tokenizer using FINITE STATE MACHINE
-    private Spec tokenize(final String input) {
-        final String[] primaryTokens = input.split(" ", 3);
-        final String pts = primaryTokens[0];
-        final String cts = primaryTokens[1];
-
-        final Result<Program, TokenizerError> program = switch (pts) {
-            case "todo" -> Result.ok(new Todo());
-            case "user" -> Result.ok(new User());
-            case "calendar" -> Result.ok(new Calendar());
-            default -> Result.err(new TokenizerError("Unknown program"));
-        };
-
-        final Result<Command, TokenizerError> command = switch (cts) {
-            case "create" -> Result.ok(new Create());
-            case "list" -> Result.ok(new List());
-            case "update" -> Result.ok(new Update());
-            case "delete" -> Result.ok(new Delete());
-            case "show" -> Result.ok(new Show());
-            default -> Result.err(new TokenizerError("Unknown command"));
-        };
-
-        // -d"test description"    -s"11/02/13"     argument
-        // DescriptionOption        StartOption     Argument
-        final String[] remainingTokens = primaryTokens[2].split(" ");
-        final Pattern optionPattern = Pattern.compile("-([a-zA-Z])\"([^\"\\s]*)\"");
-        final Set<Option> options = Arrays.stream(remainingTokens)
-                .filter(t -> t.matches(optionPattern.pattern()))
-                .map(optionPattern::matcher)
-                .map(m -> switch (m.group(1).charAt(0)) {
-                    case 'd' -> new Description(m.group(2));
-                    case 's' -> new Start(m.group(2));
-                    case 'e' -> new End(m.group(2));
-                    default -> throw new IllegalStateException("unknown option " + m.group(1));
-                })
-                .collect(Collectors.toSet());
-
-        // todo: rework options extractor using Result<Option, TokenizerError>
-        /*
-        final Set<Result<Option, TokenizerError>> options = Arrays.stream(remainingTokens)
-                .filter(t -> t.matches(optionPattern.pattern()))
-                .map(optionPattern::matcher)
-                .map(matcher -> switch (matcher.group(1).charAt(0)) {
-                    case 'd' -> Result.<Option, TokenizerError>ok(new Description(matcher.group(2)));
-                    case 's' -> Result.<Option, TokenizerError>ok(new Start(matcher.group(2)));
-                    case 'e' -> Result.<Option, TokenizerError>ok(new End(matcher.group(2)));
-                    default ->
-                            Result.<Option, TokenizerError>err(new TokenizerError("Unknown option " + matcher.group(1)));
-                })
-                .collect(Collectors.toSet());
-        */
-
-        // todo: implement parsing of arguments
-
-        // todo: rework using map and mapErr
-        final Result<Tuple<Program, Command>, TokenizerError> tuple = Result.merge(program, command);
-        return switch (tuple) {
-            case Ok(Tuple(Todo _, Create _)) -> new TodoCreate(options);
-            case Ok(Tuple(Todo _, List _)) -> new TodoList();
-            case Ok(Tuple(Todo _, Update _)) -> new TodoUpdate(options);
-            case Ok(Tuple(Todo _, Delete _)) -> new TodoDelete(Collections.emptySet());
-            case Ok(Tuple(User _, Show _)) -> new UserShow();
-            case Ok(Tuple(Calendar _, Show _)) -> new CalendarShow();
-            default -> new Unknown(program.unwrap(), command.unwrap());
-        };
-    }
+    @Inject
+    Tokenizer tokenizer;
 
     public Result<CliCommand, Exception> parse(final String input) {
-        final Spec spec = tokenize(input);
-        return switch (spec) {
-            case TodoCreate(Set<Option> opts) when opts.isEmpty() -> Result.err(new IllegalStateException());
-            case TodoCreate(Set<Option> opts) -> getOpt(opts, Description.class)
-                    .map(Description::value)
-                    .map(description -> Result.merge(getStart(opts), getEnd(opts))
-                            .map(tuple -> {
-                                final Optional<Start> start = tuple.first();
-                                final Optional<End> end = tuple.second();
-                                if (start.isPresent() && end.isPresent()) {
-                                    return new CreateTodoCommand(description, Range.of(start.get().toDate(), end.get().toDate()));
-                                } else if (start.isPresent()) {
-                                    return new CreateTodoCommand(description, Range.from(start.get().toDate()));
-                                } else if (end.isPresent()) {
-                                    return new CreateTodoCommand(description, Range.until(end.get().toDate()));
-                                } else {
-                                    return new CreateTodoCommand(description, Range.of(null, null));
-                                }
-                            }))
-                    .flatMap(result -> switch (result) {
-                        case Ok(CreateTodoCommand v) -> Result.ok(v);
-                        case Err(Exception e) -> Result.err(e);
-                    });
+        final Result<SequencedCollection<Token>, TokenizerError> tokenizerResult = tokenizer.tokenize(input);
 
-            case TodoList() -> Result.ok(new ListTodoCommand());
-            case TodoUpdate(Set<Option> opts) when opts.isEmpty() -> Result.err(new IllegalStateException());
-            case TodoUpdate(Set<Option> opts) -> {
-                // todo: rework as TodoCreate command
-                final Optional<Description> description = getOpOpt(opts, Description.class);
-                final Optional<Start> start = getOpOpt(opts, Start.class);
-                final Optional<End> end = getOpOpt(opts, End.class);
-                yield Result.ok(new UpdateTodoCommand(Set.of(), description.map(Description::value).orElse(null), start.map(Start::value).map(LocalDateTime::parse).orElse(null), end.map(End::value).map(LocalDateTime::parse).orElse(null)));
-            }
-            case TodoDelete(Set<Argument> args) when args.isEmpty() -> Result.err(new IllegalStateException());
-            case TodoDelete(Set<Argument> _) -> Result.ok(new DeleteTodoCommand(Set.of()));
-            case UserShow() -> Result.ok(new UserShowCommand());
-            case CalendarShow() -> Result.ok(new CalendarShowCommand());
-            case Unknown(Program p, Command c) -> Result.err(new IllegalStateException("not supported"));
+        if (tokenizerResult.isErr())
+            return new Err<>(new IllegalStateException("tokenizer error"));
+
+        final SequencedCollection<Token> tokens = tokenizerResult.unwrap();
+        final Token programToken = tokens.removeFirst();
+
+        return switch (programToken) {
+            case Program.Todo _ -> parseTodoProgram(tokens);
+            case Program.Calendar _ -> parseCalendarProgram(tokens);
+            case Program.User _ -> parseUserProgram(tokens);
+            default -> Result.err(new IllegalStateException("unknown command"));
         };
     }
 
-    private static Result<Optional<Start>, Exception> getStart(Set<Option> opts) {
-        for (var opt : opts) {
-            if (opt instanceof Start start) return Result.ok(Optional.of(start));
-        }
-        return Result.ok(Optional.empty());
+    private Result<CliCommand, Exception> parseTodoProgram(final SequencedCollection<Token> tokens) {
+        final Token commandToken = tokens.removeFirst();
+
+        return switch (commandToken) {
+            case Command.Create _ -> parseTodoCreateCommand(tokens);
+            case Command.List _ -> parseTodoListCommand(tokens);
+            case Command.Update _ -> parseTodoUpdateCommand(tokens);
+            case Command.Delete _ -> parseTodoDeleteCommand(tokens);
+            default -> Result.err(new IllegalStateException("unknown todo command"));
+        };
     }
 
-    private static Result<Optional<End>, Exception> getEnd(Set<Option> opts) {
-        for (var opt : opts) {
-            if (opt instanceof End end) return Result.ok(Optional.of(end));
-        }
-        return Result.ok(Optional.empty());
+    private Result<CliCommand, Exception> parseTodoCreateCommand(final SequencedCollection<Token> tokens) {
+        // title        - argument
+        // description  - option
+        // start        - option
+        // end          - option
+        final CreateTodoCommand.CreateTodoCommandBuilder builder = new CreateTodoCommand.CreateTodoCommandBuilder();
+        final Result<Argument, Exception> argumentResult = getArgument(tokens, Argument.class);
+
+        if (argumentResult.isErr())
+            return new Err<>(new IllegalStateException("todo argument not found"));
+
+        argumentResult
+                .map(argument -> builder.withTitle(argument.value()));
+
+        getOption(tokens, Option.Description.class)
+                .map(description -> builder.withDescription(description.value()));
+
+        getOption(tokens, Option.Start.class)
+                .map(start -> builder.withStart(LocalDate.parse(start.value())));
+
+        getOption(tokens, Option.End.class)
+                .map(end -> builder.withEnd(LocalDate.parse(end.value())));
+
+        return Result.ok(builder.build());
     }
 
-    private static <T extends Option> Optional<T> getOpOpt(Set<Option> opts, Class<T> target) {
+    private Result<CliCommand, Exception> parseTodoListCommand(final SequencedCollection<Token> tokens) {
+        return Result.err(new IllegalStateException("not implemented"));
+    }
+
+    private Result<CliCommand, Exception> parseTodoUpdateCommand(final SequencedCollection<Token> tokens) {
+        return Result.err(new IllegalStateException("not implemented"));
+    }
+
+    private Result<CliCommand, Exception> parseTodoDeleteCommand(final SequencedCollection<Token> tokens) {
+        return Result.err(new IllegalStateException("not implemented"));
+    }
+
+    private Result<CliCommand, Exception> parseCalendarProgram(final SequencedCollection<Token> tokens) {
+        return Result.err(new IllegalStateException("not implemented"));
+    }
+
+    private Result<CliCommand, Exception> parseUserProgram(final SequencedCollection<Token> tokens) {
+        return Result.err(new IllegalStateException("not implemented"));
+    }
+
+    private static <T> Optional<T> getOption(
+            final Collection<? extends Token> opts,
+            final Class<T> target
+    ) {
         return opts.stream()
                 .filter(target::isInstance)
                 .findFirst()
                 .map(target::cast);
     }
 
-    private static <T extends Option> Result<T, Exception> getOpt(Set<Option> opts, Class<T> target) {
+    private static <T> Result<T, Exception> getArgument(
+            final Collection<? extends Token> opts,
+            final Class<T> target
+    ) {
         return opts.stream()
                 .filter(target::isInstance)
                 .findFirst()
