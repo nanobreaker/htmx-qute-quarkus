@@ -246,7 +246,28 @@ class TokenizerTest {
         );
     }
 
-    // todo: implement more scenarios where Tokenizer might get crazy (oom, infinite cycle and etc.)
+    @Test
+    void shouldReturnUnknowns() {
+        final String input = "some crazy shit bla bla -j\"\" 243989fdfljsdlfkfdlk \" \"";
+        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+
+        assertThat(result.isOk()).isTrue();
+
+        final SequencedCollection<Token> tokens = result.unwrap();
+
+        assertThat(tokens.size()).isEqualTo(8);
+        assertThat(tokens).containsExactly(
+                new Unknown("some"),
+                new Unknown("crazy"),
+                new Unknown("shit"),
+                new Unknown("bla"),
+                new Unknown("bla"),
+                new Unknown(""),
+                new Unknown("243989fdfljsdlfkfdlk"),
+                new Argument(" ")
+        );
+    }
+
 
     @Test
     void shouldReturnErrorWhenInputIsEmptyOrNull() {

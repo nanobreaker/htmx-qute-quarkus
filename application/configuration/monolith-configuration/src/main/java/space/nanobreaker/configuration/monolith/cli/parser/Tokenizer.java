@@ -85,7 +85,7 @@ public class Tokenizer {
             switch (stateNow) {
                 case State.New _ -> {
                     currentTokenString = new StringBuilder();
-                    if (Character.isAlphabetic(character)) {
+                    if (Character.isLetterOrDigit(character)) {
                         currentTokenString.append(character);
                         stateNext = new State.StringLiteral();
                         character = iterator.next();
@@ -107,7 +107,7 @@ public class Tokenizer {
                 }
 
                 case State.StringLiteral _ -> {
-                    if (Character.isAlphabetic(character)) {
+                    if (Character.isLetterOrDigit(character)) {
                         currentTokenString.append(character);
                         character = iterator.next();
                     }
