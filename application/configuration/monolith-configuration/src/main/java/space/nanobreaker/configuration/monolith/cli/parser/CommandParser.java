@@ -8,7 +8,6 @@ import space.nanobreaker.configuration.monolith.cli.parser.token.*;
 import space.nanobreaker.configuration.monolith.extension.Err;
 import space.nanobreaker.configuration.monolith.extension.Result;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.SequencedCollection;
@@ -66,10 +65,10 @@ public class CommandParser {
                 .map(description -> builder.withDescription(description.value()));
 
         getOption(tokens, Option.Start.class)
-                .map(start -> builder.withStart(LocalDate.parse(start.value())));
+                .map(start -> builder.withStart(start.value()));
 
         getOption(tokens, Option.End.class)
-                .map(end -> builder.withEnd(LocalDate.parse(end.value())));
+                .map(end -> builder.withEnd(end.value()));
 
         return Result.ok(builder.build());
     }
