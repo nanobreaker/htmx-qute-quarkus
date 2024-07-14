@@ -88,13 +88,13 @@ public class CommandResource {
                 case ParserErr.NotSupportedOperation _ -> "not supported";
                 case ParserErr.UnknownCommand _ -> "unknown command";
                 case ParserErr.UnknownProgram _ -> "unknown program";
+                case ParserErr.DateTimeParseErr e -> STR."can't parse date: \{e.description()}";
             };
             case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
                 case TokenizerErr.EmptyInput _ -> "empty command line";
             };
             case CmdErr cmdErr -> switch (cmdErr) {
-                case CmdErr.CreationFailed creationFailed ->
-                        STR."failed to create command: \{creationFailed.description()}";
+                case CmdErr.CreationFailed e -> STR."failed to create command: \{e.description()}";
             };
             default -> err.getClass().getTypeName();
         };
