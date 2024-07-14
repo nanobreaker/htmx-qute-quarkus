@@ -1,8 +1,8 @@
 package space.nanobreaker.configuration.monolith.cli.command;
 
-public sealed interface CalendarCommand
-        extends CliCommand
-        permits CalendarShowCommand {
+public sealed interface CalendarCmd
+        extends Command
+        permits CalendarShowCmd {
 
     default String help() {
         return """

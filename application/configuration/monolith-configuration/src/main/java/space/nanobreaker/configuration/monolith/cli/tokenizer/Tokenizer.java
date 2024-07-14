@@ -1,7 +1,8 @@
-package space.nanobreaker.configuration.monolith.cli.parser;
+package space.nanobreaker.configuration.monolith.cli.tokenizer;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import space.nanobreaker.configuration.monolith.cli.parser.token.*;
+import space.nanobreaker.configuration.monolith.cli.tokenizer.token.*;
+import space.nanobreaker.configuration.monolith.extension.Error;
 import space.nanobreaker.configuration.monolith.extension.Result;
 
 import java.text.CharacterIterator;
@@ -12,59 +13,30 @@ import java.util.SequencedCollection;
 @ApplicationScoped
 public class Tokenizer {
 
+    // @formatter:off
     sealed interface State {
-        record New() implements State {
-        }
-
-        record StringLiteral() implements State {
-        }
-
-        record OptionStart() implements State {
-        }
-
-        record ArgumentValue() implements State {
-        }
-
-        record TitleOption() implements State {
-        }
-
-        record TitleOptionValue() implements State {
-        }
-
-        record DescriptionOption() implements State {
-        }
-
-        record DescriptionOptionValue() implements State {
-        }
-
-        record StartOption() implements State {
-        }
-
-        record StartOptionValue() implements State {
-        }
-
-        record EndOption() implements State {
-        }
-
-        record EndOptionValue() implements State {
-        }
-
-        record UknownOption() implements State {
-        }
-
-        record UknownOptionValue() implements State {
-        }
-
-        record FinalizeToken() implements State {
-        }
-
-        record Exit() implements State {
-        }
+        record New() implements State { }
+        record StringLiteral() implements State { }
+        record OptionStart() implements State { }
+        record ArgumentValue() implements State { }
+        record TitleOption() implements State { }
+        record TitleOptionValue() implements State { }
+        record DescriptionOption() implements State { }
+        record DescriptionOptionValue() implements State { }
+        record StartOption() implements State { }
+        record StartOptionValue() implements State { }
+        record EndOption() implements State { }
+        record EndOptionValue() implements State { }
+        record UnknownOption() implements State { }
+        record UnknownOptionValue() implements State { }
+        record FinalizeToken() implements State { }
+        record Exit() implements State { }
     }
+    // @formatter:on
 
-    public Result<SequencedCollection<Token>, TokenizerError> tokenize(final String input) {
+    public Result<SequencedCollection<Token>, Error> tokenize(final String input) {
         if (input == null || input.isEmpty())
-            return Result.err(new TokenizerError("no input"));
+            return Result.err(new TokenizerErr.EmptyInput());
 
         final SequencedCollection<Token> tokens = new LinkedList<>();
 
@@ -89,20 +61,18 @@ public class Tokenizer {
                         currentTokenString.append(character);
                         stateNext = new State.StringLiteral();
                         character = iterator.next();
-                    }
-                    if (Character.isWhitespace(character)) {
+                    } else if (Character.isWhitespace(character)) {
                         character = iterator.next();
-                    }
-                    if (character == '-') {
+                    } else if (character == '-') {
                         stateNext = new State.OptionStart();
                         character = iterator.next();
-                    }
-                    if (character == '"') {
+                    } else if (character == '"') {
                         stateNext = new State.ArgumentValue();
                         character = iterator.next();
-                    }
-                    if (character == CharacterIterator.DONE) {
+                    } else if (character == CharacterIterator.DONE) {
                         stateNext = new State.Exit();
+                    } else {
+                        character = iterator.next();
                     }
                 }
 
@@ -110,33 +80,34 @@ public class Tokenizer {
                     if (Character.isLetterOrDigit(character)) {
                         currentTokenString.append(character);
                         character = iterator.next();
-                    }
-                    if (Character.isWhitespace(character) || character == CharacterIterator.DONE) {
+                    } else if (Character.isWhitespace(character) || character == CharacterIterator.DONE) {
                         currentToken = switch (currentTokenString.toString()) {
-                            case "todo" -> new Program.Todo();
-                            case "user" -> new Program.User();
-                            case "calendar" -> new Program.Calendar();
-                            case "update" -> new Command.Update();
-                            case "create" -> new Command.Create();
-                            case "list" -> new Command.List();
-                            case "delete" -> new Command.Delete();
-                            case "show" -> new Command.Show();
-                            default -> new Unknown(currentTokenString.toString());
+                            case "todo" -> new Prog.Todo();
+                            case "user" -> new Prog.User();
+                            case "calendar" -> new Prog.Calendar();
+                            case "update" -> new Cmd.Update();
+                            case "create" -> new Cmd.Create();
+                            case "list" -> new Cmd.List();
+                            case "delete" -> new Cmd.Delete();
+                            case "show" -> new Cmd.Show();
+                            default -> new Unk(currentTokenString.toString());
                         };
 
                         stateNext = new State.FinalizeToken();
+                    } else {
+                        character = iterator.next();
                     }
                 }
 
                 case State.ArgumentValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unknown(currentTokenString.toString());
+                        currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Argument(currentTokenString.toString());
+                        currentToken = new Arg(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
@@ -161,7 +132,7 @@ public class Tokenizer {
                                 character = iterator.next();
                             }
                             default -> {
-                                stateNext = new State.UknownOption();
+                                stateNext = new State.UnknownOption();
                                 character = iterator.next();
                             }
                         }
@@ -196,74 +167,74 @@ public class Tokenizer {
                     }
                 }
 
-                case State.UknownOption _ -> {
+                case State.UnknownOption _ -> {
                     if (character == '"') {
                         character = iterator.next();
-                        stateNext = new State.UknownOptionValue();
+                        stateNext = new State.UnknownOptionValue();
                     }
                 }
 
                 case State.TitleOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unknown(currentTokenString.toString());
+                        currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Option.Title(currentTokenString.toString());
+                        currentToken = new Opt.Title(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
 
                 case State.DescriptionOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unknown(currentTokenString.toString());
+                        currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Option.Description(currentTokenString.toString());
+                        currentToken = new Opt.Description(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
 
                 case State.StartOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unknown(currentTokenString.toString());
+                        currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (Character.isDigit(character) || character == '/') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else if (character == '"') {
-                        currentToken = new Option.Start(currentTokenString.toString());
+                        currentToken = new Opt.Start(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
 
                 case State.EndOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unknown(currentTokenString.toString());
+                        currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (Character.isDigit(character) || character == '/') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else if (character == '"') {
-                        currentToken = new Option.End(currentTokenString.toString());
+                        currentToken = new Opt.End(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
 
-                case State.UknownOptionValue _ -> {
+                case State.UnknownOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unknown(currentTokenString.toString());
+                        currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Unknown(currentTokenString.toString());
+                        currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }

@@ -1,4 +1,4 @@
-package space.nanobreaker.configuration.monolith.exceptions;
+package space.nanobreaker.configuration.monolith.exception;
 
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;

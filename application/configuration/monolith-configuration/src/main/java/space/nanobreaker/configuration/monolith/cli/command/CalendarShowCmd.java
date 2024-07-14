@@ -1,6 +1,6 @@
 package space.nanobreaker.configuration.monolith.cli.command;
 
-public record CalendarShowCommand() implements CalendarCommand {
+public record CalendarShowCmd() implements CalendarCmd {
 
     public String help() {
         return """

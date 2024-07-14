@@ -5,12 +5,12 @@ import space.nanobreaker.core.domain.v1.TodoId;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-public record UpdateTodoCommand(
+public record UpdateTodoCmd(
         Set<TodoId> ids,
         String description,
         LocalDateTime start,
         LocalDateTime end
-) implements TodoCommand {
+) implements TodoCmd {
 
     public String help() {
         return """

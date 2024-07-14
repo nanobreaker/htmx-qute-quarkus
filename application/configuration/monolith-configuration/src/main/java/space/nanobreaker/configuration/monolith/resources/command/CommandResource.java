@@ -9,9 +9,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
-import space.nanobreaker.configuration.monolith.cli.command.CliCommand;
-import space.nanobreaker.configuration.monolith.cli.parser.CommandParser;
+import space.nanobreaker.configuration.monolith.cli.command.CmdErr;
+import space.nanobreaker.configuration.monolith.cli.command.Command;
+import space.nanobreaker.configuration.monolith.cli.parser.Parser;
+import space.nanobreaker.configuration.monolith.cli.parser.ParserErr;
+import space.nanobreaker.configuration.monolith.cli.tokenizer.TokenizerErr;
 import space.nanobreaker.configuration.monolith.extension.Err;
+import space.nanobreaker.configuration.monolith.extension.Error;
 import space.nanobreaker.configuration.monolith.extension.Ok;
 import space.nanobreaker.configuration.monolith.sse.SSEService;
 
@@ -31,17 +35,16 @@ public class CommandResource {
     EventBus eventBus;
 
     @Inject
-    CommandParser commandParser;
+    Parser parser;
 
     @POST
     @Path("process-command")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_HTML)
     public Response process(String command) {
-        // todo: rework, handle new type of Errors and make explicit handling of each of them
-        final String result = switch (commandParser.parse(command)) {
-            case Ok(CliCommand cliCommand) -> cliCommand.help();
-            case Err(Exception exception) -> exception.getMessage();
+        final String result = switch (parser.parse(command)) {
+            case Ok(Command cmd) -> cmd.help();
+            case Err(Error err) -> describeErr(err);
         };
 
         updateClient(result);
@@ -55,12 +58,10 @@ public class CommandResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Response execute(@FormParam("command") String command) {
-        final String result = switch (commandParser.parse(command)) {
-            case Ok(CliCommand cmd) -> cmd.help();
-            case Err(Exception exception) -> exception.getMessage();
-        };
-
-        updateClient(result);
+        switch (parser.parse(command)) {
+            case Ok(Command cmd) -> cmd.help();
+            case Err(Error err) -> err.getClass().getTypeName();
+        }
 
         return Response.noContent()
                 .build();
@@ -78,6 +79,25 @@ public class CommandResource {
         final String username = securityIdentity.getPrincipal().getName();
         sseService.get(username)
                 .map(sseEventSink -> sseEventSink.send(sse.newEvent("feedback", output)));
+    }
+
+    private String describeErr(final Error err) {
+        return switch (err) {
+            case ParserErr parserErr -> switch (parserErr) {
+                case ParserErr.ArgumentNotFound _ -> "argument required";
+                case ParserErr.NotSupportedOperation _ -> "not supported";
+                case ParserErr.UnknownCommand _ -> "unknown command";
+                case ParserErr.UnknownProgram _ -> "unknown program";
+            };
+            case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
+                case TokenizerErr.EmptyInput _ -> "empty command line";
+            };
+            case CmdErr cmdErr -> switch (cmdErr) {
+                case CmdErr.CreationFailed creationFailed ->
+                        STR."failed to create command: \{creationFailed.description()}";
+            };
+            default -> err.getClass().getTypeName();
+        };
     }
 
 }

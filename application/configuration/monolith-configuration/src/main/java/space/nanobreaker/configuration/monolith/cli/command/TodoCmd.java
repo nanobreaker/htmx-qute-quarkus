@@ -1,10 +1,10 @@
 package space.nanobreaker.configuration.monolith.cli.command;
 
-public sealed interface TodoCommand extends CliCommand permits
-        DeleteTodoCommand,
-        ListTodoCommand,
-        CreateTodoCommand,
-        UpdateTodoCommand {
+public sealed interface TodoCmd extends Command permits
+        DeleteTodoCmd,
+        ListTodoCmd,
+        CreateTodoCmd,
+        UpdateTodoCmd {
 
     default String help() {
         return """

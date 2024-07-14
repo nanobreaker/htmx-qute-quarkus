@@ -1,8 +1,8 @@
 package space.nanobreaker.configuration.monolith.cli.command;
 
-public sealed interface UserCommand
-        extends CliCommand
-        permits UserShowCommand {
+public sealed interface UserCmd
+        extends Command
+        permits UserShowCmd {
 
     default String help() {
         return """

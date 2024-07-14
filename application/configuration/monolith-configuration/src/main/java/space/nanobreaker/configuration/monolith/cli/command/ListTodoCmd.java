@@ -1,8 +1,8 @@
 package space.nanobreaker.configuration.monolith.cli.command;
 
 
-public record ListTodoCommand(
-) implements TodoCommand {
+public record ListTodoCmd(
+) implements TodoCmd {
 
     public String help() {
         return """

@@ -4,9 +4,9 @@ import space.nanobreaker.core.domain.v1.TodoId;
 
 import java.util.Set;
 
-public record DeleteTodoCommand(
+public record DeleteTodoCmd(
         Set<TodoId> ids
-) implements TodoCommand {
+) implements TodoCmd {
 
     public String help() {
         return """

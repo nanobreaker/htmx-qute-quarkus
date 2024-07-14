@@ -73,13 +73,13 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-vertx</artifactId>
         </dependency>
-<!--
-        <dependency>
-            <groupId>io.quarkiverse.web-bundler</groupId>
-            <artifactId>quarkus-web-bundler</artifactId>
-            <version>1.4.0</version>
-        </dependency>
--->
+        <!--
+                <dependency>
+                    <groupId>io.quarkiverse.web-bundler</groupId>
+                    <artifactId>quarkus-web-bundler</artifactId>
+                    <version>1.4.0</version>
+                </dependency>
+        -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-docker</artifactId>
@@ -196,6 +196,12 @@
                             <artifactId>quarkus-rest-qute</artifactId>
                         </extension>
                     </extensions>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                    <jvmArgs>--enable-preview</jvmArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -204,6 +210,7 @@
                 <configuration>
                     <source>22</source>
                     <target>22</target>
+                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

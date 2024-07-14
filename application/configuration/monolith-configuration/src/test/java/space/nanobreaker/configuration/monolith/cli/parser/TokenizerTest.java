@@ -3,7 +3,9 @@ package space.nanobreaker.configuration.monolith.cli.parser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.cli.parser.token.*;
+import space.nanobreaker.configuration.monolith.cli.tokenizer.Tokenizer;
+import space.nanobreaker.configuration.monolith.cli.tokenizer.token.*;
+import space.nanobreaker.configuration.monolith.extension.Error;
 import space.nanobreaker.configuration.monolith.extension.Result;
 
 import java.util.SequencedCollection;
@@ -49,20 +51,20 @@ class TokenizerTest {
     @Test
     void shouldReturnProgramToken() {
         final String input = "todo";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
         final SequencedCollection<Token> tokens = result.unwrap();
 
         assertThat(tokens.size()).isEqualTo(1);
-        assertThat(tokens).contains(new Program.Todo());
+        assertThat(tokens).contains(new Prog.Todo());
     }
 
     @Test
     void shouldReturnProgramCommandTokens() {
         final String input = "todo create";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -70,15 +72,15 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.Create()
+                new Prog.Todo(),
+                new Cmd.Create()
         );
     }
 
     @Test
     void shouldReturnProgramAndCommandAndTitleTokens() {
         final String input = "todo create \"yoga\"";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -86,16 +88,16 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(3);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.Create(),
-                new Argument("yoga")
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Arg("yoga")
         );
     }
 
     @Test
     void shouldReturnProgramCommandTitleDescriptionTokens() {
         final String input = "todo create \"yoga\" -d\"Igor the best yogin in Moldova gives yoga lesson\"";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -103,17 +105,17 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.Create(),
-                new Argument("yoga"),
-                new Option.Description("Igor the best yogin in Moldova gives yoga lesson")
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Arg("yoga"),
+                new Opt.Description("Igor the best yogin in Moldova gives yoga lesson")
         );
     }
 
     @Test
     void shouldReturnProgramCommandTitleDescriptionStartTokens() {
         final String input = "todo create \"yoga\" -d\"Igor the best yogin in Moldova gives yoga lesson\" -s\"27/06/2024\"";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -121,18 +123,18 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.Create(),
-                new Argument("yoga"),
-                new Option.Description("Igor the best yogin in Moldova gives yoga lesson"),
-                new Option.Start("27/06/2024")
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Arg("yoga"),
+                new Opt.Description("Igor the best yogin in Moldova gives yoga lesson"),
+                new Opt.Start("27/06/2024")
         );
     }
 
     @Test
     void shouldReturnProgramCommandArgumentsTokens() {
         final String input = "todo list \"id_one\" \"id_two\" \"id_three\"";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -140,31 +142,31 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.List(),
-                new Argument("id_one"),
-                new Argument("id_two"),
-                new Argument("id_three")
+                new Prog.Todo(),
+                new Cmd.List(),
+                new Arg("id_one"),
+                new Arg("id_two"),
+                new Arg("id_three")
         );
     }
 
     @Test
     void shouldReturnUnknownTokenWhenProgramIsNotComplete() {
         final String input = "tod";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
         final SequencedCollection<Token> tokens = result.unwrap();
 
         assertThat(tokens.size()).isEqualTo(1);
-        assertThat(tokens).contains(new Unknown("tod"));
+        assertThat(tokens).contains(new Unk("tod"));
     }
 
     @Test
     void shouldReturnUnknownTokenWhenCommandIsNotComplete() {
         final String input = "todo crea";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -172,15 +174,15 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Unknown("crea")
+                new Prog.Todo(),
+                new Unk("crea")
         );
     }
 
     @Test
     void shouldReturnUnknownTokensWhenProgramAndCommandAreNotComplete() {
         final String input = "tod crea";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -188,15 +190,15 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Unknown("tod"),
-                new Unknown("crea")
+                new Unk("tod"),
+                new Unk("crea")
         );
     }
 
     @Test
     void shouldReturnUnknownTokenWhenArgumentIsNotComplete() {
         final String input = "todo create \"yog";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -204,16 +206,16 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(3);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.Create(),
-                new Unknown("yog")
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Unk("yog")
         );
     }
 
     @Test
     void shouldReturnUnknownTokenWhenOptionIsNotComplete() {
         final String input = "todo create \"yoga\" -d\"not compl";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -221,17 +223,17 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.Create(),
-                new Argument("yoga"),
-                new Unknown("not compl")
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Arg("yoga"),
+                new Unk("not compl")
         );
     }
 
     @Test
     void shouldReturnUnknownTokenWhenOptionIsNotKnown() {
         final String input = "todo create \"yoga\" -x\"wtf\"";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -239,17 +241,17 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Program.Todo(),
-                new Command.Create(),
-                new Argument("yoga"),
-                new Unknown("wtf")
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Arg("yoga"),
+                new Unk("wtf")
         );
     }
 
     @Test
     void shouldReturnUnknowns() {
         final String input = "some crazy shit bla bla -j\"\" 243989fdfljsdlfkfdlk \" \"";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
@@ -257,14 +259,36 @@ class TokenizerTest {
 
         assertThat(tokens.size()).isEqualTo(8);
         assertThat(tokens).containsExactly(
-                new Unknown("some"),
-                new Unknown("crazy"),
-                new Unknown("shit"),
-                new Unknown("bla"),
-                new Unknown("bla"),
-                new Unknown(""),
-                new Unknown("243989fdfljsdlfkfdlk"),
-                new Argument(" ")
+                new Unk("some"),
+                new Unk("crazy"),
+                new Unk("shit"),
+                new Unk("bla"),
+                new Unk("bla"),
+                new Unk(""),
+                new Unk("243989fdfljsdlfkfdlk"),
+                new Arg(" ")
+        );
+    }
+
+    @Test
+    void shouldReturnUnknownsAndIgnoreSpecialSymbols() {
+        final String input = "hey yo, what the fuck, are you failing?!";
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+
+        assertThat(result.isOk()).isTrue();
+
+        final SequencedCollection<Token> tokens = result.unwrap();
+
+        assertThat(tokens.size()).isEqualTo(8);
+        assertThat(tokens).containsExactly(
+                new Unk("hey"),
+                new Unk("yo"),
+                new Unk("what"),
+                new Unk("the"),
+                new Unk("fuck"),
+                new Unk("are"),
+                new Unk("you"),
+                new Unk("failing")
         );
     }
 
@@ -272,7 +296,7 @@ class TokenizerTest {
     @Test
     void shouldReturnErrorWhenInputIsEmptyOrNull() {
         final String input = "";
-        final Result<SequencedCollection<Token>, TokenizerError> result = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isErr()).isTrue();
     }

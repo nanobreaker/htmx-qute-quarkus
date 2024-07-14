@@ -16,7 +16,13 @@
                    name="command"
                    type="search"
                    hx-post="/cli/execute-command"
-                   hx-trigger="keyup changed delay:500ms, search"
+                   hx-trigger="keyup[key=='Enter']"
+                   _='on keyup
+                        debounced at 500ms
+                        fetch /cli/process-command
+                            with
+                                body: my value,
+                                method: "POST"'
             >
         </div>
     </fieldset>
