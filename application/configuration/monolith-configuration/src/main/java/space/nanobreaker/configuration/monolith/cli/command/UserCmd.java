@@ -4,7 +4,7 @@ public sealed interface UserCmd
         extends Command
         permits UserShowCmd {
 
-    default String help() {
+    static String help() {
         return """
                   usage: user &lt;show&gt;
                   \s

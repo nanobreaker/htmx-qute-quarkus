@@ -5,7 +5,6 @@
     </div>
 
     <fieldset class="command-line-interface crowded">
-        <legend class="legend">command line interface</legend>
         <div class="command-line">
             <label class="command-prompt"
                    for="command">
@@ -15,11 +14,11 @@
                    class="command-input"
                    name="command"
                    type="search"
-                   hx-post="/cli/execute-command"
+                   hx-post="/command/execute"
                    hx-trigger="keyup[key=='Enter']"
                    _='on keyup
                         debounced at 500ms
-                        fetch /cli/process-command
+                        fetch /command/analyze
                             with
                                 body: my value,
                                 method: "POST"'
@@ -27,14 +26,13 @@
         </div>
     </fieldset>
 
-    <fieldset class="command-line-parser crowded"
+    {!<fieldset class="command-line-parser crowded"
               hx-ext="sse"
-              sse-connect="/cli/feedback">
-        <legend class="legend">command line feedback</legend>
+              sse-connect="/command/feedback">
         <div class="command-parser-output"
              sse-swap="feedback">
         </div>
-    </fieldset>
+    </fieldset>!}
 
     <div id="result-div">
 

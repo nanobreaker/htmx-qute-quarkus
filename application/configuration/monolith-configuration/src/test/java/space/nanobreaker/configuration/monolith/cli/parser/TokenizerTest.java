@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.token.*;
-import space.nanobreaker.configuration.monolith.extension.Error;
-import space.nanobreaker.configuration.monolith.extension.Result;
+import space.nanobreaker.library.Error;
+import space.nanobreaker.library.Result;
 
 import java.util.SequencedCollection;
 

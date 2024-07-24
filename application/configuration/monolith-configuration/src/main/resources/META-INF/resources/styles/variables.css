@@ -10,7 +10,7 @@
 
 :root {
     /* Lengths */
-    --rhythm: 1.8rem; /* Vertical rhythm, line height. */
+    --rhythm: 1.1rem; /* Vertical rhythm, line height. */
     --line-length: 42rem; /* Maximum line length for prose. */
     --border-radius: .0rem;
 
@@ -21,6 +21,7 @@
 
     /* Colors */
     --night: #0a0c0fff;
+    --almost-night: #252422;
     --french-gray: #bec3cbff;
     --antiflash-white: #f0f3f5ff;
     --fire-engine-red: #c42021ff;

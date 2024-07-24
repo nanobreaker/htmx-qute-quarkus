@@ -3,8 +3,8 @@ package space.nanobreaker.configuration.monolith.config;
 import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Produces;
-import space.nanobreaker.core.usecases.repositories.v1.TodoRepository;
-import space.nanobreaker.infra.dataproviders.postgres.repositories.PostgresPanacheTodoRepository;
+import space.nanobreaker.core.domain.v1.todo.TodoRepository;
+import space.nanobreaker.infra.dataproviders.postgres.repositories.todo.TodoJpaPostgresRepository;
 
 @Dependent
 public class TodoRepositoryConfig {
@@ -12,7 +12,7 @@ public class TodoRepositoryConfig {
     @Produces
     @DefaultBean
     public TodoRepository postgresTodoRepository() {
-        return new PostgresPanacheTodoRepository();
+        return new TodoJpaPostgresRepository();
     }
 
 }

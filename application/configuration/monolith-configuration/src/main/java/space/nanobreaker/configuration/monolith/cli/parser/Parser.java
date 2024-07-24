@@ -6,8 +6,11 @@ import space.nanobreaker.configuration.monolith.cli.command.Command;
 import space.nanobreaker.configuration.monolith.cli.command.CreateTodoCmd;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.token.*;
-import space.nanobreaker.configuration.monolith.extension.Error;
-import space.nanobreaker.configuration.monolith.extension.*;
+import space.nanobreaker.library.None;
+import space.nanobreaker.library.Option;
+import space.nanobreaker.library.Result;
+import space.nanobreaker.library.Some;
+import space.nanobreaker.library.Error;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -77,10 +80,14 @@ public class Parser {
             return Result.err(new ParserErr.ArgumentNotFound());
 
         final Arg arg = argumentResult.unwrap();
-        final Option<Opt.Description> descriptionOption = Option.over(getOption(tokens, Opt.Description.class));
-        final Option<Opt.Start> startOption = Option.over(getOption(tokens, Opt.Start.class));
-        final Option<Opt.End> endOption = Option.over(getOption(tokens, Opt.End.class));
-        record TodoCreateBox(Arg arg, Option<Opt.Description> desc, Option<Opt.Start> start, Option<Opt.End> end) {
+        final Option<Opt.Description> descriptionOption = getOption(tokens, Opt.Description.class);
+        final Option<Opt.Start> startOption = getOption(tokens, Opt.Start.class);
+        final Option<Opt.End> endOption = getOption(tokens, Opt.End.class);
+        record TodoCreateBox(
+                Arg arg,
+                Option<Opt.Description> desc,
+                Option<Opt.Start> start,
+                Option<Opt.End> end) {
         }
         final TodoCreateBox box = new TodoCreateBox(arg, descriptionOption, startOption, endOption);
 
@@ -150,14 +157,16 @@ public class Parser {
         return Result.err(new ParserErr.NotSupportedOperation());
     }
 
-    private static <T> Optional<T> getOption(
+    private static <T> Option<T> getOption(
             final Collection<? extends Token> opts,
             final Class<T> target
     ) {
-        return opts.stream()
+        final Optional<T> optional = opts.stream()
                 .filter(target::isInstance)
                 .findFirst()
                 .map(target::cast);
+
+        return Option.over(optional);
     }
 
     private static <T> Result<T, Error> getArgument(

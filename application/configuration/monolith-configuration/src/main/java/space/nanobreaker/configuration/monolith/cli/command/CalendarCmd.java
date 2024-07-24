@@ -4,7 +4,7 @@ public sealed interface CalendarCmd
         extends Command
         permits CalendarShowCmd {
 
-    default String help() {
+    static String help() {
         return """
                   usage: calendar &lt;show&gt;
                   \s

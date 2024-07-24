@@ -2,13 +2,14 @@ package space.nanobreaker.configuration.monolith.cli.tokenizer;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.token.*;
-import space.nanobreaker.configuration.monolith.extension.Error;
-import space.nanobreaker.configuration.monolith.extension.Result;
+import space.nanobreaker.library.Error;
+import space.nanobreaker.library.Result;
 
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.LinkedList;
 import java.util.SequencedCollection;
+
 
 @ApplicationScoped
 public class Tokenizer {

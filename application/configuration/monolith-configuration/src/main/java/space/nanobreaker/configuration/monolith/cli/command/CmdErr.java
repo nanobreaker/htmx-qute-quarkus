@@ -1,6 +1,6 @@
 package space.nanobreaker.configuration.monolith.cli.command;
 
-import space.nanobreaker.configuration.monolith.extension.Error;
+import space.nanobreaker.library.Error;
 
 public sealed interface CmdErr extends Error {
 

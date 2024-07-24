@@ -5,7 +5,15 @@ public sealed interface Command permits
         UserCmd,
         CalendarCmd {
 
-    String help();
+    static String help() {
+        return """
+                  usage: &lt;program&gt; &lt;command&gt; &lt;args&gt; [options]
+                  \s
+                  programs:
+                  todo          manage todos
+                  calendar      manage calendar
+                  user          manage user
+                """;
+    }
 
 }
-

@@ -7,6 +7,16 @@
     <artifactId>htmx-qute-quarkus</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <modules>
+        <module>library</module>
+        <module>framework</module>
+        <module>application/configuration/monolith-configuration</module>
+        <module>application/core/domain/v1</module>
+        <module>application/core/usecases/v1</module>
+        <module>application/infrastructure/dataproviders/postgres-dataprovider/v1</module>
+    </modules>
+
     <properties>
         <compiler-plugin.version>3.11.0</compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,6 +38,31 @@
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>space.nanobreaker</groupId>
+                <artifactId>library</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>space.nanobreaker</groupId>
+                <artifactId>framework</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>space.nanobreaker</groupId>
+                <artifactId>core-domain-v1</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>space.nanobreaker</groupId>
+                <artifactId>core-usecases-v1</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>space.nanobreaker</groupId>
+                <artifactId>infrastructure-dataproviders-postgres-v1</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -124,6 +159,8 @@
             <id>microservice-user</id>
             <activation/>
             <modules>
+                <module>library</module>
+                <module>framework</module>
                 <module>application/configuration/microservice-user-configuration</module>
                 <module>application/core/domain/v1</module>
                 <module>application/core/usecases/v1</module>
@@ -145,6 +182,8 @@
             <id>microservice-todo</id>
             <activation/>
             <modules>
+                <module>library</module>
+                <module>framework</module>
                 <module>application/configuration/microservice-todo-configuration</module>
                 <module>application/core/domain/v1</module>
                 <module>application/core/usecases/v1</module>
@@ -166,6 +205,8 @@
             <id>monolith</id>
             <activation/>
             <modules>
+                <module>library</module>
+                <module>framework</module>
                 <module>application/configuration/monolith-configuration</module>
                 <module>application/core/domain/v1</module>
                 <module>application/core/usecases/v1</module>

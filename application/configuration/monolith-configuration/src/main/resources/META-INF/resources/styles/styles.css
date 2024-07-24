@@ -22,76 +22,104 @@ html {
     cursor: text;
 }
 
-.command-line-interface {
-    width: 100%;
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden
+}
+
+#dashboard {
     display: grid;
-    grid-template:  [prompt] "c" [prompt]
-                      [info] "i" [info];
+    grid-template-rows: 1.6rem 1fr 1.6rem 1.6rem;
 
-    .command-line {
-        display: grid;
+    #top-bar {
+        label {
+            line-height: 1.6rem;
+        }
+    }
+
+    #bottom-bar {
+        label {
+            line-height: 1.6rem;
+        }
+    }
+}
+
+#content {
+    display: grid;
+}
+
+#feedback {
+    max-height: fit-content;
+    align-self: end;
+}
+
+.command-line {
+    display: grid;
+    grid-template:   [prompt] "p c" [prompt];
+    grid-template-columns: auto 1fr;
+
+    border-color: var(--faded-fg);
+
+    .command-prompt {
+        grid-area: p;
+        padding-block: unset;
+        padding-left: 0.1rem;
+        line-height: 1.6rem;
+    }
+
+    .command-input {
         grid-area: c;
-        grid-template:   [prompt] "p c" [prompt];
-        grid-template-columns: auto 1fr;
-        grid-column-gap: 0.2em;
+        height: 1.6rem;
+        line-height: 1.6rem;
+        border: unset;
+        outline: none;
+        caret-shape: block;
+    }
 
-        border-color: var(--faded-fg);
-
-        .command-prompt {
-            padding-top: 0.1rem;
-            grid-area: p;
-        }
-
-        .command-prompt:hover {
-            color: var(--magenta);
-        }
-
-        .command-input {
-            grid-area: c;
-            height: 2em;
-            border: unset;
-
-            caret-color: var(--magenta);
-        }
-
-        .command-input:focus {
-            outline: none;
-
-            border-bottom-style: solid;
-            border-bottom-width: 0.01rem;
-            border-bottom-color: var(--magenta);
-        }
+    .command-input:focus {
+        outline: none;
+        border: unset;
     }
 }
 
-.command-line-interface:has(.command-prompt:hover) {
-    .legend {
-        color: var(--accent);
-    }
-
-    border-color: var(--accent);
+.triangle {
+    display: inline-block;
+    border-left: 13px solid;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
 }
 
-.command-line-interface:has(.command-input:hover) {
-    .legend {
-        color: var(--accent);
-    }
-
-    border-color: var(--accent);
+.arrow-right {
+    display: inline-block;
+    position: relative;
 }
 
-.command-line-parser:has(.command-prompt:hover) {
+.arrow-right::after {
+    color: currentColor;
+    border-left: 13px solid;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+    display: inline-block;
+    content: '';
+    position: absolute;
+    right: -13px;
 }
 
-.command-line-parser {
+.arrow-left {
+    display: inline-block;
+    position: relative;
+}
 
-    .command-parser-output {
-        white-space: pre-wrap; /* Since CSS 2.1 */
-        white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-        white-space: -pre-wrap; /* Opera 4-6 */
-        white-space: -o-pre-wrap; /* Opera 7 */
-        word-wrap: break-word; /* Internet Explorer 5.5+ */
-    }
+.arrow-left::after {
+    color: inherit;
+    border-right: 13px solid;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+    display: inline-block;
+    content: '';
+    position: absolute;
+    left: -13px;
 }
 
 .command-line-parser:hover {

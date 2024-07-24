@@ -1,6 +1,6 @@
 package space.nanobreaker.configuration.monolith.cli.tokenizer;
 
-import space.nanobreaker.configuration.monolith.extension.Error;
+import space.nanobreaker.library.Error;
 
 public sealed interface TokenizerErr extends Error {
 

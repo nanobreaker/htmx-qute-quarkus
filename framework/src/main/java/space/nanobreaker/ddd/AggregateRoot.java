@@ -1,0 +1,21 @@
+package space.nanobreaker.ddd;
+
+import java.util.ArrayList;
+import java.util.SequencedCollection;
+
+public abstract class AggregateRoot<Id> extends Entity<Id> {
+
+    private final SequencedCollection<DomainEvent> domainEvents = new ArrayList<>();
+
+    protected AggregateRoot(Id id) {
+        super(id);
+    }
+
+    protected void registerEvent(DomainEvent event) {
+        domainEvents.add(event);
+    }
+
+    public SequencedCollection<DomainEvent> getDomainEvents() {
+        return domainEvents;
+    }
+}

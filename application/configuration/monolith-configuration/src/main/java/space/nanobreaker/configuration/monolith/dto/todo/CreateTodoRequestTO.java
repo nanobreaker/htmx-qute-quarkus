@@ -3,14 +3,11 @@ package space.nanobreaker.configuration.monolith.dto.todo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.core.Context;
-import lombok.Data;
-import space.nanobreaker.core.usecases.v1.todo.command.CreateTodoCommand;
+import space.nanobreaker.core.usecases.v1.todo.command.TodoCreateCommand;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
 public class CreateTodoRequestTO {
 
     @Context
@@ -29,8 +26,8 @@ public class CreateTodoRequestTO {
     @FormParam("end")
     private LocalDateTime end;
 
-    public CreateTodoCommand mapToCommand() {
-        return new CreateTodoCommand(principal.getName(), description, start, end);
+    public TodoCreateCommand mapToCommand() {
+        return new TodoCreateCommand(principal.getName(), "test", description, start, end);
     }
 }
 

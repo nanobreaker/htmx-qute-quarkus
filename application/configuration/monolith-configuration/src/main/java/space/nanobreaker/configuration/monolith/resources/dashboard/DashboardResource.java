@@ -10,8 +10,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import java.security.Principal;
-
 @Path("dashboard")
 public class DashboardResource {
 
@@ -32,5 +30,17 @@ public class DashboardResource {
                         applicationVersion,
                         identity.getPrincipal().getName())
                 .createUni();
+    }
+
+    @Path("v2")
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public String getV2() {
+        return Dashboard2Templates.dashboard2(
+                        applicationName,
+                        applicationVersion,
+                        identity.getPrincipal().getName()
+                )
+                .render();
     }
 }
