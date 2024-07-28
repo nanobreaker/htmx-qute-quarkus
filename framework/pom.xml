@@ -22,6 +22,10 @@
             <groupId>space.nanobreaker</groupId>
             <artifactId>library</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-mutiny</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

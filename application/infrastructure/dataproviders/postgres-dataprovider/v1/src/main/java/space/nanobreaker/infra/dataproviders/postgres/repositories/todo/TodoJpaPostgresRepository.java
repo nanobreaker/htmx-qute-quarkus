@@ -1,13 +1,14 @@
 package space.nanobreaker.infra.dataproviders.postgres.repositories.todo;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Sort;
+import io.smallrye.mutiny.Uni;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
 import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Option;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.library.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,49 +17,45 @@ public class TodoJpaPostgresRepository
         implements TodoRepository, PanacheRepositoryBase<TodoJpaEntity, TodoJpaId> {
 
     @Override
-    public Result<Todo, Error> save(final Todo todo) {
+    @WithSpan("saveTodo")
+    public Uni<Result<Todo, Error>> save(final Todo todo) {
         final TodoJpaEntity jpaEntity = mapToJpaEntity(todo);
 
-        PanacheRepositoryBase.super.persist(jpaEntity);
-
-        return Result.ok(null);
+        return PanacheRepositoryBase.super.persist(jpaEntity)
+                .map(todoJpaEntity -> Result.ok(mapToDomainEntity(todoJpaEntity)));
     }
 
     @Override
-    public Result<Option<Todo>, Error> findByTodoId(TodoId id) {
+    @WithSpan("findByTodoId")
+    public Uni<Result<Todo, Error>> findByTodoId(TodoId id) {
         final TodoJpaId jpaId = mapToJpaId(id);
 
-        final TodoJpaEntity todoJpaEntity = findById(jpaId);
-        final Todo todo = mapToDomainEntity(todoJpaEntity);
-
-        return Result.ok(Option.over(Optional.of(todo)));
+        return findById(jpaId)
+                .map(todoJpaEntity -> Option.over(Optional.of(todoJpaEntity)))
+                .map(optionTodoJpaEntity -> switch (optionTodoJpaEntity) {
+                    case Some(TodoJpaEntity entity) -> Result.ok(mapToDomainEntity(entity));
+                    case None() -> Result.err(null);
+                });
     }
 
     @Override
-    public Result<List<Todo>, Error> listTodos() {
-        final List<Todo> all = this.listAll(Sort.ascending("end"))
-                .stream()
-                .map(this::mapToDomainEntity)
-                .toList();
-
-        return Result.ok(all);
+    @WithSpan("listTodos")
+    public Uni<Result<List<Todo>, Error>> listTodos() {
+        return this.listAll(Sort.ascending("end"))
+                .map(jpaEntities -> jpaEntities.stream()
+                        .map(this::mapToDomainEntity)
+                        .toList()
+                )
+                .map(Result::ok);
     }
 
     @Override
-    public Result<Void, Error> deleteByTodoId(TodoId id) {
+    @WithSpan("deleteByTodoId")
+    public Uni<Result<Void, Error>> deleteByTodoId(TodoId id) {
         final TodoJpaId jpaId = mapToJpaId(id);
 
-        final boolean isDeleted = this.deleteById(jpaId);
-
-        if (isDeleted == false)
-            Result.err(new Error() {
-                @Override
-                public int hashCode() {
-                    return super.hashCode();
-                }
-            });
-
-        return Result.ok(null);
+        return this.deleteById(jpaId)
+                .map(isDeleted -> isDeleted ? Result.ok(null) : Result.err(null));
     }
 
     protected TodoJpaId mapToJpaId(final TodoId id) {

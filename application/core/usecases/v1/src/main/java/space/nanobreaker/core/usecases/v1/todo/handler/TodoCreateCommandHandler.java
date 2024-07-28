@@ -1,11 +1,13 @@
 package space.nanobreaker.core.usecases.v1.todo.handler;
 
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
+import io.quarkus.logging.Log;
 import io.quarkus.vertx.ConsumeEvent;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.eventbus.EventBus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
@@ -28,10 +30,10 @@ public class TodoCreateCommandHandler implements CommandHandler<TodoCreateComman
     @Inject
     EventBus eventBus;
 
-    @Transactional
     @ConsumeEvent(value = "todo.create")
-    @WithSpan("createTodoCommandHandler execute")
-    public Result<Void, Error> execute(final TodoCreateCommand todoCreateCommand) {
+    @WithSpan("handleTodoCreateCommand")
+    @WithSession
+    public Uni<Result<Void, Error>> handle(final TodoCreateCommand todoCreateCommand) {
         final TodoId id = new TodoId(UUID.randomUUID(), todoCreateCommand.username());
         final Todo todo = new Todo(
                 id,
@@ -42,15 +44,20 @@ public class TodoCreateCommandHandler implements CommandHandler<TodoCreateComman
                 todoCreateCommand.end()
         );
 
-        final Result<Todo, Error> result = todoRepository.save(todo);
+        return todoRepository.save(todo)
+                .invoke(this::dispatchTodoCreatedEvent)
+                .map(result -> switch (result) {
+                    case Ok(Todo _) -> Result.ok(null);
+                    case Err(Error e) -> Result.err(e);
+                });
+    }
 
-        return switch (result) {
-            case Ok(Todo t) -> {
-                eventBus.publish("todo.created", t);
-                yield Result.ok(null);
-            }
-            case Err(Error e) -> Result.err(e);
-        };
+    @WithSpan("dispatchTodoCreatedEvent")
+    public void dispatchTodoCreatedEvent(final Result<Todo, Error> result) {
+        switch (result) {
+            case Ok(Todo t) -> eventBus.publish("todo.created", t);
+            case Err(Error _) -> Log.error("failed to save todo");
+        }
     }
 
 }

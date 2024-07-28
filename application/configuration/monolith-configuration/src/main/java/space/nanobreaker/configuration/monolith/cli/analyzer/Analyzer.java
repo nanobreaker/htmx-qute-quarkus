@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.cli.analyzer;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import space.nanobreaker.configuration.monolith.cli.command.*;
@@ -18,6 +19,7 @@ public class Analyzer {
     @Inject
     Tokenizer tokenizer;
 
+    @WithSpan("analyzeInputString")
     public Result<String, Error> analyze(final String input) {
         final Result<SequencedCollection<Token>, Error> tokenizerResult = tokenizer.tokenize(input);
 

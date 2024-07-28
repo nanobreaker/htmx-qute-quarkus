@@ -52,6 +52,13 @@ html, body {
 #feedback {
     max-height: fit-content;
     align-self: end;
+    border-top: white;
+    border-top-style: ridge;
+    border-top-width: thin;
+    background: var(--almost-night);
+    padding-bottom: 1rem;
+    margin-bottom: unset;
+    padding-top: 1rem;
 }
 
 .command-line {
@@ -83,43 +90,42 @@ html, body {
     }
 }
 
-.triangle {
-    display: inline-block;
-    border-left: 13px solid;
-    border-top: 13px solid transparent;
-    border-bottom: 13px solid transparent;
+.bar-element-arrow-right {
+    display: grid;
+    grid-template: "label arrow";
+    grid-template-columns: 1fr max-content;
+
+    label {
+        grid-area: label;
+    }
+
+    div {
+        grid-area: arrow;
+
+        display: inline-block;
+        border-left: 13px solid;
+        border-top: 13px solid transparent;
+        border-bottom: 13px solid transparent;
+    }
 }
 
-.arrow-right {
-    display: inline-block;
-    position: relative;
-}
+.bar-element-arrow-left {
+    display: grid;
+    grid-template: "arrow label";
+    grid-template-columns: max-content 1fr;
 
-.arrow-right::after {
-    color: currentColor;
-    border-left: 13px solid;
-    border-top: 13px solid transparent;
-    border-bottom: 13px solid transparent;
-    display: inline-block;
-    content: '';
-    position: absolute;
-    right: -13px;
-}
+    div {
+        grid-area: arrow;
 
-.arrow-left {
-    display: inline-block;
-    position: relative;
-}
+        display: inline-block;
+        border-right: 13px solid;
+        border-top: 13px solid transparent;
+        border-bottom: 13px solid transparent;
+    }
 
-.arrow-left::after {
-    color: inherit;
-    border-right: 13px solid;
-    border-top: 13px solid transparent;
-    border-bottom: 13px solid transparent;
-    display: inline-block;
-    content: '';
-    position: absolute;
-    left: -13px;
+    label {
+        grid-area: label;
+    }
 }
 
 .command-line-parser:hover {
@@ -182,37 +188,81 @@ html, body {
 .todo-grid {
     display: grid;
     max-width: 100%;
-    gap: 1rem;
+    gap: 2em;
     grid-template-columns: repeat(auto-fill, minmax(30ch, 1fr));
 }
 
 .todo-item {
     display: grid;
-    grid-template: [title-top] "t    t    t    t" [title-bottom]
-                   [dates-top] "s    s    f    f" [dates-bottom]
-             [description-top] "d    d    d    d" [description-bottom]
-                 [buttons-top] "c    c    e    e" [buttons-bottom]
-                             /  1fr  1fr  1fr  1fr;
-}
-
-.title-field {
-    grid-area: t;
+    grid-template: [dates-top] "start   start   end     end" [dates-bottom]
+             [description-top] "desc    desc    desc    desc" [description-bottom]
+                             /  1fr     1fr     1fr     1fr;
 }
 
 .start-field {
-    grid-area: s;
+    grid-area: start;
+
+    padding: 10px;
+    border: 2px solid;
+    margin: 10px;
+
+    position: relative;
+
+    label {
+        position: absolute;
+        top: -15px;
+        left: 10px;
+        background-color: var(--night);
+    }
+
+    input {
+        width: 100%;
+        border: none;
+    }
 }
 
-.target-field {
-    grid-area: f;
+.end-field {
+    grid-area: end;
+
+    padding: 10px;
+    border: 2px solid;
+    margin: 10px;
+
+    position: relative;
+
+    label {
+        position: absolute;
+        top: -15px;
+        left: 10px;
+        background-color: var(--night);
+    }
+
+    input {
+        width: 100%;
+        border: none;
+    }
 }
 
-.todo {
-    box-sizing: border-box;
-    border-width: medium;
-    border-style: solid;
-    border-color: var(--graphical-fg);
-    border-radius: unset;
+.description-field {
+    grid-area: desc;
+
+    padding: 10px;
+    border: 2px solid;
+    margin: 10px;
+
+    position: relative;
+
+    label {
+        position: absolute;
+        top: -15px;
+        left: 10px;
+        background-color: var(--night);
+    }
+
+    input {
+        width: 100%;
+        border: none;
+    }
 }
 
 .todo:hover {

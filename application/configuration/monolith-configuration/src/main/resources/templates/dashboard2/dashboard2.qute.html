@@ -14,12 +14,37 @@
     <script src="https://unpkg.com/hyperscript.org@0.9.12/dist/eventsource.js"></script>
     <script type="text/hyperscript">
         eventsource CliUpdates from http://localhost:8080/command/feedback
-            on feedback
+            on help
                 put it into #feedback
+                then show #feedback with display:block
+            end
+
+            on empty
+                put it into #feedback
+                then show #feedback with display:none
+            end
+
+            on internal_error
+                put it into #feedback
+                then show #feedback with display:block
             end
 
             on open
-                log 'connection opened.'
+                log "connection opened."
+            end
+
+            on todoCreated
+                put it at the end of #todo-grid
+            end
+
+            on close
+                log "connection closed."
+                log "trying to reconnect."
+                call CliUpdates.open()
+            end
+
+            on error
+                log "handle error here..."
             end
         end
 
@@ -44,23 +69,53 @@
 
     <div id="top-bar"
          style="background: var(--almost-night)">
-        <label class="float:left  padding-inline arrow-right ok bg fg">alice@dashboard</label>
-        <label class="float:right padding-inline arrow-left  ok bg fg">version {applicationVersion ?: 'unknown'}</label>
+        <div class="bar-element-arrow-right float:left">
+            <label class="padding-inline ok bg fg">
+                alice@htmx-qute-quarkus
+            </label>
+            <div style="color: var(--mint)"></div>
+        </div>
+        <div class="bar-element-arrow-left float:right">
+            <div style="color: var(--mint)"></div>
+            <label class="padding-inline ok bg fg">
+                version {applicationVersion ?: 'unknown'}
+            </label>
+        </div>
     </div>
 
     <div id="content">
-        <pre id="feedback">
+        <div id="todo-grid"
+             class="todo-grid">
+        </div>
+        <pre id="feedback" style="display: none">
         </pre>
     </div>
 
     <div id="bottom-bar"
          style="background: var(--almost-night)">
-        <label class="float:left  padding-inline"
-               style="background: var(--magenta); color: var(--fg)">
-            TODO
-        </label>
-        <div class="triangle"
-             style="color: var(--magenta)">
+        <div class="bar-element-arrow-right float:left">
+            <label class="padding-inline"
+                   style="background: var(--magenta); color: var(--fg)">
+                TODO
+            </label>
+            <div style="color: var(--magenta)"></div>
+        </div>
+        <div class="bar-element-arrow-left float:right">
+            <div style="color: var(--true-blue)"></div>
+            <label class="padding-inline info bg fg"
+                   _="init
+                        repeat forever
+                            js
+                                return new Date().toLocaleString('ru-RU', {
+                                    timeStyle: 'short',
+                                    dateStyle: 'short'
+                                });
+                            end
+                            then put it into my.innerHTML
+                            wait 60s
+                    "
+            >
+            </label>
         </div>
     </div>
 

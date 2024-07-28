@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.cli.tokenizer;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.token.*;
 import space.nanobreaker.library.Error;
@@ -35,6 +36,7 @@ public class Tokenizer {
     }
     // @formatter:on
 
+    @WithSpan("tokenizeInputString")
     public Result<SequencedCollection<Token>, Error> tokenize(final String input) {
         if (input == null || input.isEmpty())
             return Result.err(new TokenizerErr.EmptyInput());
@@ -144,6 +146,10 @@ public class Tokenizer {
                     if (character == '"') {
                         character = iterator.next();
                         stateNext = new State.TitleOptionValue();
+                    } else if (character == CharacterIterator.DONE) {
+                        stateNext = new State.Exit();
+                    } else {
+                        character = iterator.next();
                     }
                 }
 
@@ -151,6 +157,10 @@ public class Tokenizer {
                     if (character == '"') {
                         character = iterator.next();
                         stateNext = new State.DescriptionOptionValue();
+                    } else if (character == CharacterIterator.DONE) {
+                        stateNext = new State.Exit();
+                    } else {
+                        character = iterator.next();
                     }
                 }
 
@@ -158,6 +168,10 @@ public class Tokenizer {
                     if (character == '"') {
                         character = iterator.next();
                         stateNext = new State.StartOptionValue();
+                    } else if (character == CharacterIterator.DONE) {
+                        stateNext = new State.Exit();
+                    } else {
+                        character = iterator.next();
                     }
                 }
 
@@ -165,6 +179,10 @@ public class Tokenizer {
                     if (character == '"') {
                         character = iterator.next();
                         stateNext = new State.EndOptionValue();
+                    } else if (character == CharacterIterator.DONE) {
+                        stateNext = new State.Exit();
+                    } else {
+                        character = iterator.next();
                     }
                 }
 
@@ -172,6 +190,10 @@ public class Tokenizer {
                     if (character == '"') {
                         character = iterator.next();
                         stateNext = new State.UnknownOptionValue();
+                    } else if (character == CharacterIterator.DONE) {
+                        stateNext = new State.Exit();
+                    } else {
+                        character = iterator.next();
                     }
                 }
 

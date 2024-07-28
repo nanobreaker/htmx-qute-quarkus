@@ -27,4 +27,17 @@ class ResultTest {
         assertThat(flatten).isEqualTo(Result.err(error));
     }
 
+    @Test
+    void test() {
+        final Result<String, Object> test = Result.ok("test");
+
+        final String s = switch (test) {
+            case Ok(String value) -> value.toLowerCase();
+            case Err(Object error) -> error.toString();
+        };
+
+
+
+    }
+
 }

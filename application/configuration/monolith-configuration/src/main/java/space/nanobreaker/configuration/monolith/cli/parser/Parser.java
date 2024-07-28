@@ -1,16 +1,14 @@
 package space.nanobreaker.configuration.monolith.cli.parser;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import space.nanobreaker.configuration.monolith.cli.command.Command;
 import space.nanobreaker.configuration.monolith.cli.command.CreateTodoCmd;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.cli.tokenizer.token.*;
-import space.nanobreaker.library.None;
-import space.nanobreaker.library.Option;
-import space.nanobreaker.library.Result;
-import space.nanobreaker.library.Some;
 import space.nanobreaker.library.Error;
+import space.nanobreaker.library.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +42,10 @@ public class Parser {
             .parseDefaulting(ChronoField.MONTH_OF_YEAR, 7)
             .toFormatter();
 
+    @WithSpan("parseInputString")
     public Result<Command, Error> parse(final String input) {
+        // input = todo create "todo" -d"fjsdlkfjsdlf" -s"12/12/2024" -e"12/12/2024"
+
         final Result<SequencedCollection<Token>, Error> tokenizerResult = tokenizer.tokenize(input);
 
         if (tokenizerResult.isErr())
@@ -74,6 +75,8 @@ public class Parser {
     }
 
     private Result<Command, Error> parseTodoCreateCommand(final SequencedCollection<Token> tokens) {
+        // final Arg argumentResult = getArgument(tokens, Arg.class)?;
+
         final Result<Arg, Error> argumentResult = getArgument(tokens, Arg.class);
 
         if (argumentResult.isErr())
@@ -83,6 +86,7 @@ public class Parser {
         final Option<Opt.Description> descriptionOption = getOption(tokens, Opt.Description.class);
         final Option<Opt.Start> startOption = getOption(tokens, Opt.Start.class);
         final Option<Opt.End> endOption = getOption(tokens, Opt.End.class);
+
         record TodoCreateBox(
                 Arg arg,
                 Option<Opt.Description> desc,

@@ -231,6 +231,22 @@ class TokenizerTest {
     }
 
     @Test
+    void shouldReturnUnknownTokenWhenOptionIsNotSpecified() {
+        final String input = "todo create -d";
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+
+        assertThat(result.isOk()).isTrue();
+
+        final SequencedCollection<Token> tokens = result.unwrap();
+
+        assertThat(tokens.size()).isEqualTo(2);
+        assertThat(tokens).containsExactly(
+                new Prog.Todo(),
+                new Cmd.Create()
+        );
+    }
+
+    @Test
     void shouldReturnUnknownTokenWhenOptionIsNotKnown() {
         final String input = "todo create \"yoga\" -x\"wtf\"";
         final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
