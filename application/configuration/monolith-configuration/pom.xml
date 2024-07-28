@@ -17,39 +17,47 @@
         <quarkus.platform.version>3.10.0</quarkus.platform.version>
         <quarkus.application.version>1.0.0-SNAPSHOT</quarkus.application.version>
         <surefire-plugin.version>3.1.2</surefire-plugin.version>
-        <compiler-plugin.version>3.11.0</compiler-plugin.version>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>22</maven.compiler.source>
-        <maven.compiler.target>22</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
-
     <dependencies>
         <!-- DOMAIN -->
         <dependency>
             <groupId>space.nanobreaker</groupId>
             <artifactId>core-domain-v1</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>space.nanobreaker</groupId>
             <artifactId>core-usecases-v1</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <!-- INFRASTRUCTURE -->
         <dependency>
             <groupId>space.nanobreaker</groupId>
             <artifactId>infrastructure-dataproviders-postgres-v1</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <!-- LIBRARIES -->
         <dependency>
             <groupId>space.nanobreaker</groupId>
             <artifactId>library</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>space.nanobreaker</groupId>
             <artifactId>framework</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-qute</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-qute</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -80,11 +88,11 @@
             <artifactId>quarkus-vertx</artifactId>
         </dependency>
         <!--
-                <dependency>
-                    <groupId>io.quarkiverse.web-bundler</groupId>
-                    <artifactId>quarkus-web-bundler</artifactId>
-                    <version>1.4.0</version>
-                </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.web-bundler</groupId>
+            <artifactId>quarkus-web-bundler</artifactId>
+            <version>1.7.0</version>
+        </dependency>
         -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -92,19 +100,19 @@
         </dependency>
         <!-- web dependencies -->
         <dependency>
-            <groupId>org.mvnpm</groupId>
+            <groupId>org.webjars.npm</groupId>
             <artifactId>htmx.org</artifactId>
-            <version>1.9.11</version>
+            <version>2.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mvnpm</groupId>
+            <groupId>org.webjars.npm</groupId>
             <artifactId>missing.css</artifactId>
             <version>1.1.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mvnpm</groupId>
+            <groupId>org.webjars.npm</groupId>
             <artifactId>hyperscript.org</artifactId>
             <version>0.9.12</version>
             <scope>provided</scope>
@@ -161,23 +169,6 @@
         </resources>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler-plugin.version}</version>
-                <configuration>
-                    <parameters>true</parameters>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-                        <maven.home>${maven.home}</maven.home>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
@@ -189,27 +180,27 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <extensions>
-                        <extension>
-                            <groupId>io.quarkus</groupId>
-                            <artifactId>quarkus-rest-qute</artifactId>
-                        </extension>
-                    </extensions>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
-                    <jvmArgs>--enable-preview</jvmArgs>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler-plugin.version}</version>
                 <configuration>
-                    <source>22</source>
-                    <target>22</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                        <maven.home>${maven.home}</maven.home>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
@@ -259,28 +250,6 @@
                     <name>!unlocked</name>
                 </property>
             </activation>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.mvnpm</groupId>
-                        <artifactId>htmx.org</artifactId>
-                        <version>1.9.11</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.mvnpm</groupId>
-                        <artifactId>hyperscript.org</artifactId>
-                        <version>0.9.12</version>
-                        <scope>provided</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.mvnpm</groupId>
-                        <artifactId>missing.css</artifactId>
-                        <version>1.1.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
         </profile>
     </profiles>
 </project>

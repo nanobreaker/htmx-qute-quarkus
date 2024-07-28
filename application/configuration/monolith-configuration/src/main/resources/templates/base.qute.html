@@ -5,13 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=2">
     <meta name="_csrf_header" content="{inject:csrf.token}"/>
     <title>htmx-qute-quarkus</title>
-
-    {! HTMX !}
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
-    {! HyperScript !}
-    <script type="text/hyperscript" src="/functions/functions._hs"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12/dist/eventsource.js"></script>
+    <script type="text/hyperscript" src="/functions/functions._hs"></script>
+    <script type="text/hyperscript">
+        def navigation.focusById(id)
+            js(id)
+                document.getElementById(id).focus()
+            end
+        end
+
+        eventsource CliUpdates from http://localhost:8080/command/feedback
+            on help
+                put it into #feedback
+                then show #feedback with display:block
+            end
+
+            on empty
+                put it into #feedback
+                then show #feedback with display:none
+            end
+
+            on internal_error
+                put it into #feedback
+                then show #feedback with display:block
+            end
+
+            on open
+                log "connection opened."
+                then add .ok to #sse-connection-chip
+                then put "UP" into #sse-connection-chip
+            end
+
+            on todoCreated
+                put it at the end of #todo-grid
+            end
+
+            on close
+                log "connection closed."
+                log "trying to reconnect."
+                then add .warn to #sse-connection-chip
+                then put "DOWN" into #sse-connection-chip
+                call CliUpdates.open()
+            end
+
+            on error
+                log "sse connection lost....."
+                then add .warn to #sse-connection-chip
+                then put "DOWN" into #sse-connection-chip
+            end
+        end
+    </script>
     {! CSS !}
     <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
     <link rel="stylesheet" href="/styles/styles.css">
@@ -19,13 +66,10 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.ico">
 </head>
-<body>
-<main id="main"
-      hx-ext="response-targets">
-    <div id="content-container">
-        {#insert}{/}
-    </div>
-    <div id="error-container"></div>
-</main>
+<body hx-ext="response-targets"
+      _="on keyup[key is ':']
+            navigation.focusById('command')
+         end">
+{#insert}{/}
 </body>
 </html>

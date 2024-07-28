@@ -1,40 +1,77 @@
 {#include base}
-    <div class="padding-block-end">
-        <label class="padding info bg fg float:left">{applicationName ?: 'HTMX QUTE QUARKUS'}</label>
-        <label class="padding ok bg fg float:right">VERSION {applicationVersion ?: 'UNKNOWN'}</label>
-    </div>
+    <div id="dashboard"
+         class="fullscreen">
 
-    <fieldset class="command-line-interface crowded">
-        <div class="command-line">
-            <label class="command-prompt"
-                   for="command">
-                {username ?: 'root'}$
-            </label>
-            <input id="command"
-                   class="command-input"
+        <div id="top-bar"
+             style="background: var(--almost-night)">
+            <div class="float:left">
+                <label class="padding-inline mono-font">
+                    alice@htmx-qute-quarkus:{applicationVersion ?: 'unknown'}
+                </label>
+            </div>
+
+            <div id="sse-connection-status" class="float:right">
+                <label class="padding-inline mono-font">
+                    SSE
+                    <chip id="sse-connection-chip"
+                          style="border-radius: unset;">
+                    </chip>
+                </label>
+            </div>
+        </div>
+
+        <div id="content">
+            <div id="todo-grid"
+                 class="todo-grid">
+            </div>
+            <pre id="feedback" style="display: none">
+            </pre>
+        </div>
+
+        <div id="bottom-bar"
+             style="background: var(--almost-night)">
+            <div class="bar-element-arrow-right float:left">
+                <label class="padding-inline"
+                       style="background: var(--magenta); color: var(--fg)">
+                    TODO
+                </label>
+                <div style="color: var(--magenta)"></div>
+            </div>
+            <div class="bar-element-arrow-left float:right">
+                <div style="color: var(--true-blue)"></div>
+                <label class="padding-inline info bg fg"
+                       _="init
+                        repeat forever
+                            js
+                                return new Date().toLocaleString('ru-RU', {
+                                    timeStyle: 'short',
+                                    dateStyle: 'short'
+                                });
+                            end
+                            then put it into my.innerHTML
+                            wait 60s
+                    "
+                >
+                </label>
+            </div>
+        </div>
+
+        <div id="command-line"
+             class="command-line">
+            <label class="command-prompt" for="command">:</label>
+            <input class="command-input" id="command"
                    name="command"
                    type="search"
                    hx-post="/command/execute"
                    hx-trigger="keyup[key=='Enter']"
-                   _='on keyup
-                        debounced at 500ms
-                        fetch /command/analyze
-                            with
-                                body: my value,
-                                method: "POST"'
-            >
+                   hx-target="#feedback"
+                   hx-target-error="#feedback"
+                   _="on keyup[key!=='Enter']
+                            debounced at 500ms
+                            fetch /command/analyze
+                                with
+                                    body: my value,
+                                    method: 'POST'">
         </div>
-    </fieldset>
-
-    {!<fieldset class="command-line-parser crowded"
-              hx-ext="sse"
-              sse-connect="/command/feedback">
-        <div class="command-parser-output"
-             sse-swap="feedback">
-        </div>
-    </fieldset>!}
-
-    <div id="result-div">
-
     </div>
 {/include}

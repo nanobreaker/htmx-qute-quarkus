@@ -1,15 +1,5 @@
-def navigation.navigateByCode(code)
-    js(code)
-        console.log(code)
-    end
-end
-
 def navigation.focusById(id)
     js(id)
         document.getElementById(id).focus()
     end
-end
-
-def executeCommand()
-
 end

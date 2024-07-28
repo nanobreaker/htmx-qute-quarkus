@@ -22,11 +22,8 @@ public class Todo extends AggregateRoot<TodoId> {
             final LocalDateTime start,
             final LocalDateTime end
     ) {
-        Objects.requireNonNull(todoId);
-        Objects.requireNonNull(title);
-
         super(todoId);
-        this.title = title;
+        this.title = Objects.requireNonNull(title);
         this.description = description;
         this.state = state;
         this.start = start;

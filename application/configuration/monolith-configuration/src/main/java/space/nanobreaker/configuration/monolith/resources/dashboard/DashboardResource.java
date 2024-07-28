@@ -31,16 +31,4 @@ public class DashboardResource {
                         identity.getPrincipal().getName())
                 .createUni();
     }
-
-    @Path("v2")
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public String getV2() {
-        return Dashboard2Templates.dashboard2(
-                        applicationName,
-                        applicationVersion,
-                        identity.getPrincipal().getName()
-                )
-                .render();
-    }
 }

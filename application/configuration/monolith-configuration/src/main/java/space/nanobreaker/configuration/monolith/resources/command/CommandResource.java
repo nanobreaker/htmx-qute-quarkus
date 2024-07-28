@@ -1,9 +1,9 @@
 package space.nanobreaker.configuration.monolith.resources.command;
 
 import io.opentelemetry.instrumentation.annotations.WithSpan;
-import io.quarkus.logging.Log;
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
 import io.quarkus.security.identity.SecurityIdentity;
-import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -14,18 +14,17 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.sse.OutboundSseEvent;
 import jakarta.ws.rs.sse.Sse;
-import jakarta.ws.rs.sse.SseEventSink;
-import space.nanobreaker.configuration.monolith.cli.analyzer.Analyzer;
-import space.nanobreaker.configuration.monolith.cli.command.*;
-import space.nanobreaker.configuration.monolith.cli.parser.Parser;
-import space.nanobreaker.configuration.monolith.cli.parser.ParserErr;
-import space.nanobreaker.configuration.monolith.cli.tokenizer.TokenizerErr;
-import space.nanobreaker.configuration.monolith.resources.todo.TodoTemplates;
-import space.nanobreaker.configuration.monolith.sse.SSEService;
-import space.nanobreaker.core.domain.v1.todo.Todo;
+import space.nanobreaker.configuration.monolith.services.analyzer.Analyzer;
+import space.nanobreaker.configuration.monolith.services.command.*;
+import space.nanobreaker.configuration.monolith.services.parser.Parser;
+import space.nanobreaker.configuration.monolith.services.parser.ParserErr;
+import space.nanobreaker.configuration.monolith.services.tokenizer.TokenizerErr;
+import space.nanobreaker.configuration.monolith.sse.SseEventSinkService;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoCreateCommand;
+import space.nanobreaker.library.Err;
 import space.nanobreaker.library.Error;
-import space.nanobreaker.library.*;
+import space.nanobreaker.library.Ok;
+import space.nanobreaker.library.Result;
 
 import java.net.URI;
 
@@ -39,7 +38,7 @@ public class CommandResource {
     Sse sse;
 
     @Inject
-    SSEService sseService;
+    SseEventSinkService sseEventSink;
 
     @Inject
     SecurityIdentity securityIdentity;
@@ -49,6 +48,9 @@ public class CommandResource {
 
     @Inject
     Analyzer analyzer;
+
+    @Location("exception/error.qute.html")
+    Template error;
 
     @POST
     @Path("execute")
@@ -78,7 +80,9 @@ public class CommandResource {
 
         return result.map(r -> switch (r) {
             case Ok(Void _) -> Response.created(URI.create("test")).build();
-            case Err(Error _) -> Response.serverError().build();
+            case Err(Error err) -> Response.serverError()
+                    .entity(error.data("error", err.getClass().getName()))
+                    .build();
         });
     }
 
@@ -101,44 +105,10 @@ public class CommandResource {
         };
 
         final String username = securityIdentity.getPrincipal().getName();
-        dispatchOutboundSseEvent(event, username);
+        sseEventSink.dispatchOutboundSseEvent(event, username);
 
         return Response.noContent()
                 .build();
-    }
-
-    @WithSpan("dispatchOutboundSseEvent")
-    public void dispatchOutboundSseEvent(
-            final OutboundSseEvent event,
-            final String username
-    ) {
-        final Option<SseEventSink> optionalSink = Option.over(sseService.get(username));
-
-        switch (optionalSink) {
-            case Some(SseEventSink sink) -> sink.send(event);
-            case None() -> Log.warn(STR."sink not found for \{username}");
-        }
-    }
-
-    @ConsumeEvent(value = "todo.created")
-    @WithSpan("handleTodoCreatedEvent")
-    public void handleTodoCreatedEvent(final Todo todo) {
-        final String todoHtml = TodoTemplates.todo(todo).render();
-        final OutboundSseEvent todoCreated = sse.newEvent("todoCreated", todoHtml);
-
-        final String username = todo.getId().getUsername();
-        dispatchOutboundSseEvent(sse.newEvent("empty", ""), username);
-        dispatchOutboundSseEvent(todoCreated, username);
-    }
-
-    @GET
-    @Path("feedback")
-    @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void eventStream(
-            @Context final SseEventSink eventSink
-    ) {
-        final String username = securityIdentity.getPrincipal().getName();
-        sseService.register(username, eventSink);
     }
 
     private Uni<Result<Void, Error>> executeTodoCreateCommand(
@@ -195,13 +165,13 @@ public class CommandResource {
                 case ParserErr.NotSupportedOperation _ -> "not supported";
                 case ParserErr.UnknownCommand _ -> "unknown command";
                 case ParserErr.UnknownProgram _ -> "unknown program";
-                case ParserErr.DateTimeParseErr e -> STR."can't parse date: \{e.description()}";
+                case ParserErr.DateTimeParseErr e -> "can't parse date: " + e.description();
             };
             case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
                 case TokenizerErr.EmptyInput _ -> "empty command line";
             };
             case CmdErr cmdErr -> switch (cmdErr) {
-                case CmdErr.CreationFailed e -> STR."failed to create command: \{e.description()}";
+                case CmdErr.CreationFailed e -> "failed to create command: " + e.description();
             };
             default -> err.getClass().getTypeName();
         };

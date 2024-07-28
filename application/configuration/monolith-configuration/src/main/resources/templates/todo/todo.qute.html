@@ -1,37 +1,43 @@
 <form>
     <fieldset id="todo-{todo.id.id}"
               class="todo-item fade-me-out">
-        <legend>{todo.title}</legend>
-        <div class="start-field">
-            <label for="start-{todo.id.id}">
-                 start
-            </label>
-            <input id="start-{todo.id.id}"
-                   style="font-size: smaller"
-                   type=date
-                   name="start"
-                   readonly
-                   value="{todo.start}">
-        </div>
-        <div class="end-field">
-            <label for="end-{todo.id.id}">
-                 end
-            </label>
-            <input id="end-{todo.id.id}"
-                   style="font-size: smaller"
-                   type=date
-                   name="end"
-                   readonly
-                   value="{todo.end}">
-        </div>
-        <div class="description-field">
-            <label for="description-{todo.id.id}">
-                 description
-            </label>
-            <input id="description-{todo.id.id}"
-                   type=text
-                   name="description" readonly
-                   value="{todo.description}">
-        </div>
+        <legend class="center-legend">{todo.title}</legend>
+        {#if todo.start != null}
+            <div class="start-field">
+                <label for="start-{todo.id.id}">
+                    start
+                </label>
+                <input id="start-{todo.id.id}"
+                       style="font-size: smaller"
+                       type=date
+                       name="start"
+                       readonly
+                       value="{todo.start}">
+            </div>
+        {/if}
+        {#if todo.end != null}
+            <div class="end-field">
+                <label for="end-{todo.id.id}">
+                    end
+                </label>
+                <input id="end-{todo.id.id}"
+                       style="font-size: smaller"
+                       type=date
+                       name="end"
+                       readonly
+                       value="{todo.end}">
+            </div>
+        {/if}
+        {#if !todo.description.isEmpty()}
+            <div class="description-field">
+                <label for="description-{todo.id.id}">
+                    description
+                </label>
+                <input id="description-{todo.id.id}"
+                       type=text
+                       name="description" readonly
+                       value="{todo.description}">
+            </div>
+        {/if}
     </fieldset>
 </form>
