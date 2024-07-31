@@ -24,13 +24,13 @@ public sealed interface Result<V, E>
     default V unwrap() {
         return switch (this) {
             case Ok(V v) -> v;
-            case Err(_) -> throw new IllegalStateException("Err can not be unwrapped");
+            case Err(E ignored) -> throw new IllegalStateException("Err can not be unwrapped");
         };
     }
 
     default E error() {
         return switch (this) {
-            case Ok(_) -> throw new IllegalStateException("Ok can not be error");
+            case Ok(V ignored) -> throw new IllegalStateException("Ok can not be error");
             case Err(E e) -> e;
         };
     }
@@ -60,9 +60,9 @@ public sealed interface Result<V, E>
         final var tuple = new Tuple<>(first, second);
         return switch (tuple) {
             case Tuple(Ok(F f), Ok(S s)) -> Result.ok(new Tuple<F, S>(f, s));
-            case Tuple(Ok(F _), Err(E e)) -> Result.err(e);
-            case Tuple(Err(E e), Ok(S _)) -> Result.err(e);
-            case Tuple(Err(E e), Err(E _)) -> Result.err(e);
+            case Tuple(Ok(F ignored), Err(E e)) -> Result.err(e);
+            case Tuple(Err(E e), Ok(S ignored)) -> Result.err(e);
+            case Tuple(Err(E e), Err(E ignored)) -> Result.err(e);
         };
     }
 

@@ -47,7 +47,7 @@ public class TodoCreateCommandHandler implements CommandHandler<TodoCreateComman
         return todoRepository.save(todo)
                 .invoke(this::dispatchTodoCreatedEvent)
                 .map(result -> switch (result) {
-                    case Ok(Todo _) -> Result.ok(null);
+                    case Ok(Todo ignored) -> Result.ok(null);
                     case Err(Error e) -> Result.err(e);
                 });
     }
@@ -56,7 +56,7 @@ public class TodoCreateCommandHandler implements CommandHandler<TodoCreateComman
     public void dispatchTodoCreatedEvent(final Result<Todo, Error> result) {
         switch (result) {
             case Ok(Todo t) -> eventBus.publish("todo.created", t);
-            case Err(Error _) -> Log.error("failed to save todo");
+            case Err(Error ignored) -> Log.error("failed to save todo");
         }
     }
 

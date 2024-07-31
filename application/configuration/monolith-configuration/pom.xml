@@ -12,15 +12,15 @@
     <name>monolith-configuration</name>
     <version>1.0.0-SNAPSHOT</version>
     <properties>
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.10.0</quarkus.platform.version>
-        <quarkus.application.version>1.0.0-SNAPSHOT</quarkus.application.version>
-        <surefire-plugin.version>3.1.2</surefire-plugin.version>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+        <quarkus.platform.version>3.13.0</quarkus.platform.version>
+        <quarkus.application.version>1.0.0-SNAPSHOT</quarkus.application.version>
+        <compiler-plugin.version>3.13.0</compiler-plugin.version>
+        <surefire-plugin.version>3.1.2</surefire-plugin.version>
     </properties>
     <dependencies>
         <!-- DOMAIN -->
@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-csrf-reactive</artifactId>
+            <artifactId>quarkus-rest-csrf</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -87,32 +87,42 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-vertx</artifactId>
         </dependency>
-        <!--
         <dependency>
             <groupId>io.quarkiverse.web-bundler</groupId>
             <artifactId>quarkus-web-bundler</artifactId>
             <version>1.7.0</version>
         </dependency>
-        -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-docker</artifactId>
         </dependency>
         <!-- web dependencies -->
         <dependency>
-            <groupId>org.webjars.npm</groupId>
+            <groupId>org.mvnpm</groupId>
             <artifactId>htmx.org</artifactId>
             <version>2.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>missing.css</artifactId>
-            <version>1.1.1</version>
+            <groupId>org.mvnpm</groupId>
+            <artifactId>htmx-ext-sse</artifactId>
+            <version>2.2.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.webjars.npm</groupId>
+            <groupId>org.mvnpm</groupId>
+            <artifactId>htmx-ext-response-targets</artifactId>
+            <version>2.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mvnpm</groupId>
+            <artifactId>missing.css</artifactId>
+            <version>1.1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mvnpm</groupId>
             <artifactId>hyperscript.org</artifactId>
             <version>0.9.12</version>
             <scope>provided</scope>

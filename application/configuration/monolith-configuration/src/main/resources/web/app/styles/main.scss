@@ -1,2 +1,369 @@
-@import "variables.css";
-@import "styles.css";
+@import "missing.css";
+
+@font-face {
+  font-family: 'firacode-nerd-regular';
+  src: url("../fonts/FiraCodeNerdFont-Regular.ttf") format("woff");
+}
+
+@font-face {
+  font-family: 'firacode-nerd-regular-bold';
+  src: url("../fonts/FiraCodeNerdFont-Bold.ttf") format("woff");
+}
+
+@font-face {
+  font-family: 'firacode-nerd-regular-mono';
+  src: url("../fonts/FiraCodeNerdFontMono-Regular.ttf") format("woff");
+}
+
+:root {
+  /* Lengths */
+  --rhythm: 1.1rem; /* Vertical rhythm, line height. */
+  --line-length: 42rem; /* Maximum line length for prose. */
+  --border-radius: .0rem;
+
+  /* Fonts */
+  --main-font: 'firacode-nerd-regular', system-ui;
+  --secondary-font: 'firacode-nerd-regular-bold', system-ui;
+  --mono-font: 'firacode-nerd-regular-mono', system-ui;
+
+  /* Colors */
+  --night: #0a0c0fff;
+  --almost-night: #252422;
+  --french-gray: #bec3cbff;
+  --antiflash-white: #f0f3f5ff;
+  --fire-engine-red: #c42021ff;
+  --tangerine: #f18701ff;
+  --xanthous: #f0b72fff;
+  --mint: #68a27aff;
+  --true-blue: #576ca8ff;
+  --magenta: #e36588ff;
+
+  --bg: var(--night);
+  --fg: var(--antiflash-white);
+  --faded-fg: var(--french-gray);
+  --graphical-fg: var(--antiflash-white);
+  --box-bg: var(--night);
+  --interactive-bg: var(--night);
+  --accent: var(--tangerine);
+  --muted-accent: var(--xanthous);
+
+  --plain-fg: var(--antiflash-white);
+  --plain-bg: var(--night);
+  --plain-graphical-fg: var(--night);
+
+  --info-fg: var(--antiflash-white);
+  --info-bg: var(--true-blue);
+  --info-graphical-fg: var(--true-blue);
+
+  --ok-fg: var(--night);
+  --ok-bg: var(--mint);
+  --ok-graphical-fg: var(--mint);
+
+  --bad-fg: var(--antiflash-white);
+  --bad-bg: var(--fire-engine-red);
+  --bad-graphical-fg: var(--fire-engine-red);
+
+  --warn-fg: var(--night);
+  --warn-bg: var(--tangerine);
+  --warn-graphical-fg: var(--tangerine);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.-no-dark-theme) {
+
+    --bg: var(--night);
+    --fg: var(--antiflash-white);
+    --faded-fg: var(--french-gray);
+    --graphical-fg: var(--antiflash-white);
+    --box-bg: var(--night);
+    --interactive-bg: var(--night);
+    --accent: var(--tangerine);
+    --muted-accent: var(--xanthous);
+
+    --plain-fg: var(--antiflash-white);
+    --plain-bg: var(--night);
+    --plain-graphical-fg: var(--night);
+
+    --info-fg: var(--antiflash-white);
+    --info-bg: var(--true-blue);
+    --info-graphical-fg: var(--true-blue);
+
+    --ok-fg: var(--night);
+    --ok-bg: var(--mint);
+    --ok-graphical-fg: var(--mint);
+
+    --bad-fg: var(--antiflash-white);
+    --bad-bg: var(--fire-engine-red);
+    --bad-graphical-fg: var(--fire-engine-red);
+
+    --warn-fg: var(--night);
+    --warn-bg: var(--tangerine);
+    --warn-graphical-fg: var(--tangerine);
+  }
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  height: 1em;
+  width: 1em;
+  border-radius: 50em;
+  background: url(https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times-circle.svg) no-repeat 50% 50%;
+  background-size: contain;
+  color: var(--fg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+input[type="search"]:focus::-webkit-search-cancel-button {
+  opacity: .3;
+  pointer-events: all;
+  filter: invert(1);
+}
+
+html {
+  cursor: text;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden
+}
+
+#dashboard {
+  display: grid;
+  grid-template-rows: 1.6rem 1fr 1.6rem 1.6rem;
+
+  #top-bar {
+    label {
+      line-height: 1.6rem;
+    }
+  }
+
+  #bottom-bar {
+    label {
+      line-height: 1.6rem;
+    }
+  }
+}
+
+#content {
+  display: grid;
+}
+
+#feedback {
+  opacity: 0.7;
+  max-height: fit-content;
+  align-self: end;
+  background: var(--almost-night);
+  padding-bottom: 1rem;
+  margin-bottom: unset;
+  padding-top: 1rem;
+}
+
+.command-line {
+  display: grid;
+  grid-template:   [prompt] "p c" [prompt];
+  grid-template-columns: auto 1fr;
+
+  border-color: var(--faded-fg);
+
+  .command-prompt {
+    grid-area: p;
+    padding-block: unset;
+    padding-left: 0.1rem;
+    line-height: 1.6rem;
+  }
+
+  .command-input {
+    grid-area: c;
+    height: 1.6rem;
+    line-height: 1.6rem;
+    border: unset;
+    outline: none;
+    caret-shape: block;
+  }
+
+  .command-input:focus {
+    outline: none;
+    border: unset;
+  }
+}
+
+.bar-element-arrow-right {
+  display: grid;
+  grid-template: "label arrow";
+  grid-template-columns: 1fr max-content;
+
+  label {
+    grid-area: label;
+  }
+
+  div {
+    grid-area: arrow;
+
+    display: inline-block;
+    border-left: 13px solid;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+  }
+}
+
+.bar-element-arrow-left {
+  display: grid;
+  grid-template: "arrow label";
+  grid-template-columns: max-content 1fr;
+
+  div {
+    grid-area: arrow;
+
+    display: inline-block;
+    border-right: 13px solid;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+  }
+
+  label {
+    grid-area: label;
+  }
+
+  label::before {
+    padding-right: 1ch;
+    content: "\f00f0";
+  }
+}
+
+.command-line-parser:hover {
+  .legend {
+    color: var(--accent);
+  }
+
+  border-color: var(--accent);
+}
+
+.todo-grid {
+  display: grid;
+  max-width: 100%;
+  gap: 0;
+  grid-template-columns: repeat(auto-fill, minmax(9ch, 27ch));
+  grid-auto-rows: min-content;
+  justify-items: center;
+}
+
+.todo {
+  display: grid;
+  grid-template:  [title-top] "title   title   title   title"  [title-bottom]
+                    [start-top] "start   start   start   start"  [start-bottom]
+                      [end-top] "end     end     end     end"    [end-bottom]
+                    [descr-top] "desc    desc    desc    desc"   [descr-bottom]
+                             /  1fr      1fr     1fr     1fr;
+  grid-row-gap: 0;
+  grid-template-rows: auto auto auto auto;
+
+  border: var(--fg);
+  border-style: solid;
+  border-width: 0.1rem;
+  margin: var(--rhythm);
+
+  width: 18ch;
+
+  .title {
+    font-family: var(--mono-font);
+    font-size: .9em;
+    text-align: center;
+    background-color: var(--fg);
+    color: var(--bg);
+    grid-area: title;
+    line-height: 2ch;
+    text-wrap: auto;
+  }
+
+  .start {
+    grid-area: start;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+
+    .time {
+      font-family: var(--mono-font);
+      font-size: .9em;
+      background-color: var(--almost-night);
+      color: var(--fg);
+      text-align: center;
+    }
+
+    .arrow-right {
+      color: var(--almost-night);
+      border-top: 9px solid transparent;
+      border-left: 9px solid;
+      border-bottom: 9px solid transparent;
+    }
+  }
+
+  .end {
+    grid-area: end;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+
+    .arrow-left {
+      color: var(--almost-night);
+      border-top: 9px solid transparent;
+      border-right: 9px solid;
+      border-bottom: 9px solid transparent;
+    }
+
+    .time {
+      font-family: var(--mono-font);
+      font-size: .9em;
+      background-color: var(--almost-night);
+      color: var(--fg);
+      text-align: center;
+    }
+  }
+
+  .description {
+    grid-area: desc;
+    background-color: var(--night);
+    max-height: 18ch;
+
+    label {
+      text-align: left;
+      background-color: var(--night);
+    }
+
+    input {
+      font-size: smaller;
+      width: 100%;
+      border: none;
+    }
+
+    pre {
+      text-align: center;
+      text-wrap: auto;
+    }
+  }
+}
+
+.todo:hover {
+  border-color: var(--fg);
+}
+
+.todo button {
+  min-height: var(--rhythm);
+  background: var(--bg);
+  box-shadow: unset;
+  border: unset;
+  border-radius: unset;
+}
+
+.todo :is(button,.\<button\>):hover, :is(button,.\<button\>):focus-visible {
+  filter: brightness(1.1);
+  box-shadow: 0 3px 6px -2px var(--accent);
+  text-decoration: none;
+}
+
+.fade-me-out.htmx-swapping {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}

@@ -1,5 +1,0 @@
-def navigation.focusById(id)
-    js(id)
-        document.getElementById(id).focus()
-    end
-end

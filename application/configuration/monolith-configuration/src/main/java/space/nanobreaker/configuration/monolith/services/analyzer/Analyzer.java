@@ -30,9 +30,9 @@ public class Analyzer {
         final Token programToken = tokens.removeFirst();
 
         return switch (programToken) {
-            case Prog.Todo _ -> analyzeTodoProgram(tokens);
-            case Prog.Calendar _ -> analyzeCalendarProgram(tokens);
-            case Prog.User _ -> analyzeUserProgram(tokens);
+            case Prog.Todo ignored -> analyzeTodoProgram(tokens);
+            case Prog.Calendar ignored -> analyzeCalendarProgram(tokens);
+            case Prog.User ignored -> analyzeUserProgram(tokens);
             default -> Result.ok(Command.help());
         };
     }
@@ -44,10 +44,10 @@ public class Analyzer {
         final Token commandToken = tokens.removeFirst();
 
         return switch (commandToken) {
-            case Cmd.Create _ -> Result.ok(CreateTodoCmd.help());
-            case Cmd.List _ -> Result.ok(ListTodoCmd.help());
-            case Cmd.Update _ -> Result.ok(UpdateTodoCmd.help());
-            case Cmd.Delete _ -> Result.ok(DeleteTodoCmd.help());
+            case Cmd.Create ignored -> Result.ok(CreateTodoCmd.help());
+            case Cmd.List ignored -> Result.ok(ListTodoCmd.help());
+            case Cmd.Update ignored -> Result.ok(UpdateTodoCmd.help());
+            case Cmd.Delete ignored -> Result.ok(DeleteTodoCmd.help());
             default -> Result.ok(TodoCmd.help());
         };
     }
@@ -59,7 +59,7 @@ public class Analyzer {
         final Token commandToken = tokens.removeFirst();
 
         return switch (commandToken) {
-            case Cmd.Show _ -> Result.ok(CalendarShowCmd.help());
+            case Cmd.Show ignored -> Result.ok(CalendarShowCmd.help());
             default -> Result.ok(CalendarCmd.help());
         };
     }
@@ -71,7 +71,7 @@ public class Analyzer {
         final Token commandToken = tokens.removeFirst();
 
         return switch (commandToken) {
-            case Cmd.Show _ -> Result.ok(UserShowCmd.help());
+            case Cmd.Show ignored -> Result.ok(UserShowCmd.help());
             default -> Result.ok(UserCmd.help());
         };
     }

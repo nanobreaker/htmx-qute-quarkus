@@ -6,16 +6,14 @@
              style="background: var(--almost-night)">
             <div class="float:left">
                 <label class="padding-inline mono-font">
-                    alice@htmx-qute-quarkus:{applicationVersion ?: 'unknown'}
+                    alice@reactive-todos:{applicationVersion ?: 'unknown'}
                 </label>
             </div>
 
             <div id="sse-connection-status" class="float:right">
                 <label class="padding-inline mono-font">
                     SSE
-                    <chip id="sse-connection-chip"
-                          style="border-radius: unset;">
-                    </chip>
+                    <chip id="sse-connection-chip" style="border-radius: unset;"></chip>
                 </label>
             </div>
         </div>
@@ -29,17 +27,18 @@
         </div>
 
         <div id="bottom-bar"
-             style="background: var(--almost-night)">
+             style="background: var(--night)">
             <div class="bar-element-arrow-right float:left">
                 <label class="padding-inline"
-                       style="background: var(--magenta); color: var(--fg)">
-                    TODO
+                       style="background: var(--almost-night); color: var(--fg)">
+                    COMMAND
                 </label>
-                <div style="color: var(--magenta)"></div>
+                <div style="color: var(--almost-night)"></div>
             </div>
             <div class="bar-element-arrow-left float:right">
-                <div style="color: var(--true-blue)"></div>
-                <label class="padding-inline info bg fg"
+                <div style="color: var(--almost-night)"></div>
+                <label class="with-icon padding-inline info fg"
+                       style="background: var(--almost-night)"
                        _="init
                         repeat forever
                             js
@@ -52,6 +51,7 @@
                             wait 60s
                     "
                 >
+                    <i class="nf-md-calendar_clock"></i>
                 </label>
             </div>
         </div>

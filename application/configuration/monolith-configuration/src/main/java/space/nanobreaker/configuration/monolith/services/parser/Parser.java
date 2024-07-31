@@ -55,9 +55,9 @@ public class Parser {
         final Token programToken = tokens.removeFirst();
 
         return switch (programToken) {
-            case Prog.Todo _ -> parseTodoProgram(tokens);
-            case Prog.Calendar _ -> parseCalendarProgram(tokens);
-            case Prog.User _ -> parseUserProgram(tokens);
+            case Prog.Todo ignored -> parseTodoProgram(tokens);
+            case Prog.Calendar ignored -> parseCalendarProgram(tokens);
+            case Prog.User ignored -> parseUserProgram(tokens);
             default -> Result.err(new ParserErr.UnknownProgram());
         };
     }
@@ -66,10 +66,10 @@ public class Parser {
         final Token commandToken = tokens.removeFirst();
 
         return switch (commandToken) {
-            case Cmd.Create _ -> parseTodoCreateCommand(tokens);
-            case Cmd.List _ -> parseTodoListCommand(tokens);
-            case Cmd.Update _ -> parseTodoUpdateCommand(tokens);
-            case Cmd.Delete _ -> parseTodoDeleteCommand(tokens);
+            case Cmd.Create ignored -> parseTodoCreateCommand(tokens);
+            case Cmd.List ignored -> parseTodoListCommand(tokens);
+            case Cmd.Update ignored -> parseTodoUpdateCommand(tokens);
+            case Cmd.Delete ignored -> parseTodoDeleteCommand(tokens);
             default -> Result.err(new ParserErr.UnknownCommand());
         };
     }
@@ -98,21 +98,21 @@ public class Parser {
         return switch (box) {
             case TodoCreateBox(
                     Arg(final String title),
-                    None<Opt.Description> _,
-                    None<Opt.Start> _,
-                    None<Opt.End> _
+                    None<Opt.Description> ignored1,
+                    None<Opt.Start> ignored2,
+                    None<Opt.End> ignored3
             ) -> CreateTodoCmd.of(title, null, null, null);
             case TodoCreateBox(
                     Arg(final String title),
                     Some(Opt.Description(final String description)),
-                    None<Opt.Start> _,
-                    None<Opt.End> _
+                    None<Opt.Start> ignored1,
+                    None<Opt.End> ignored2
             ) -> CreateTodoCmd.of(title, description, null, null);
             case TodoCreateBox(
                     Arg(final String title),
                     Some(Opt.Description(final String description)),
                     Some(Opt.Start(final String startStr)),
-                    None<Opt.End> _
+                    None<Opt.End> ignored
             ) -> {
                 final Result<LocalDateTime, Error> start = parseDate(startStr);
                 if (start.isErr())

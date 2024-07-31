@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=2">
     <meta name="_csrf_header" content="{inject:csrf.token}"/>
     <title>htmx-qute-quarkus</title>
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/response-targets.js"></script>
+
+    <script src="https://unpkg.com/htmx.org@2.0.1"
+            integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/"
+            crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx-ext-sse@2.2.1/sse.js"></script>
+    <script src="https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12/dist/eventsource.js"></script>
-    <script type="text/hyperscript" src="/functions/functions._hs"></script>
     <script type="text/hyperscript">
         def navigation.focusById(id)
             js(id)
@@ -21,17 +23,17 @@
         eventsource CliUpdates from http://localhost:8080/command/feedback
             on help
                 put it into #feedback
-                then show #feedback with display:block
+                then show #feedback
             end
 
             on empty
                 put it into #feedback
-                then show #feedback with display:none
+                then hide #feedback
             end
 
             on internal_error
                 put it into #feedback
-                then show #feedback with display:block
+                then show #feedback
             end
 
             on open
@@ -59,12 +61,11 @@
             end
         end
     </script>
-    {! CSS !}
-    <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
-    <link rel="stylesheet" href="/styles/styles.css">
-    {! FAVICON !}
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.ico">
+
+        {#bundle /}
+    <link rel="stylesheet" href="https://www.nerdfonts.com/assets/css/webfont.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.ico">
 </head>
 <body hx-ext="response-targets"
       _="on keyup[key is ':']

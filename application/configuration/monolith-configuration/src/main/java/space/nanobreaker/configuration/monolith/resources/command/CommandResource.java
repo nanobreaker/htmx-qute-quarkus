@@ -79,7 +79,7 @@ public class CommandResource {
         };
 
         return result.map(r -> switch (r) {
-            case Ok(Void _) -> Response.created(URI.create("test")).build();
+            case Ok(Void ignored) -> Response.created(URI.create("test")).build();
             case Err(Error err) -> Response.serverError()
                     .entity(error.data("error", err.getClass().getName()))
                     .build();
@@ -98,7 +98,7 @@ public class CommandResource {
             case Ok(String help) -> sse.newEvent("help", help);
             case Err(Error err) -> switch (err) {
                 case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
-                    case TokenizerErr.EmptyInput _ -> sse.newEvent("empty", "");
+                    case TokenizerErr.EmptyInput ignored -> sse.newEvent("empty", "");
                 };
                 default -> sse.newEvent("internal_error", mapErrorToDescription(err));
             };
@@ -161,14 +161,14 @@ public class CommandResource {
     ) {
         return switch (err) {
             case ParserErr parserErr -> switch (parserErr) {
-                case ParserErr.ArgumentNotFound _ -> "argument required";
-                case ParserErr.NotSupportedOperation _ -> "not supported";
-                case ParserErr.UnknownCommand _ -> "unknown command";
-                case ParserErr.UnknownProgram _ -> "unknown program";
+                case ParserErr.ArgumentNotFound ignored -> "argument required";
+                case ParserErr.NotSupportedOperation ignored -> "not supported";
+                case ParserErr.UnknownCommand ignored -> "unknown command";
+                case ParserErr.UnknownProgram ignored -> "unknown program";
                 case ParserErr.DateTimeParseErr e -> "can't parse date: " + e.description();
             };
             case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
-                case TokenizerErr.EmptyInput _ -> "empty command line";
+                case TokenizerErr.EmptyInput ignored -> "empty command line";
             };
             case CmdErr cmdErr -> switch (cmdErr) {
                 case CmdErr.CreationFailed e -> "failed to create command: " + e.description();
