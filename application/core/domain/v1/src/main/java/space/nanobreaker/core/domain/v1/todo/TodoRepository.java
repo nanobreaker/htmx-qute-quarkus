@@ -1,19 +1,33 @@
 package space.nanobreaker.core.domain.v1.todo;
 
 import io.smallrye.mutiny.Uni;
-import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.library.Option;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public interface TodoRepository {
 
-    Uni<Result<Todo, Error>> save(Todo Todo);
+    Uni<Todo> save(
+            final Todo Todo
+    );
 
-    Uni<Result<Todo, Error>> findByTodoId(TodoId id);
+    Uni<Option<Todo>> findById(
+            final TodoId id
+    );
 
-    Uni<Result<List<Todo>, Error>> listTodos();
+    Uni<Stream<Todo>> listBy(
+            final String username,
+            final Set<String> searchPatterns
+    );
 
-    Uni<Result<Void, Error>> deleteByTodoId(TodoId id);
+    Uni<Void> update(
+            final Todo todo,
+            final Option<String> someTitle,
+            final Option<String> someDescription,
+            final Option<LocalDateTime> someStart,
+            final Option<LocalDateTime> someEnd
+    );
 
 }

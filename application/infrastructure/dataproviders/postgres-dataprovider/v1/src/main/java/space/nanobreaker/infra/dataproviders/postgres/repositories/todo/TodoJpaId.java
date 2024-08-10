@@ -1,20 +1,17 @@
 package space.nanobreaker.infra.dataproviders.postgres.repositories.todo;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.GeneratedValue;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 @Embeddable
 public class TodoJpaId implements Serializable {
 
-    @GeneratedValue
-    private UUID id;
+    private Integer id;
     private String username;
 
     public TodoJpaId(
-            final UUID id,
+            final Integer id,
             final String username
     ) {
         this.id = id;
@@ -22,10 +19,17 @@ public class TodoJpaId implements Serializable {
     }
 
     public TodoJpaId() {
-
     }
 
-    public UUID getId() {
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Integer getId() {
         return id;
     }
 

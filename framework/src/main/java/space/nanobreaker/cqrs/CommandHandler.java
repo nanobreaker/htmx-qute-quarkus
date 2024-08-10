@@ -1,11 +1,10 @@
 package space.nanobreaker.cqrs;
 
 import io.smallrye.mutiny.Uni;
-import space.nanobreaker.library.Error;
 import space.nanobreaker.library.Result;
 
-public interface CommandHandler<C extends Command> {
+public interface CommandHandler<C extends Command, R extends Result> {
 
-    Uni<Result<Void, Error>> handle(C command);
+    Uni<R> handle(C command);
 
 }

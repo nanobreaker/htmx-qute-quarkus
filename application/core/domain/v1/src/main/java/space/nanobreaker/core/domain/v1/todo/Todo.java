@@ -30,6 +30,26 @@ public class Todo extends AggregateRoot<TodoId> {
         this.end = end;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setState(TodoState state) {
+        this.state = state;
+    }
+
+    public void setStart(LocalDateTime start) {
+        this.start = start;
+    }
+
+    public void setEnd(LocalDateTime end) {
+        this.end = end;
+    }
+
     public String getTitle() {
         return title;
     }

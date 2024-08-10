@@ -1,16 +1,38 @@
 package space.nanobreaker.configuration.monolith.services.command;
 
-import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.library.Error;
+import space.nanobreaker.library.Result;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 public record UpdateTodoCmd(
-        Set<TodoId> ids,
+        Set<String> filters,
+        String title,
         String description,
         LocalDateTime start,
         LocalDateTime end
 ) implements TodoCmd {
+
+
+    public UpdateTodoCmd {
+        Objects.requireNonNull(filters);
+        assert !filters.isEmpty();
+    }
+
+    public static Result<Command, Error> of(
+            final Set<String> searchPatterns,
+            final String title,
+            final String description,
+            final LocalDateTime start,
+            final LocalDateTime end) {
+        try {
+            return Result.ok(new UpdateTodoCmd(searchPatterns, title, description, start, end));
+        } catch (Exception e) {
+            return Result.err(new CmdErr.CreationFailed(e.getMessage()));
+        }
+    }
 
     public static String help() {
         return """

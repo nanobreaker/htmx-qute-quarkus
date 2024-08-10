@@ -15,6 +15,7 @@ public record CreateTodoCmd(
 
     public CreateTodoCmd {
         Objects.requireNonNull(title);
+        assert !title.isBlank();
     }
 
     public static Result<Command, Error> of(

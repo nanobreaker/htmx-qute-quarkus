@@ -12,52 +12,10 @@
     <script src="https://unpkg.com/htmx-ext-sse@2.2.1/sse.js"></script>
     <script src="https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.12/dist/eventsource.js"></script>
     <script type="text/hyperscript">
         def navigation.focusById(id)
             js(id)
                 document.getElementById(id).focus()
-            end
-        end
-
-        eventsource CliUpdates from http://localhost:8080/command/feedback
-            on help
-                put it into #feedback
-                then show #feedback
-            end
-
-            on empty
-                put it into #feedback
-                then hide #feedback
-            end
-
-            on internal_error
-                put it into #feedback
-                then show #feedback
-            end
-
-            on open
-                log "connection opened."
-                then add .ok to #sse-connection-chip
-                then put "UP" into #sse-connection-chip
-            end
-
-            on todoCreated
-                put it at the end of #todo-grid
-            end
-
-            on close
-                log "connection closed."
-                log "trying to reconnect."
-                then add .warn to #sse-connection-chip
-                then put "DOWN" into #sse-connection-chip
-                call CliUpdates.open()
-            end
-
-            on error
-                log "sse connection lost....."
-                then add .warn to #sse-connection-chip
-                then put "DOWN" into #sse-connection-chip
             end
         end
     </script>

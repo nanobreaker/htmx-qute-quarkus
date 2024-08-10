@@ -12,7 +12,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.sse.OutboundSseEvent;
 import jakarta.ws.rs.sse.Sse;
 import space.nanobreaker.configuration.monolith.services.analyzer.Analyzer;
 import space.nanobreaker.configuration.monolith.services.command.*;
@@ -20,11 +19,11 @@ import space.nanobreaker.configuration.monolith.services.parser.Parser;
 import space.nanobreaker.configuration.monolith.services.parser.ParserErr;
 import space.nanobreaker.configuration.monolith.services.tokenizer.TokenizerErr;
 import space.nanobreaker.configuration.monolith.sse.SseEventSinkService;
+import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoCreateCommand;
-import space.nanobreaker.library.Err;
+import space.nanobreaker.core.usecases.v1.todo.command.TodoUpdateCommand;
 import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Ok;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.library.*;
 
 import java.net.URI;
 
@@ -60,13 +59,13 @@ public class CommandResource {
     public Uni<Response> execute(
             @FormParam("command") final String command
     ) {
-        final Uni<Result<Void, Error>> result = switch (parser.parse(command)) {
+        final Uni<Result<?, Error>> result = switch (parser.parse(command)) {
             case Ok(Command cmd) -> switch (cmd) {
                 case TodoCmd todoCmd -> switch (todoCmd) {
                     case CreateTodoCmd createTodoCmd -> executeTodoCreateCommand(createTodoCmd);
-                    case DeleteTodoCmd deleteTodoCmd -> executeTodoDeleteCommand(deleteTodoCmd);
-                    case ListTodoCmd listTodoCmd -> executeTodoListCommand(listTodoCmd);
                     case UpdateTodoCmd updateTodoCmd -> executeTodoUpdateCommand(updateTodoCmd);
+                    case ListTodoCmd listTodoCmd -> executeTodoListCommand(listTodoCmd);
+                    case DeleteTodoCmd deleteTodoCmd -> executeTodoDeleteCommand(deleteTodoCmd);
                 };
                 case CalendarCmd calendarCmd -> switch (calendarCmd) {
                     case CalendarShowCmd calendarShowCmd -> executeCalendarShowCommand(calendarShowCmd);
@@ -79,10 +78,14 @@ public class CommandResource {
         };
 
         return result.map(r -> switch (r) {
-            case Ok(Void ignored) -> Response.created(URI.create("test")).build();
-            case Err(Error err) -> Response.serverError()
+            case Ok(TodoId todoId) -> Response
+                    .created(URI.create(todoId.getId().toString()))
+                    .build();
+            case Err(Error err) -> Response
+                    .serverError()
                     .entity(error.data("error", err.getClass().getName()))
                     .build();
+            default -> Response.accepted().build();
         });
     }
 
@@ -94,24 +97,28 @@ public class CommandResource {
     public Response analyze(
             final String command
     ) {
-        final OutboundSseEvent event = switch (analyzer.analyze(command)) {
-            case Ok(String help) -> sse.newEvent("help", help);
-            case Err(Error err) -> switch (err) {
+        final String username = securityIdentity.getPrincipal().getName();
+        final CommandSource.SseCommand sseCommand = switch (analyzer.analyze(command)) {
+            case Ok(final String help) -> new CommandSource.CommandAnalyzed(username, help);
+            case Err(final Error err) -> switch (err) {
                 case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
-                    case TokenizerErr.EmptyInput ignored -> sse.newEvent("empty", "");
+                    case TokenizerErr.EmptyInput ignored -> new CommandSource.CommandClear(username);
                 };
-                default -> sse.newEvent("internal_error", mapErrorToDescription(err));
+                default -> new CommandSource.CommandError(username, mapErrorToDescription(err));
             };
         };
 
-        final String username = securityIdentity.getPrincipal().getName();
-        sseEventSink.dispatchOutboundSseEvent(event, username);
+        switch (sseCommand) {
+            case CommandSource.CommandAnalyzed c -> eventBus.publish("command.analyzed", c);
+            case CommandSource.CommandClear c -> eventBus.publish("command.clear", c);
+            case CommandSource.CommandError c -> eventBus.publish("command.error", c);
+        }
 
         return Response.noContent()
                 .build();
     }
 
-    private Uni<Result<Void, Error>> executeTodoCreateCommand(
+    private Uni<Result<?, Error>> executeTodoCreateCommand(
             final CreateTodoCmd cmd
     ) {
         final TodoCreateCommand todoCreateCommand = new TodoCreateCommand(
@@ -122,35 +129,45 @@ public class CommandResource {
                 cmd.end()
         );
 
-        return eventBus.<Result<Void, Error>>request("todo.create", todoCreateCommand)
+        return eventBus.<Result<TodoId, Error>>request("todo.create", todoCreateCommand)
                 .map(Message::body);
     }
 
-    private Uni<Result<Void, Error>> executeTodoListCommand(
+    private Uni<Result<?, Error>> executeTodoUpdateCommand(
+            final UpdateTodoCmd cmd
+    ) {
+        final TodoUpdateCommand todoUpdateCommand = new TodoUpdateCommand(
+                cmd.filters(),
+                securityIdentity.getPrincipal().getName(),
+                Option.over(cmd.title()),
+                Option.over(cmd.description()),
+                Option.over(cmd.start()),
+                Option.over(cmd.end())
+        );
+
+        return eventBus.<Result<Void, Error>>request("todo.update", todoUpdateCommand)
+                .map(Message::body);
+    }
+
+    private Uni<Result<?, Error>> executeTodoListCommand(
             final ListTodoCmd cmd
     ) {
         return Uni.createFrom().item(Result.ok(null));
     }
 
-    private Uni<Result<Void, Error>> executeTodoUpdateCommand(
-            final UpdateTodoCmd cmd
-    ) {
-        return Uni.createFrom().item(Result.ok(null));
-    }
-
-    private Uni<Result<Void, Error>> executeTodoDeleteCommand(
+    private Uni<Result<?, Error>> executeTodoDeleteCommand(
             final DeleteTodoCmd cmd
     ) {
         return Uni.createFrom().item(Result.ok(null));
     }
 
-    private Uni<Result<Void, Error>> executeCalendarShowCommand(
+    private Uni<Result<?, Error>> executeCalendarShowCommand(
             final CalendarShowCmd cmd
     ) {
         return Uni.createFrom().item(Result.ok(null));
     }
 
-    private Uni<Result<Void, Error>> executeUserShowCommand(
+    private Uni<Result<?, Error>> executeUserShowCommand(
             final UserShowCmd cmd
     ) {
         return Uni.createFrom().item(Result.ok(null));

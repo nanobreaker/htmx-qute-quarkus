@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import space.nanobreaker.configuration.monolith.services.command.Command;
 import space.nanobreaker.configuration.monolith.services.command.CreateTodoCmd;
+import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCmd;
 import space.nanobreaker.configuration.monolith.services.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
 import space.nanobreaker.library.Error;
@@ -18,12 +19,18 @@ import java.time.temporal.ChronoField;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.SequencedCollection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class Parser {
 
+    private final Tokenizer tokenizer;
+
     @Inject
-    Tokenizer tokenizer;
+    public Parser(final Tokenizer tokenizer) {
+        this.tokenizer = tokenizer;
+    }
 
     private static final StringBuilder pattern = new StringBuilder()
             .append("[dd/MM/yyyy HH:mm]")
@@ -44,8 +51,6 @@ public class Parser {
 
     @WithSpan("parseInputString")
     public Result<Command, Error> parse(final String input) {
-        // input = todo create "todo" -d"fjsdlkfjsdlf" -s"12/12/2024" -e"12/12/2024"
-
         final Result<SequencedCollection<Token>, Error> tokenizerResult = tokenizer.tokenize(input);
 
         if (tokenizerResult.isErr())
@@ -75,8 +80,6 @@ public class Parser {
     }
 
     private Result<Command, Error> parseTodoCreateCommand(final SequencedCollection<Token> tokens) {
-        // final Arg argumentResult = getArgument(tokens, Arg.class)?;
-
         final Result<Arg, Error> argumentResult = getArgument(tokens, Arg.class);
 
         if (argumentResult.isErr())
@@ -87,58 +90,32 @@ public class Parser {
         final Option<Opt.Start> startOption = getOption(tokens, Opt.Start.class);
         final Option<Opt.End> endOption = getOption(tokens, Opt.End.class);
 
-        record TodoCreateBox(
-                Arg arg,
-                Option<Opt.Description> desc,
-                Option<Opt.Start> start,
-                Option<Opt.End> end) {
-        }
-        final TodoCreateBox box = new TodoCreateBox(arg, descriptionOption, startOption, endOption);
-
-        return switch (box) {
-            case TodoCreateBox(
-                    Arg(final String title),
-                    None<Opt.Description> ignored1,
-                    None<Opt.Start> ignored2,
-                    None<Opt.End> ignored3
-            ) -> CreateTodoCmd.of(title, null, null, null);
-            case TodoCreateBox(
-                    Arg(final String title),
-                    Some(Opt.Description(final String description)),
-                    None<Opt.Start> ignored1,
-                    None<Opt.End> ignored2
-            ) -> CreateTodoCmd.of(title, description, null, null);
-            case TodoCreateBox(
-                    Arg(final String title),
-                    Some(Opt.Description(final String description)),
-                    Some(Opt.Start(final String startStr)),
-                    None<Opt.End> ignored
-            ) -> {
-                final Result<LocalDateTime, Error> start = parseDate(startStr);
-                if (start.isErr())
-                    yield Result.err(start.error());
-
-                yield CreateTodoCmd.of(title, description, start.unwrap(), null);
-            }
-            case TodoCreateBox(
-                    Arg(final String title),
-                    Some(Opt.Description(final String description)),
-                    Some(Opt.Start(final String startStr)),
-                    Some(Opt.End(final String endStr))
-            ) -> {
-                final Result<LocalDateTime, Error> start = parseDate(startStr);
-                if (start.isErr())
-                    yield Result.err(start.error());
-
-                final Result<LocalDateTime, Error> end = parseDate(endStr);
-                if (end.isErr())
-                    yield Result.err(end.error());
-
-                yield CreateTodoCmd.of(title, description, start.unwrap(), end.unwrap());
-            }
-            // todo: add handling for case where just end date is specified?
-            default -> Result.err(new ParserErr.NotSupportedOperation());
+        final String title = arg.value();
+        final String description = switch (descriptionOption) {
+            case Some(Opt.Description(final String d)) -> d;
+            case None<Opt.Description> ignored -> null;
         };
+        final LocalDateTime start = switch (startOption) {
+            case Some(Opt.Start(final String startStr)) -> switch (parseDate(startStr)) {
+                case Ok(final LocalDateTime date) -> date;
+                case Err(final Error ignored) -> null;
+            };
+            case None<Opt.Start> ignored -> null;
+        };
+        final LocalDateTime end = switch (endOption) {
+            case Some(Opt.End(final String endStr)) -> switch (parseDate(endStr)) {
+                case Ok(final LocalDateTime date) -> date;
+                case Err(final Error ignored) -> null;
+            };
+            case None<Opt.End> ignored -> null;
+        };
+
+        return CreateTodoCmd.of(
+                title,
+                description,
+                start,
+                end
+        );
     }
 
     private Result<Command, Error> parseTodoListCommand(final SequencedCollection<Token> tokens) {
@@ -146,7 +123,50 @@ public class Parser {
     }
 
     private Result<Command, Error> parseTodoUpdateCommand(final SequencedCollection<Token> tokens) {
-        return Result.err(new ParserErr.NotSupportedOperation());
+        final Result<Set<Arg>, Error> argumentResult = getArguments(tokens, Arg.class);
+
+        if (argumentResult.isErr())
+            return Result.err(argumentResult.error());
+
+        final Set<Arg> args = argumentResult.unwrap();
+        final Option<Opt.Title> titleOption = getOption(tokens, Opt.Title.class);
+        final Option<Opt.Description> descriptionOption = getOption(tokens, Opt.Description.class);
+        final Option<Opt.Start> startOption = getOption(tokens, Opt.Start.class);
+        final Option<Opt.End> endOption = getOption(tokens, Opt.End.class);
+
+        final Set<String> filters = args.stream()
+                .map(Arg::value)
+                .collect(Collectors.toSet());
+        final String title = switch (titleOption) {
+            case Some(Opt.Title(final String t)) -> t;
+            case None<Opt.Title> ignored -> null;
+        };
+        final String description = switch (descriptionOption) {
+            case Some(Opt.Description(final String d)) -> d;
+            case None<Opt.Description> ignored -> null;
+        };
+        final LocalDateTime start = switch (startOption) {
+            case Some(Opt.Start(final String startStr)) -> switch (parseDate(startStr)) {
+                case Ok(final LocalDateTime date) -> date;
+                case Err(final Error ignored) -> null;
+            };
+            case None<Opt.Start> ignored -> null;
+        };
+        final LocalDateTime end = switch (endOption) {
+            case Some(Opt.End(final String endStr)) -> switch (parseDate(endStr)) {
+                case Ok(final LocalDateTime date) -> date;
+                case Err(final Error ignored) -> null;
+            };
+            case None<Opt.End> ignored -> null;
+        };
+
+        return UpdateTodoCmd.of(
+                filters,
+                title,
+                description,
+                start,
+                end
+        );
     }
 
     private Result<Command, Error> parseTodoDeleteCommand(final SequencedCollection<Token> tokens) {
@@ -183,6 +203,21 @@ public class Parser {
                 .map(target::cast)
                 .map(Result::<T, Error>ok)
                 .orElse(Result.err(new ParserErr.ArgumentNotFound()));
+    }
+
+    private static <T> Result<Set<T>, Error> getArguments(
+            final Collection<? extends Token> opts,
+            final Class<T> target
+    ) {
+        final Set<T> args = opts.stream()
+                .filter(target::isInstance)
+                .map(target::cast)
+                .collect(Collectors.toSet());
+
+        if (args.isEmpty())
+            return Result.err(new ParserErr.ArgumentNotFound());
+
+        return Result.ok(args);
     }
 
     private static Result<LocalDateTime, Error> parseDate(final String string) {

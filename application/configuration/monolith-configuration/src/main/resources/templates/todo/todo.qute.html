@@ -1,35 +1,23 @@
-<form id="todo-{todo.id.id}" class="todo crowded fade-me-out">
+<form id="todo-{todo.id.id}"
+        {#if swap } hx-swap-oob="true" {/if}
+      hx-get="/todo/{todo.id.id}"
+      hx-trigger="sse:todo.updated.{todo.id.id}"
+      hx-swap="outerHTML"
+      class="todo crowded fade-me-out">
     <pre class="title">{todo.title}</pre>
     {#if todo.getStart().isPresent()}
         <div class="start">
-            {!<label for="start-{todo.id.id}">S</label>!}
-            {!<input id="start-{todo.id.id}"
-                   type=date
-                   name="start"
-                   value="{todo.start}" readonly>!}
             <div class="time">{todo.getStart().get().toString()}</div>
             <div class="arrow-right"></div>
         </div>
     {/if}
     {#if todo.getEnd().isPresent()}
         <div class="end">
-            {!<label for="end-{todo.id.id}">E</label>!}
-            {!<input id="end-{todo.id.id}"
-                   type=date
-                   name="end"
-                   value="{todo.end}" readonly>!}
             <div class="arrow-left"></div>
             <div class="time">{todo.getEnd().get().toString()}</div>
         </div>
     {/if}
     {#if todo.getDescription().isPresent()}
-        <div class="description padding-inline">
-            {!<label for="description-{todo.id.id}"></label>
-            <input id="description-{todo.id.id}"
-                   type=text
-                   name="description"
-                   value="{todo.description}" readonly>!}
-            <pre>{todo.description}</pre>
-        </div>
+        <pre class="description padding-inline">{todo.description}</pre>
     {/if}
 </form>

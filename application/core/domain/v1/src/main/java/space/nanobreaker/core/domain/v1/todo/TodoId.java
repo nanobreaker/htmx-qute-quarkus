@@ -1,16 +1,15 @@
 package space.nanobreaker.core.domain.v1.todo;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class TodoId {
 
-    private UUID id;
+    private Integer id;
 
     private String username;
 
     public TodoId(
-            final UUID id,
+            final Integer id,
             final String username
     ) {
         Objects.requireNonNull(id);
@@ -20,7 +19,19 @@ public class TodoId {
         this.username = username;
     }
 
-    public UUID getId() {
+    public TodoId() {
+
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Integer getId() {
         return id;
     }
 

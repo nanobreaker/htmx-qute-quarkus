@@ -149,16 +149,27 @@ html, body {
 
 #content {
   display: grid;
+  position: relative;
 }
 
 #feedback {
-  opacity: 0.7;
-  max-height: fit-content;
-  align-self: end;
-  background: var(--almost-night);
-  padding-bottom: 1rem;
-  margin-bottom: unset;
-  padding-top: 1rem;
+  display: contents;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+
+  pre {
+    position: inherit;
+    width: 100%;
+    max-height: fit-content;
+    align-self: end;
+    background: var(--almost-night);
+    padding-bottom: 1rem;
+    margin-bottom: unset;
+    padding-top: 1rem;
+  }
 }
 
 .command-line {
@@ -265,6 +276,7 @@ html, body {
   border-width: 0.1rem;
   margin: var(--rhythm);
 
+  height: min-content;
   width: 18ch;
 
   .title {
@@ -326,22 +338,7 @@ html, body {
     grid-area: desc;
     background-color: var(--night);
     max-height: 18ch;
-
-    label {
-      text-align: left;
-      background-color: var(--night);
-    }
-
-    input {
-      font-size: smaller;
-      width: 100%;
-      border: none;
-    }
-
-    pre {
-      text-align: center;
-      text-wrap: auto;
-    }
+    text-wrap: wrap;
   }
 }
 

@@ -1,6 +1,8 @@
 {#include base}
     <div id="dashboard"
-         class="fullscreen">
+         class="fullscreen"
+         hx-ext="sse"
+         sse-connect="/command/feedback">
 
         <div id="top-bar"
              style="background: var(--almost-night)">
@@ -12,18 +14,32 @@
 
             <div id="sse-connection-status" class="float:right">
                 <label class="padding-inline mono-font">
-                    SSE
-                    <chip id="sse-connection-chip" style="border-radius: unset;"></chip>
+                    SYNC
+                    <chip id="sse-connection-chip"
+                          style="border-radius: unset;"
+                          _="on htmx:sseOpen from document
+                                remove .warn from me
+                                then add .ok to me
+                                then put 'UP' into me
+                             on htmx:sseError from document
+                                remove .ok from me
+                                then add .warn to me
+                                then put 'DOWN' into me
+                            "></chip>
                 </label>
             </div>
         </div>
 
         <div id="content">
             <div id="todo-grid"
-                 class="todo-grid">
+                 class="todo-grid"
+                 sse-swap="todo.created,todo.updated"
+                 hx-swap="beforeend">
             </div>
-            <pre id="feedback" style="display: none">
-            </pre>
+            <div id="feedback"
+                 sse-swap="help,empty,internal_error"
+                 hx-swap="innerHTML">
+            </div>
         </div>
 
         <div id="bottom-bar"
