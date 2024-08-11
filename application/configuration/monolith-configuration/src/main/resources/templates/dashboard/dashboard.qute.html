@@ -6,28 +6,24 @@
 
         <div id="top-bar"
              style="background: var(--almost-night)">
-            <div class="float:left">
-                <label class="padding-inline mono-font">
-                    alice@reactive-todos:{applicationVersion ?: 'unknown'}
-                </label>
-            </div>
-
-            <div id="sse-connection-status" class="float:right">
-                <label class="padding-inline mono-font">
-                    SYNC
-                    <chip id="sse-connection-chip"
-                          style="border-radius: unset;"
-                          _="on htmx:sseOpen from document
+            <label class="top-bar-title title-font big padding-inline">reactive-todos</label>
+            <chip id="sse-connection-chip"
+                  class="top-bar-connection mono-font warn"
+                  style="border-radius: unset;"
+                  _="on htmx:sseOpen from document
                                 remove .warn from me
                                 then add .ok to me
-                                then put 'UP' into me
+                                then put 'CONN' into me
                              on htmx:sseError from document
                                 remove .ok from me
                                 then add .warn to me
                                 then put 'DOWN' into me
-                            "></chip>
-                </label>
-            </div>
+                            ">
+                DOWN
+            </chip>
+            <label class="top-bar-version">
+                v{applicationVersion ?: 'unknown'}
+            </label>
         </div>
 
         <div id="content">

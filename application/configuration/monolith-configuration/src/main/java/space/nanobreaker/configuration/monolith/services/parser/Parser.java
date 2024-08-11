@@ -39,17 +39,24 @@ public class Parser {
             .append("[dd[/][.][-]MM[/][.][-]yy HH:mm]")
             .append("[dd[/][.][-]MM[/][.][-]yy HH]")
             .append("[dd[/][.][-]MM[/][.][-]yy]")
+            .append("[dd[/][.][-]MM HH:mm]")
+            .append("[dd[/][.][-]MM HH]")
             .append("[dd[/][.][-]MM]")
-            .append("[dd]");
+            .append("[dd HH:mm]")
+            .append("[dd HH]")
+            .append("[dd]")
+            .append("[HH:mm]");
 
-    // todo: remove hardcoded values and use current date & time
+    // todo: remove hardcoded values and use current date (year,month,day)
+    private static final LocalDateTime now = LocalDateTime.now();
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
             .appendPattern(pattern.toString())
+            .parseDefaulting(ChronoField.YEAR, now.getYear())
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, now.getMonthValue())
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, now.getDayOfMonth())
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-            .parseDefaulting(ChronoField.YEAR, 2024)
-            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 7)
             .toFormatter();
 
     @WithSpan("parseInputString")
@@ -225,6 +232,8 @@ public class Parser {
 
     private static Result<LocalDateTime, Error> parseDate(final String string) {
         try {
+            // todo: make possible to parse with LocalTime
+            //          otherwise creation by pure time "12:30" is not possible
             return Result.ok(LocalDateTime.parse(string, formatter));
         } catch (DateTimeParseException e) {
             return Result.err(new ParserErr.DateTimeParseErr(e.getParsedString()));

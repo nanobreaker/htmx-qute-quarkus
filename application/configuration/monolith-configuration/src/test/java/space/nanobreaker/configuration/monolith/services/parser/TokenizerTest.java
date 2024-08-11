@@ -132,6 +132,25 @@ class TokenizerTest {
     }
 
     @Test
+    void shouldReturnStartAndEndTokensWhenDatesAreDateTime() {
+        final String input = "todo create \"t\" -s\"12:00\" -e\"13:00\"";
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+
+        assertThat(result.isOk()).isTrue();
+
+        final SequencedCollection<Token> tokens = result.unwrap();
+
+        assertThat(tokens.size()).isEqualTo(5);
+        assertThat(tokens).containsExactly(
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Arg("t"),
+                new Opt.Start("12:00"),
+                new Opt.End("13:00")
+        );
+    }
+
+    @Test
     void shouldReturnProgramCommandArgumentsTokens() {
         final String input = "todo list \"id_one\" \"id_two\" \"id_three\"";
         final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);

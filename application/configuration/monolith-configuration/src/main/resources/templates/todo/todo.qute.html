@@ -7,14 +7,14 @@
     <pre class="title">{todo.title}</pre>
     {#if todo.getStart().isPresent()}
         <div class="start">
-            <div class="time">{todo.getStart().get().toString()}</div>
+            <div class="time">{todo.getStart().get().formatDate}</div>
             <div class="arrow-right"></div>
         </div>
     {/if}
     {#if todo.getEnd().isPresent()}
         <div class="end">
             <div class="arrow-left"></div>
-            <div class="time">{todo.getEnd().get().toString()}</div>
+            <div class="time">{todo.getEnd().get().formatDate}</div>
         </div>
     {/if}
     {#if todo.getDescription().isPresent()}

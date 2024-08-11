@@ -31,7 +31,7 @@ public class TodoCreateCommandHandler implements CommandHandler<TodoCreateComman
     public Uni<Result<TodoId, Error>> handle(final TodoCreateCommand todoCreateCommand) {
         final Uni<TodoId> nextId = idGenerator.next(todoCreateCommand.username());
 
-        return nextId
+        final Uni<Todo> createdTodo = nextId
                 .map(todoId -> new Todo(
                         todoId,
                         todoCreateCommand.title(),
@@ -40,7 +40,9 @@ public class TodoCreateCommandHandler implements CommandHandler<TodoCreateComman
                         todoCreateCommand.start(),
                         todoCreateCommand.end()
                 ))
-                .chain(todoRepository::save)
+                .chain(todoRepository::save);
+
+        return createdTodo
                 .flatMap(todo -> this.dispatchTodoCreatedEvent(todo).replaceWith(todo))
                 .flatMap(todo -> idGenerator.increment(todo.getId().getUsername()).replaceWith(todo))
                 .map(todo -> Result.ok(todo.getId()));

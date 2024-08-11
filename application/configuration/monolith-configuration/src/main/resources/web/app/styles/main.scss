@@ -1,18 +1,23 @@
 @import "missing.css";
 
 @font-face {
-  font-family: 'firacode-nerd-regular';
-  src: url("../fonts/FiraCodeNerdFont-Regular.ttf") format("woff");
+  font-family: 'heavy-data-nerd-font-regular';
+  src: url("../fonts/HeavyDataNerdFont-Regular.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'firacode-nerd-regular-bold';
-  src: url("../fonts/FiraCodeNerdFont-Bold.ttf") format("woff");
+  font-family: 'jetbrains-nerd-regular';
+  src: url("../fonts/JetBrainsMonoNerdFont-Regular.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'firacode-nerd-regular-mono';
-  src: url("../fonts/FiraCodeNerdFontMono-Regular.ttf") format("woff");
+  font-family: 'jetbrains-nerd-bold';
+  src: url("../fonts/JetBrainsMonoNerdFont-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'jetbrains-nerd-mono-regular';
+  src: url("../fonts/JetBrainsMonoNLNerdFontMono-Regular.ttf") format("truetype");
 }
 
 :root {
@@ -22,9 +27,10 @@
   --border-radius: .0rem;
 
   /* Fonts */
-  --main-font: 'firacode-nerd-regular', system-ui;
-  --secondary-font: 'firacode-nerd-regular-bold', system-ui;
-  --mono-font: 'firacode-nerd-regular-mono', system-ui;
+  --title-font: 'heavy-data-nerd-font-regular', system-ui;
+  --main-font: 'jetbrains-nerd-regular', system-ui;
+  --secondary-font: 'jetbrains-nerd-bold', system-ui;
+  --mono-font: 'jetbrains-nerd-mono-regular', system-ui;
 
   /* Colors */
   --night: #0a0c0fff;
@@ -102,6 +108,11 @@
   }
 }
 
+.title-font {
+  font-family: var(--title-font), system-ui;
+  font-style: italic;
+}
+
 input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: none;
   height: 1em;
@@ -135,8 +146,30 @@ html, body {
   grid-template-rows: 1.6rem 1fr 1.6rem 1.6rem;
 
   #top-bar {
-    label {
+    display: grid;
+    grid-template:   [prompt] "title connection version" [prompt];
+    grid-template-columns: 1fr auto auto;
+    line-height: 1.6rem;
+
+    .top-bar-title {
+      grid-area: title;
       line-height: 1.6rem;
+    }
+
+    .top-bar-connection {
+      grid-area: connection;
+      padding-inline: 0.4rem;
+      line-height: 1.6rem;
+      border: unset;
+    }
+
+    .top-bar-version {
+      grid-area: version;
+      padding-inline: 0.4rem;
+      line-height: 1.6rem;
+      border: unset;
+      background: var(--xanthous);
+      color: var(--night);
     }
   }
 
@@ -272,9 +305,8 @@ html, body {
 
 .todo {
   display: grid;
-  grid-template:  [title-top] "title   title   title   title"  [title-bottom]
-                    [start-top] "start   start   start   start"  [start-bottom]
-                      [end-top] "end     end     end     end"    [end-bottom]
+  grid-template:    [title-top] "title   title   title   title"  [title-bottom]
+                    [dates-top] "start   start   end     end"    [dates-bottom]
                     [descr-top] "desc    desc    desc    desc"   [descr-bottom]
                              /  1fr      1fr     1fr     1fr;
   grid-row-gap: 0;

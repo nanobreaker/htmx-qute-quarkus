@@ -227,17 +227,12 @@ public class Tokenizer {
                     if (character == CharacterIterator.DONE) {
                         currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
-                    } else if (
-                            Character.isDigit(character)
-                                    || character == '/'
-                                    || character == '-'
-                                    || character == '.'
-                    ) {
-                        currentTokenString.append(character);
-                        character = iterator.next();
                     } else if (character == '"') {
                         currentToken = new Opt.Start(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
+                    } else {
+                        currentTokenString.append(character);
+                        character = iterator.next();
                     }
                 }
 
@@ -245,17 +240,12 @@ public class Tokenizer {
                     if (character == CharacterIterator.DONE) {
                         currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
-                    } else if (
-                            Character.isDigit(character)
-                                    || character == '/'
-                                    || character == '-'
-                                    || character == '.'
-                    ) {
-                        currentTokenString.append(character);
-                        character = iterator.next();
                     } else if (character == '"') {
                         currentToken = new Opt.End(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
+                    } else {
+                        currentTokenString.append(character);
+                        character = iterator.next();
                     }
                 }
 
