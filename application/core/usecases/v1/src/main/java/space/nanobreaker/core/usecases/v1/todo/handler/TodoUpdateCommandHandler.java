@@ -2,7 +2,6 @@ package space.nanobreaker.core.usecases.v1.todo.handler;
 
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
-import io.quarkus.logging.Log;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -15,7 +14,8 @@ import space.nanobreaker.core.domain.v1.todo.TodoRepository;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoUpdateCommand;
 import space.nanobreaker.cqrs.CommandHandler;
 import space.nanobreaker.library.Error;
-import space.nanobreaker.library.*;
+import space.nanobreaker.library.Option;
+import space.nanobreaker.library.Result;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -59,17 +59,17 @@ public class TodoUpdateCommandHandler implements CommandHandler<TodoUpdateComman
                 .onItem().transformToUniAndMerge(resultUni -> resultUni);
 
         return updatedTodosIds
-                .invoke(this::dispatchTodoUpdateEvent)
-                .collect().with(Collectors.counting())
+                .map(this::dispatchTodoUpdateEvent)
+                .onItem().transformToUniAndMerge(voidUni -> voidUni)
+                .toUni()
                 .replaceWith(() -> Result.ok(null));
     }
 
     @WithSpan("dispatchTodoUpdatedEvent")
-    public void dispatchTodoUpdateEvent(final TodoId todoId) {
-        switch (Option.over(todoId)) {
-            case Some(final TodoId t) -> eventBus.publish("todo.updated", t);
-            case None<TodoId> ignored -> Log.error("todo.updated ignored");
-        }
+    public Uni<Void> dispatchTodoUpdateEvent(final TodoId todoId) {
+        return Uni.createFrom()
+                .item(() -> eventBus.publish("todo.updated", todoId))
+                .replaceWithVoid();
     }
 
 }
