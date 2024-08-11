@@ -162,13 +162,22 @@ html, body {
 
   pre {
     position: inherit;
+    padding: 0.3rem;
     width: 100%;
     max-height: fit-content;
     align-self: end;
-    background: var(--almost-night);
-    padding-bottom: 1rem;
     margin-bottom: unset;
-    padding-top: 1rem;
+  }
+
+  .info {
+    background: var(--almost-night);
+    color: var(--faded-fg);
+  }
+
+  .error {
+    background: var(--bad-faded-fg);
+    color: var(--bad-fg);
+    white-space: pre-line;
   }
 }
 
@@ -271,9 +280,10 @@ html, body {
   grid-row-gap: 0;
   grid-template-rows: auto auto auto auto;
 
+  background-color: var(--almost-night);
   border: var(--fg);
   border-style: solid;
-  border-width: 0.1rem;
+  border-width: 0.01rem;
   margin: var(--rhythm);
 
   height: min-content;
@@ -299,13 +309,13 @@ html, body {
     .time {
       font-family: var(--mono-font);
       font-size: .9em;
-      background-color: var(--almost-night);
+      background-color: var(--ok-bg);
       color: var(--fg);
       text-align: center;
     }
 
     .arrow-right {
-      color: var(--almost-night);
+      color: var(--ok-bg);
       border-top: 9px solid transparent;
       border-left: 9px solid;
       border-bottom: 9px solid transparent;
@@ -319,7 +329,7 @@ html, body {
     align-items: center;
 
     .arrow-left {
-      color: var(--almost-night);
+      color: var(--accent);
       border-top: 9px solid transparent;
       border-right: 9px solid;
       border-bottom: 9px solid transparent;
@@ -328,7 +338,7 @@ html, body {
     .time {
       font-family: var(--mono-font);
       font-size: .9em;
-      background-color: var(--almost-night);
+      background-color: var(--accent);
       color: var(--fg);
       text-align: center;
     }
@@ -336,9 +346,10 @@ html, body {
 
   .description {
     grid-area: desc;
-    background-color: var(--night);
+    background-color: var(--almost-night);
     max-height: 18ch;
     text-wrap: wrap;
+    text-align: center;
   }
 }
 
