@@ -36,7 +36,7 @@ class ParserTest {
                 .append("create")
                 .append("\"test\"")
                 .append("-d\"description\"")
-                .append("-s\"27/06/2024\"")
+                .append("-s\"27.06.24\"")
                 .append("-e\"27/06/2024\"")
                 .build();
 

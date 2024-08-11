@@ -33,10 +33,13 @@ public class Parser {
     }
 
     private static final StringBuilder pattern = new StringBuilder()
-            .append("[dd/MM/yyyy HH:mm]")
-            .append("[dd/MM/yyyy HH]")
-            .append("[dd/MM/yyyy]")
-            .append("[dd/MM]")
+            .append("[dd[/][.][-]MM[/][.][-]yyyy HH:mm]")
+            .append("[dd[/][.][-]MM[/][.][-]yyyy HH]")
+            .append("[dd[/][.][-]MM[/][.][-]yyyy]")
+            .append("[dd[/][.][-]MM[/][.][-]yy HH:mm]")
+            .append("[dd[/][.][-]MM[/][.][-]yy HH]")
+            .append("[dd[/][.][-]MM[/][.][-]yy]")
+            .append("[dd[/][.][-]MM]")
             .append("[dd]");
 
     // todo: remove hardcoded values and use current date & time

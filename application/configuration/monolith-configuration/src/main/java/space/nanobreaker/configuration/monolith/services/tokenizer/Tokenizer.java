@@ -227,7 +227,12 @@ public class Tokenizer {
                     if (character == CharacterIterator.DONE) {
                         currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
-                    } else if (Character.isDigit(character) || character == '/') {
+                    } else if (
+                            Character.isDigit(character)
+                                    || character == '/'
+                                    || character == '-'
+                                    || character == '.'
+                    ) {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else if (character == '"') {
@@ -240,7 +245,12 @@ public class Tokenizer {
                     if (character == CharacterIterator.DONE) {
                         currentToken = new Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
-                    } else if (Character.isDigit(character) || character == '/') {
+                    } else if (
+                            Character.isDigit(character)
+                                    || character == '/'
+                                    || character == '-'
+                                    || character == '.'
+                    ) {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else if (character == '"') {
