@@ -6,7 +6,20 @@ public record ListTodoCmd(
 
     public static String help() {
         return """
-                  usage: todo list
+                   \s
+                   usage
+                   \s
+                     todo list ["<arg>"]
+                   \s
+                   argument
+                   \s
+                     arg       string                       id of todo
+                   \s
+                   examples
+                   \s
+                     todo list
+                     todo list "1" "2" "2"
+                   \s
                 """;
     }
 }

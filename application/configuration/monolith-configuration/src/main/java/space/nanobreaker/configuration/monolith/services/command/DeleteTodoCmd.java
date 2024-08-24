@@ -10,13 +10,19 @@ public record DeleteTodoCmd(
 
     public static String help() {
         return """
-                  usage: todo delete <id(s)>
-                  \s
-                  argument:
-                  "id(s)"       "string"        id or list of ids, where id is todo title
-                  \s
-                  example:
-                  todo delete 11 21
+                   \s
+                   usage
+                   \s
+                     todo delete "<arg>"
+                   \s
+                   argument
+                   \s
+                     arg       string                       id of todo
+                   \s
+                   examples
+                   \s
+                     todo delete "1" "2" "3"
+                   \s
                 """;
     }
 }

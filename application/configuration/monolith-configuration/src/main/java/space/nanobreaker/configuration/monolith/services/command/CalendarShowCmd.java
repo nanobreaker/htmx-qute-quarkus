@@ -4,7 +4,15 @@ public record CalendarShowCmd() implements CalendarCmd {
 
     public static String help() {
         return """
-                  usage: calendar show
+                   \s
+                   usage
+                   \s
+                     calendar show
+                   \s
+                   description
+                   \s
+                     display calendar of the user
+                   \s
                 """;
     }
 

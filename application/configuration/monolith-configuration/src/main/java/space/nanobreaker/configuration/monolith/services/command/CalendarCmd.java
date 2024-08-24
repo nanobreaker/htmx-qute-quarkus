@@ -6,10 +6,14 @@ public sealed interface CalendarCmd
 
     static String help() {
         return """
-                  usage: calendar &lt;show&gt;
                   \s
-                  commands:
-                  show       display calendar information
+                  usage
+                  \s
+                    calendar <command>
+                  \s
+                  commands
+                    show    display calendar of the user
+                  \s
                 """;
     }
 

@@ -1,23 +1,43 @@
 <form id="todo-{todo.id.id}"
-        {#if swap } hx-swap-oob="true" {/if}
       hx-get="/todo/{todo.id.id}"
       hx-trigger="sse:todo.updated.{todo.id.id}"
       hx-swap="outerHTML"
-      class="todo crowded fade-me-out">
-    <pre class="title">{todo.title}</pre>
-    {#if todo.getStart().isPresent()}
-        <div class="start">
-            <div class="time">{todo.getStart().get().formatDate}</div>
-            <div class="arrow-right"></div>
+      class="todo crowded fade-me-out" {#if swap } hx-swap-oob="true" {/if}>
+
+    <div class="identifier">{todo.id.id.formatId}</div>
+
+    <div class="title padding">{todo.title}</div>
+
+    {#if todo.start.isPresent() && todo.start.isTimePresent() }
+        <div class="start-label">=>></div>
+        <div class="start-date-time">
+            <div class="start-date padding allcaps">{todo.start.formatDate}</div>
+            <div class="start-time padding">{todo.start.formatTime}</div>
         </div>
+    {#else if todo.start.isPresent() }
+        <div class="start-label">=>></div>
+        <div class="start-date-single padding allcaps">{todo.start.formatDate}</div>
+    {#else if todo.start.isTimePresent() }
+        <div class="start-label">=>></div>
+        <div class="start-time-single padding">{todo.start.formatTime}</div>
     {/if}
-    {#if todo.getEnd().isPresent()}
-        <div class="end">
-            <div class="arrow-left"></div>
-            <div class="time">{todo.getEnd().get().formatDate}</div>
+
+    {#if todo.end.isPresent() && todo.end.isTimePresent() }
+        <div class="end-label"><<=</div>
+        <div class="end-date-time">
+            <div class="end-date padding allcaps">{todo.end.formatDate}</div>
+            <div class="end-time padding">{todo.end.formatTime}</div>
         </div>
+    {#else if todo.end.isPresent() }
+        <div class="end-label"><<=</div>
+        <div class="end-date-single padding allcaps">{todo.end.formatDate}</div>
+    {#else if todo.end.isTimePresent() }
+        <div class="end-label"><<=</div>
+        <div class="end-time-single padding">{todo.end.formatTime}</div>
     {/if}
-    {#if todo.getDescription().isPresent()}
-        <pre class="description padding-inline">{todo.description}</pre>
+
+    {#if todo.description.isPresent()}
+        <div class="description-label">*</div>
+        <pre class="description padding">{todo.description}</pre>
     {/if}
 </form>

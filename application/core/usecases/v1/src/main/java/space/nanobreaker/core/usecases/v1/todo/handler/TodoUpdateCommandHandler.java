@@ -14,12 +14,9 @@ import space.nanobreaker.core.domain.v1.todo.TodoRepository;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoUpdateCommand;
 import space.nanobreaker.cqrs.CommandHandler;
 import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Option;
 import space.nanobreaker.library.Result;
 
-import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TodoUpdateCommandHandler implements CommandHandler<TodoUpdateCommand, Result<Void, Error>> {
@@ -36,10 +33,6 @@ public class TodoUpdateCommandHandler implements CommandHandler<TodoUpdateComman
     public Uni<Result<Void, Error>> handle(final TodoUpdateCommand command) {
         final String username = command.username();
         final Set<String> filters = command.filters();
-        final Option<String> title = command.title();
-        final Option<String> description = command.description();
-        final Option<LocalDateTime> start = command.start();
-        final Option<LocalDateTime> end = command.end();
 
         final Multi<Todo> todosToUpdate = todoRepository
                 .listBy(username, filters)
@@ -49,10 +42,10 @@ public class TodoUpdateCommandHandler implements CommandHandler<TodoUpdateComman
                 .map(todo -> todoRepository
                         .update(
                                 todo,
-                                title,
-                                description,
-                                start,
-                                end
+                                command.title(),
+                                command.description(),
+                                command.start(),
+                                command.end()
                         )
                         .map(result -> todo.getId())
                 )

@@ -32,20 +32,26 @@ public record CreateTodoCmd(
 
     public static String help() {
         return """
-                  usage: todo create "arg" [options]
-                  \s
-                  argument:
-                  "arg"             "string"           title
-                  \s
-                  options:
-                  -d --description  "string"           description
-                  -s --start        "dd/mm/yy hh:mm"   start date(time),
-                  -e --end          "dd/mm/yy hh:mm"   end date(time)
-                  \s
-                  examples:
-                  todo create "yoga" -d"eminescu street" -s"30/06/2024"
-                  todo create "vacation" -s"02/07" -e"09/07"
-                  todo create "walk with doggy" -s"08:00" -e"10:00"
+                   \s
+                   usage
+                   \s
+                     todo create "<arg>" [-d"<description>"] [-s"<start>"] [-e"<end>"]
+                   \s
+                   argument
+                   \s
+                     arg       string                       title of todo
+                   \s
+                   options
+                   \s
+                     -d        string                       description of todo
+                     -s        template dd/mm/yy hh:mm      start date time
+                     -e        template dd/mm/yy hh:mm      end date time
+                   \s
+                   examples
+                   \s
+                     todo create "country trip" -d"prepare car" -s"21 09:00" -e"22 18:00"
+                     todo create "vacation" -d"barcelona again?" -s"04/12" -e"22/12"
+                   \s
                 """;
     }
 

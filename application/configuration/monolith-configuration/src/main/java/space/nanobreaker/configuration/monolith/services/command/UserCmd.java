@@ -6,10 +6,14 @@ public sealed interface UserCmd
 
     static String help() {
         return """
-                  usage: user &lt;show&gt;
                   \s
-                  commands:
-                  show       display user information
+                  usage
+                  \s
+                    user <command>
+                  \s
+                  commands
+                    show    display user information
+                  \s
                 """;
     }
 

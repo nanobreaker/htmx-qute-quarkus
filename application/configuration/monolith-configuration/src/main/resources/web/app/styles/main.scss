@@ -110,7 +110,7 @@
 
 .title-font {
   font-family: var(--title-font), system-ui;
-  font-style: italic;
+  font-style: normal;
 }
 
 input[type="search"]::-webkit-search-cancel-button {
@@ -141,15 +141,146 @@ html, body {
   overflow: hidden
 }
 
+.bg-primary {
+  color: var(--night);
+}
+
+.bg-secondary {
+  color: var(--almost-night);
+}
+
+.accent {
+  color: var(--night);
+  background: var(--accent);
+}
+
+.fine {
+  color: var(--fg);
+  background: var(--almost-night);
+}
+
 #dashboard {
   display: grid;
   grid-template-rows: 1.6rem 1fr 1.6rem 1.6rem;
 
   #top-bar {
     display: grid;
-    grid-template:   [prompt] "title connection version" [prompt];
-    grid-template-columns: 1fr auto auto;
+    grid-template:   [prompt] "title conup condown data" [prompt];
+    grid-template-columns: 1fr fit-content(14rch) fit-content(14rch) fit-content(14rch);
     line-height: 1.6rem;
+
+    .counter-uplink {
+      grid-area: conup;
+      display: grid;
+      grid-template-columns: 2rch min(4rch, 8rch, 12rch);
+    }
+
+    .counter-downlink {
+      grid-area: condown;
+      display: grid;
+      grid-template-columns: 2rch min(4rch, 8rch, 12rch);
+    }
+
+    .arrow-container-up {
+      position: relative;
+      width: 1ch;
+      overflow: hidden;
+      height: 1.6rem;
+      margin-inline: 0.5rch;
+    }
+
+    .arrow-container-down {
+      position: relative;
+      width: 1ch;
+      overflow: hidden;
+      height: 1.6rem;
+      margin-inline: 0.5rch;
+    }
+
+    .arrow-up {
+      position: absolute;
+    }
+
+    .arrow-down {
+      position: absolute;
+    }
+
+    .icon-container {
+      width: 2ch;
+      height: 1.6rem;
+      margin-inline: 0.5rch;
+    }
+
+    .counter-data {
+      grid-area: data;
+      display: grid;
+      grid-template-columns: 2rch min(12rch) 3rch;
+    }
+
+    .counter {
+      border-style: none;
+      background: none;
+      color: inherit;
+      font-size: larger;
+      width: 100%;
+      text-align: center;
+      padding: unset;
+      margin: unset;
+    }
+
+    .slide-up-animation {
+      animation: slide-up 1s ease-in-out;
+    }
+
+    @keyframes slide-up {
+      0% {
+        opacity: 1;
+        transform: translateY(0ch);
+      }
+      50% {
+        opacity: 0;
+        transform: translateY(-2ch);
+      }
+      51% {
+        opacity: 0;
+        transform: translateY(4ch);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0ch)
+      }
+    }
+
+    .slide-down-animation {
+      animation: slide-down 1s ease-in-out;
+    }
+
+    @keyframes slide-down {
+      0% {
+        opacity: 1;
+        transform: translateY(0ch);
+      }
+      50% {
+        opacity: 0;
+        transform: translateY(2ch);
+      }
+      51% {
+        opacity: 0;
+        transform: translateY(-4ch);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0ch)
+      }
+    }
+
+    .top-bar-conup {
+      font-style: normal;
+    }
+
+    .top-bar-condown {
+      font-style: normal;
+    }
 
     .top-bar-title {
       grid-area: title;
@@ -203,13 +334,13 @@ html, body {
   }
 
   .info {
-    background: var(--almost-night);
-    color: var(--faded-fg);
+    background: var(--night);
+    color: var(--fg);
   }
 
   .error {
     background: var(--bad-faded-fg);
-    color: var(--bad-fg);
+    color: var(--night);
     white-space: pre-line;
   }
 }
@@ -298,90 +429,179 @@ html, body {
   display: grid;
   max-width: 100%;
   gap: 0;
-  grid-template-columns: repeat(auto-fill, minmax(9ch, 27ch));
+  grid-template-columns: repeat(auto-fill, minmax(9rch, 36rch));
   grid-auto-rows: min-content;
   justify-items: center;
 }
 
 .todo {
   display: grid;
-  grid-template:    [title-top] "title   title   title   title"  [title-bottom]
-                    [dates-top] "start   start   end     end"    [dates-bottom]
-                    [descr-top] "desc    desc    desc    desc"   [descr-bottom]
-                             /  1fr      1fr     1fr     1fr;
-  grid-row-gap: 0;
-  grid-template-rows: auto auto auto auto;
+  grid-template:    "identifier     title "
+                    "start-label    start "
+                    "end-label      end   "
+                    "desc-label     desc  ";
 
-  background-color: var(--almost-night);
+  grid-template-columns: 4rch fit-content(18rch);
+  grid-template-rows: fit-content(5.7rch) fit-content(2rch) fit-content(2rch) fit-content(9rch);
+
+  grid-row-gap: 0;
+
+  background: var(--fg);
   border: var(--fg);
   border-style: solid;
-  border-width: 0.01rem;
-  margin: var(--rhythm);
+  border-width: 0.1rem;
+  margin: var(--rhythm) var(--rhythm) 0 var(--rhythm);
 
   height: min-content;
-  width: 18ch;
+
+  .identifier {
+    grid-area: identifier;
+
+    text-align: center;
+    font-size: larger;
+    align-self: center;
+
+    color: var(--night);
+  }
 
   .title {
-    font-family: var(--mono-font);
-    font-size: .9em;
-    text-align: center;
-    background-color: var(--fg);
-    color: var(--bg);
     grid-area: title;
-    line-height: 2ch;
-    text-wrap: auto;
+
+    text-align: center;
+    font-size: medium;
+    text-wrap: pretty;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    width: 100%;
+    height: 100%;
+
+    background: var(--almost-night);
+    color: var(--fg);
   }
 
-  .start {
+  .title:hover {
+    background: var(--fg);
+    color: var(--night);
+  }
+
+  .start-label {
+    grid-area: start-label;
+    font-style: normal;
+    font-size: larger;
+    text-align: center;
+    align-self: center;
+    color: var(--night);
+  }
+
+  .start-date-time {
     grid-area: start;
     display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
+    grid-template-columns: auto auto;
 
-    .time {
-      font-family: var(--mono-font);
-      font-size: .9em;
-      background-color: var(--ok-bg);
-      color: var(--fg);
+    border-top-style: solid;
+    border-top-width: 0.1rem;
+
+    .start-date {
+      grid-area: unset;
       text-align: center;
+      background: var(--almost-night);
     }
 
-    .arrow-right {
-      color: var(--ok-bg);
-      border-top: 9px solid transparent;
-      border-left: 9px solid;
-      border-bottom: 9px solid transparent;
+    .start-time {
+      grid-area: unset;
+      text-align: center;
+      background: var(--almost-night);
     }
   }
 
-  .end {
+  .start-date-single {
+    grid-area: start;
+    text-align: center;
+    background: var(--almost-night);
+
+    border-top-style: solid;
+    border-top-width: 0.1rem;
+  }
+
+  .start-time-single {
+    grid-area: start;
+    text-align: center;
+    background: var(--almost-night);
+
+    border-top-style: solid;
+    border-top-width: 0.1rem;
+  }
+
+  .end-label {
+    grid-area: end-label;
+    font-style: normal;
+    font-size: larger;
+    text-align: center;
+    align-self: center;
+    color: var(--night);
+  }
+
+  .end-date-time {
     grid-area: end;
     display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
+    grid-template-columns: auto auto;
 
-    .arrow-left {
-      color: var(--accent);
-      border-top: 9px solid transparent;
-      border-right: 9px solid;
-      border-bottom: 9px solid transparent;
-    }
+    border-top-style: solid;
+    border-top-width: 0.1rem;
 
-    .time {
-      font-family: var(--mono-font);
-      font-size: .9em;
-      background-color: var(--accent);
-      color: var(--fg);
+    .end-date {
+      grid-area: unset;
       text-align: center;
+      background: var(--almost-night);
     }
+
+    .end-time {
+      grid-area: unset;
+      text-align: center;
+      background: var(--almost-night);
+    }
+  }
+
+  .end-date-single {
+    grid-area: end;
+    text-align: center;
+    background: var(--almost-night);
+
+    border-top-style: solid;
+    border-top-width: 0.1rem;
+  }
+
+  .end-time-single {
+    grid-area: end;
+    text-align: center;
+    background: var(--almost-night);
+
+    border-top-style: solid;
+    border-top-width: 0.1rem;
+  }
+
+  .description-label {
+    grid-area: desc-label;
+    font-style: normal;
+    font-size: larger;
+    text-align: center;
+    align-self: center;
+    color: var(--night);
   }
 
   .description {
     grid-area: desc;
-    background-color: var(--almost-night);
+    background: var(--almost-night);
     max-height: 18ch;
+    font-size: medium;
     text-wrap: wrap;
     text-align: center;
+    margin: unset;
+
+    border-top-style: solid;
+    border-top-width: 0.1rem;
   }
 }
 

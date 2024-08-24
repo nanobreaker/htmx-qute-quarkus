@@ -5,25 +5,85 @@
          sse-connect="/command/feedback">
 
         <div id="top-bar"
+             class="padding"
              style="background: var(--almost-night)">
-            <label class="top-bar-title title-font big padding-inline">reactive-todos</label>
-            <chip id="sse-connection-chip"
-                  class="top-bar-connection mono-font warn"
-                  style="border-radius: unset;"
-                  _="on htmx:sseOpen from document
-                                remove .warn from me
-                                then add .ok to me
-                                then put 'CONN' into me
-                             on htmx:sseError from document
-                                remove .ok from me
-                                then add .warn to me
-                                then put 'DOWN' into me
-                            ">
-                DOWN
-            </chip>
-            <label class="top-bar-version">
-                v{applicationVersion ?: 'unknown'}
-            </label>
+            <label class="top-bar-title mono-font">alice@reactive-todos:1.0.0-snapshot</label>
+            <div class="counter-uplink"
+                 _="on htmx:responseError from document
+                        remove .fine from me
+                        add .accent to me
+                    on htmx:afterRequest from document
+                        remove .accent from me
+                        then add .fine to me
+                   ">
+                <div class="arrow-container-up">
+                    <i class="arrow-up top-bar-conup nf-fa-arrow_up_long"
+                       _="  on htmx:afterRequest from document
+                                add .slide-up-animation to me
+                                then wait 1s
+                                then remove .slide-up-animation from me
+                            on fetch:afterRequest from document
+                                add .slide-up-animation to me
+                                then wait 1s
+                                then remove .slide-up-animation from me
+                         ">
+                    </i>
+                </div>
+                <div type="number"
+                     id="s-counter"
+                     class="counter"
+                     _="init put '000' into my innerHTML
+                        on htmx:afterRequest from document
+                            increment my.innerHTML
+                            set my.innerHTML to my.innerHTML.toString().padStart(3, '0')
+                        on fetch:afterRequest from document
+                            increment my.innerHTML
+                            set my.innerHTML to my.innerHTML.toString().padStart(3, '0')
+                       ">
+                </div>
+            </div>
+            <div class="counter-downlink"
+                 _="on htmx:sseError from document
+                        remove .fine from me
+                        add .accent to me
+                    on htmx:sseOpen from document
+                        remove .accent from me
+                        then add .fine to me
+                   ">
+                <div class="arrow-container-down">
+                    <i class="arrow-down top-bar-condown nf-fa-arrow_down_long"
+                       _="on htmx:sseMessage from document
+                            add .slide-down-animation to me
+                            then wait 1s
+                            then remove .slide-down-animation from me
+                         ">
+                    </i>
+                </div>
+                <div type="number"
+                     id="r-counter"
+                     class="counter"
+                     _="init put '000' into my innerHTML
+                        on htmx:sseMessage from document
+                            increment my.innerHTML
+                            set my.innerHTML to my.innerHTML.toString().padStart(3, '0')
+                       ">
+                </div>
+            </div>
+            <div class="counter-data">
+                <div class="icon-container">
+                    <i class="nf-md-database_sync_outline" style="font-style: normal"></i>
+                </div>
+                <div type="number"
+                     id="d-counter"
+                     class="counter"
+                     _="init put '0000.0000' into my innerHTML
+                        on fetch:afterRequest from document
+                            get metric()
+                            set my.innerHTML to it.padStart(9, '0')
+                       ">
+                </div>
+                <div style="text-align: center; font-size: larger">MB</div>
+            </div>
         </div>
 
         <div id="content">

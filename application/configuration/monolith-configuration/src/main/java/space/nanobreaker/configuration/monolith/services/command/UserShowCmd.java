@@ -4,10 +4,15 @@ public record UserShowCmd() implements UserCmd {
 
     public static String help() {
         return """
-                  usage: user &lt;show&gt;
-                  \s
-                  commands:
-                  show       display user information
+                   \s
+                   usage
+                   \s
+                     user show
+                   \s
+                   description
+                   \s
+                     display user information
+                   \s
                 """;
     }
 

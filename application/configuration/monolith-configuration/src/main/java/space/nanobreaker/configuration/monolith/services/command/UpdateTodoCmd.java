@@ -36,20 +36,27 @@ public record UpdateTodoCmd(
 
     public static String help() {
         return """
-                  usage: todo update "id" [options]
-                  \s
-                  argument:
-                  "id"              "string"           id (title)
-                  \s
-                  options:
-                  -d --description  "string"           description
-                  -s --start        "dd/mm/yy hh:mm"   start date(time),
-                  -e --end          "dd/mm/yy hh:mm"   end date(time)
-                  \s
-                  examples:
-                  todo update "yoga" -d"new description"
-                  todo update "vacation" -s"23/11" -e"26/11"
-                  todo update "walk with doggy" -s"12:00" -e"15:00"
+                   \s
+                   usage
+                   \s
+                     todo update "<titles....>" [-t"<title>"] [-d"<description>"] [-s"<start>"] [-e"<end>"]
+                   \s
+                   argument
+                   \s
+                     arg       string                       title of todo
+                   \s
+                   options
+                   \s
+                     -t        string                       title of todo
+                     -d        string                       description of todo
+                     -s        template dd/mm/yy hh:mm      start date time
+                     -e        template dd/mm/yy hh:mm      end date time
+                   \s
+                   examples
+                   \s
+                     todo update "trip to barcelona" -d"check in day before" -s"21 09:00" -e"22 18:00"
+                     todo update "doggy" -d"buy new bottle"
+                   \s
                 """;
     }
 }

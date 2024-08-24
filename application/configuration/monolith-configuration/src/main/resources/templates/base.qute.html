@@ -11,8 +11,24 @@
             crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx-ext-sse@2.2.1/sse.js"></script>
     <script src="https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
     <script type="text/hyperscript">
+        js
+            function metric() {
+                const entries = performance.getEntriesByType("resource");
+                let total = 0;
+
+                entries.forEach((entry) => {
+                    if (entry.transferSize) {
+                        total += (entry.transferSize / 1024 / 1024);
+                    }
+                });
+
+                return total.toFixed(4);
+            }
+
+            return { metric };
+        end
+
         def navigation.focusById(id)
             js(id)
                 document.getElementById(id).focus()

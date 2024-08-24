@@ -8,19 +8,17 @@ public sealed interface TodoCmd extends Command permits
 
     static String help() {
         return """
-                  usage: todo &lt;command&gt; [options]
                   \s
-                  commands:
-                  create  "&lt;description&gt;"     create new todo
-                  list    &lt;id ids&gt;            list all todos
-                  update  &lt;id ids&gt;            update todo(s) by id(s)
-                  delete  &lt;id ids&gt;            delete todo(s) by id(s)
+                  usage
                   \s
-                  options:
-                  -h --help                   more information
-                  -d --description string     description
-                  -s --start string           start date time
-                  -e --end string             end date time
+                    todo <command> "<args>" [options]
+                  \s
+                  commands
+                    create      create todo
+                    list        list todos
+                    update      update todo(s) by title(s)/id(s)
+                    delete      delete todo(s) by id(s)
+                  \s
                 """;
     }
 }
