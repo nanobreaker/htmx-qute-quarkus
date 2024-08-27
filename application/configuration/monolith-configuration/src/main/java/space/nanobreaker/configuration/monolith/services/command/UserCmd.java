@@ -12,6 +12,7 @@ public sealed interface UserCmd
                     user <command>
                   \s
                   commands
+                  \s
                     show    display user information
                   \s
                 """;

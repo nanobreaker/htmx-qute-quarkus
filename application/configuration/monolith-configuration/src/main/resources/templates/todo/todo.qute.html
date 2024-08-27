@@ -1,8 +1,8 @@
 <form id="todo-{todo.id.id}"
       hx-get="/todo/{todo.id.id}"
       hx-trigger="sse:todo.updated.{todo.id.id}"
-      hx-swap="outerHTML"
-      class="todo crowded fade-me-out" {#if swap } hx-swap-oob="true" {/if}>
+      hx-swap="outerHTML" {#if oob }hx-swap-oob="true"{/if}
+      class="todo crowded fade-me-out">
 
     <div class="identifier">{todo.id.id.formatId}</div>
 

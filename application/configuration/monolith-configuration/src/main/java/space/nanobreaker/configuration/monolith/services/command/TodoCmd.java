@@ -14,6 +14,7 @@ public sealed interface TodoCmd extends Command permits
                     todo <command> "<args>" [options]
                   \s
                   commands
+                  \s
                     create      create todo
                     list        list todos
                     update      update todo(s) by title(s)/id(s)

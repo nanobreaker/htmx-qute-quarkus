@@ -17,6 +17,10 @@ public interface TodoRepository {
             final TodoId id
     );
 
+    Uni<Stream<Todo>> list(
+            final String username
+    );
+
     Uni<Stream<Todo>> listBy(
             final String username,
             final Set<String> searchPatterns

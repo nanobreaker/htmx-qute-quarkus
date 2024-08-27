@@ -49,6 +49,30 @@ public class TodoJpaPostgresRepository
     }
 
     @Override
+    public Uni<Stream<Todo>> list(
+            final String username
+    ) {
+        final String query = """
+                select t from TodoJpaEntity t
+                where
+                    t.id.username = :username
+                order by
+                    t.id.id
+                """;
+
+        return this.getSession()
+                .flatMap(session ->
+                        session.createQuery(query, TodoJpaEntity.class)
+                                .setParameter("username", username)
+                                .getResultList()
+                )
+                .map(jpaEntities ->
+                        jpaEntities.stream()
+                                .map(this::mapToDomainEntity)
+                );
+    }
+
+    @Override
     public Uni<Stream<Todo>> listBy(
             final String username,
             final Set<String> filters

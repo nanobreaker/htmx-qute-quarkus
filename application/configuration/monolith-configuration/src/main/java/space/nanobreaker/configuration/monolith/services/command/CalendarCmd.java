@@ -12,6 +12,7 @@ public sealed interface CalendarCmd
                     calendar <command>
                   \s
                   commands
+                  \s
                     show    display calendar of the user
                   \s
                 """;

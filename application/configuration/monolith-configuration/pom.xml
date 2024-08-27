@@ -97,6 +97,7 @@
             <artifactId>quarkus-container-image-docker</artifactId>
         </dependency>
         <!-- web dependencies -->
+        <!--
         <dependency>
             <groupId>org.mvnpm</groupId>
             <artifactId>htmx.org</artifactId>
@@ -115,6 +116,7 @@
             <version>2.0.0</version>
             <scope>provided</scope>
         </dependency>
+        -->
         <dependency>
             <groupId>org.mvnpm</groupId>
             <artifactId>missing.css</artifactId>

@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import space.nanobreaker.configuration.monolith.services.command.Command;
 import space.nanobreaker.configuration.monolith.services.command.CreateTodoCmd;
+import space.nanobreaker.configuration.monolith.services.command.ListTodoCmd;
 import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCmd;
 import space.nanobreaker.configuration.monolith.services.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
@@ -129,7 +130,18 @@ public class Parser {
     }
 
     private Result<Command, Error> parseTodoListCommand(final SequencedCollection<Token> tokens) {
-        return Result.err(new ParserErr.NotSupportedOperation());
+        final Option<Set<Arg>> argumentsOption = getOptionalArguments(tokens, Arg.class);
+
+        return switch (argumentsOption) {
+            case Some(final Set<Arg> args) -> {
+                final Set<Integer> ids = args.stream()
+                        .map(a -> Integer.parseInt(a.value()))
+                        .collect(Collectors.toSet());
+
+                yield ListTodoCmd.of(ids);
+            }
+            case None() -> ListTodoCmd.of();
+        };
     }
 
     private Result<Command, Error> parseTodoUpdateCommand(final SequencedCollection<Token> tokens) {
@@ -213,6 +225,21 @@ public class Parser {
                 .map(target::cast)
                 .map(Result::<T, Error>ok)
                 .orElse(Result.err(new ParserErr.ArgumentNotFound()));
+    }
+
+    private static <T> Option<Set<T>> getOptionalArguments(
+            final Collection<? extends Token> opts,
+            final Class<T> target
+    ) {
+        final Set<T> args = opts.stream()
+                .filter(target::isInstance)
+                .map(target::cast)
+                .collect(Collectors.toSet());
+
+        if (args.isEmpty())
+            return Option.none();
+
+        return Option.over(args);
     }
 
     private static <T> Result<Set<T>, Error> getArguments(

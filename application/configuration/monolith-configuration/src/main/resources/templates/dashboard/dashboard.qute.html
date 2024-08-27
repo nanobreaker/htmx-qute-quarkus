@@ -87,10 +87,10 @@
         </div>
 
         <div id="content">
-            <div id="todo-grid"
-                 class="todo-grid"
-                 sse-swap="todo.created,todo.updated"
-                 hx-swap="beforeend">
+            <div id="todo-grid-loader"
+                 hx-get="/todo"
+                 hx-trigger="load,sse:todo.listed"
+                 hx-swap="innerHTML">
             </div>
             <div id="feedback"
                  sse-swap="help,empty,internal_error"

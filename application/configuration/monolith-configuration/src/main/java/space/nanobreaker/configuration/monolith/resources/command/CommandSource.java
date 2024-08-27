@@ -16,6 +16,9 @@ import space.nanobreaker.configuration.monolith.resources.todo.TodoTemplates;
 import space.nanobreaker.configuration.monolith.sse.SseEventSinkService;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.core.usecases.v1.todo.command.TodoListCommand;
+
+import java.util.Set;
 
 @Path("command")
 public class CommandSource {
@@ -59,6 +62,17 @@ public class CommandSource {
     ) {
         final String username = todoId.getUsername();
         final String key = "todo.updated." + todoId.getId().toString();
+        sseEventSink.dispatchOutboundSseEvent(sse.newEvent(key, ""), username);
+    }
+
+
+    @ConsumeEvent(value = "todo.listed")
+    @WithSpan("handleTodoListedEvent")
+    public void handleTodoListedEvent(
+            final TodoListCommand command
+    ) {
+        final String username = command.username();
+        final String key = "todo.listed";
         sseEventSink.dispatchOutboundSseEvent(sse.newEvent(key, ""), username);
     }
 
