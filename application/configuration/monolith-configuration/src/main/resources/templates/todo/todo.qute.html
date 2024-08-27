@@ -2,9 +2,15 @@
       hx-get="/todo/{todo.id.id}"
       hx-trigger="sse:todo.updated.{todo.id.id}"
       hx-swap="outerHTML" {#if oob }hx-swap-oob="true"{/if}
-      class="todo crowded fade-me-out">
+      class="todo crowded fade-me-out slide-it">
 
-    <div class="identifier">{todo.id.id.formatId}</div>
+    <div class="identifier"
+         hx-delete="/todo/{todo.id.id}"
+         hx-trigger="sse:todo.to.delete.{todo.id.id}"
+         hx-target="#todo-{todo.id.id}"
+         hx-swap="outerHTML swap:1s">
+        {todo.id.id.formatId}
+    </div>
 
     <div class="title padding">{todo.title}</div>
 

@@ -3,10 +3,7 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.CreateTodoCmd;
-import space.nanobreaker.configuration.monolith.services.command.ListTodoCmd;
-import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCmd;
+import space.nanobreaker.configuration.monolith.services.command.*;
 import space.nanobreaker.configuration.monolith.services.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
 import space.nanobreaker.library.Error;
@@ -192,7 +189,20 @@ public class Parser {
     }
 
     private Result<Command, Error> parseTodoDeleteCommand(final SequencedCollection<Token> tokens) {
-        return Result.err(new ParserErr.NotSupportedOperation());
+        final Result<Set<Arg>, Error> argumentResult = getArguments(tokens, Arg.class);
+
+        if (argumentResult.isErr())
+            return Result.err(argumentResult.error());
+
+        final Set<Arg> args = argumentResult.unwrap();
+
+        // always should be integer, move casting to tokenizer
+        final Set<Integer> ids = args.stream()
+                .map(Arg::value)
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
+
+        return DeleteTodoCmd.of(ids);
     }
 
     private Result<Command, Error> parseCalendarProgram(final SequencedCollection<Token> tokens) {

@@ -20,12 +20,16 @@ import space.nanobreaker.configuration.monolith.services.parser.ParserErr;
 import space.nanobreaker.configuration.monolith.services.tokenizer.TokenizerErr;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoCreateCommand;
+import space.nanobreaker.core.usecases.v1.todo.command.TodoDeleteCommand;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoListCommand;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoUpdateCommand;
 import space.nanobreaker.library.Error;
 import space.nanobreaker.library.*;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("command")
 public class CommandResource {
@@ -188,7 +192,23 @@ public class CommandResource {
     private Uni<Response> executeTodoDeleteCommand(
             final DeleteTodoCmd cmd
     ) {
-        return Uni.createFrom().item(Response.serverError().build());
+        final String username = securityIdentity.getPrincipal().getName();
+        final Set<TodoDeleteCommand> commands = cmd.ids().stream()
+                .map(id -> new TodoDeleteCommand(new TodoId(id, username)))
+                .collect(Collectors.toSet());
+
+        final List<Uni<Void>> requests = commands.stream()
+                .map(command ->
+                        Uni.createFrom()
+                                .item(() -> eventBus.publish("todo.to.delete", command))
+                                .replaceWithVoid()
+                )
+                .toList();
+
+        return Uni.join()
+                .all(requests)
+                .andCollectFailures()
+                .map(ignored -> Response.ok().build());
     }
 
     private Uni<Response> executeCalendarShowCommand(

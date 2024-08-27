@@ -7,13 +7,12 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.core.usecases.v1.todo.command.TodoDeleteCommand;
 import space.nanobreaker.core.usecases.v1.todo.query.TodoGetQuery;
 import space.nanobreaker.core.usecases.v1.todo.query.TodosGetQuery;
 import space.nanobreaker.library.Err;
@@ -69,6 +68,20 @@ public class TodoResource {
                 .map(result -> switch (result) {
                     case Ok(final Todo todo) -> TodoTemplates.todo(todo, false).render();
                     case Err(final Error err) -> error.data("error", err.getClass().getName()).render();
+                });
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Uni<Response> delete(@PathParam("id") Integer id) {
+        final TodoId todoId = new TodoId(id, securityIdentity.getPrincipal().getName());
+        final TodoDeleteCommand command = new TodoDeleteCommand(todoId);
+
+        return eventBus.<Result<Void, Error>>request("todo.delete", command)
+                .map(Message::body)
+                .map(result -> switch (result) {
+                    case Ok<Void, Error> ignored -> Response.ok().build();
+                    case Err(final Error ignored) -> Response.serverError().build();
                 });
     }
 }

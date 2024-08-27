@@ -16,9 +16,8 @@ import space.nanobreaker.configuration.monolith.resources.todo.TodoTemplates;
 import space.nanobreaker.configuration.monolith.sse.SseEventSinkService;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.core.usecases.v1.todo.command.TodoDeleteCommand;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoListCommand;
-
-import java.util.Set;
 
 @Path("command")
 public class CommandSource {
@@ -76,7 +75,23 @@ public class CommandSource {
         sseEventSink.dispatchOutboundSseEvent(sse.newEvent(key, ""), username);
     }
 
-    public sealed interface SseCommand permits CommandAnalyzed, CommandClear, CommandError{}
+    @ConsumeEvent(value = "todo.to.delete")
+    @WithSpan("handleTodoToDeleteEvent")
+    public void handleTodoToDeleteEvent(
+            final TodoDeleteCommand command
+    ) {
+        final TodoId id = command.id();
+        final String username = id.getUsername();
+        final String key = "todo.to.delete." + id.getId();
+        final OutboundSseEvent todoToDelete = sse.newEvent(key, "");
+        sseEventSink.dispatchOutboundSseEvent(sse.newEvent("empty", ""), username);
+        sseEventSink.dispatchOutboundSseEvent(todoToDelete, username);
+    }
+
+
+    public sealed interface SseCommand permits CommandAnalyzed, CommandClear, CommandError {
+    }
+
     public record CommandAnalyzed(String username, String text) implements SseCommand {
     }
 

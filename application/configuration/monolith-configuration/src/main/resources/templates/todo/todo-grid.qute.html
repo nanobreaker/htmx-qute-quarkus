@@ -9,7 +9,13 @@
               hx-swap="outerHTML"
               class="todo crowded fade-me-out">
 
-            <div class="identifier">{todo.id.id.formatId}</div>
+            <div class="identifier fade-me-out"
+                 hx-delete="/todo/{todo.id.id}"
+                 hx-trigger="sse:todo.to.delete.{todo.id.id}"
+                 hx-target="#todo-{todo.id.id}"
+                 hx-swap="outerHTML swap:1s">
+                {todo.id.id.formatId}
+            </div>
 
             <div class="title padding">{todo.title}</div>
 

@@ -2,6 +2,7 @@ package space.nanobreaker.core.usecases.v1.todo.handler;
 
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.eventbus.EventBus;
@@ -19,7 +20,7 @@ public class TodoListCommandHandler implements CommandHandler<TodoListCommand, R
     EventBus eventBus;
 
     @ConsumeEvent(value = "todo.list")
-    @WithSession
+    @WithTransaction
     @WithSpan("handleTodoListCommand")
     @Override
     public Uni<Result<Void, Error>> handle(final TodoListCommand command) {

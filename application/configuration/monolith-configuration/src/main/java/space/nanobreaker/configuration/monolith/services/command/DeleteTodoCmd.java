@@ -1,12 +1,29 @@
 package space.nanobreaker.configuration.monolith.services.command;
 
-import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.library.Error;
+import space.nanobreaker.library.Result;
 
 import java.util.Set;
 
 public record DeleteTodoCmd(
-        Set<TodoId> ids
+        Set<Integer> ids
 ) implements TodoCmd {
+
+    public static Result<Command, Error> of(final Set<Integer> ids) {
+        try {
+            return Result.ok(new DeleteTodoCmd(ids));
+        } catch (Exception e) {
+            return Result.err(new CmdErr.CreationFailed(e.getMessage()));
+        }
+    }
+
+    public static Result<Command, Error> of() {
+        try {
+            return Result.ok(new DeleteTodoCmd(Set.of()));
+        } catch (Exception e) {
+            return Result.err(new CmdErr.CreationFailed(e.getMessage()));
+        }
+    }
 
     public static String help() {
         return """

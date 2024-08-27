@@ -134,6 +134,14 @@ public class TodoJpaPostgresRepository
                 .chain(this::flush);
     }
 
+    @Override
+    public Uni<Void> deleteByTodoId(final TodoId id) {
+        final TodoJpaId jpaId = mapToJpaId(id);
+
+        return this.deleteById(jpaId)
+                .replaceWithVoid();
+    }
+
     protected TodoJpaId mapToJpaId(final TodoId id) {
         final TodoJpaId todoJpaId = new TodoJpaId();
         todoJpaId.setId(id.getId());

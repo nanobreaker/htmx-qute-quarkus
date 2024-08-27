@@ -10,28 +10,32 @@ import java.util.stream.Stream;
 public interface TodoRepository {
 
     Uni<Todo> save(
-            final Todo Todo
+            Todo Todo
     );
 
     Uni<Option<Todo>> findById(
-            final TodoId id
+            TodoId id
     );
 
     Uni<Stream<Todo>> list(
-            final String username
+            String username
     );
 
     Uni<Stream<Todo>> listBy(
-            final String username,
-            final Set<String> searchPatterns
+            String username,
+            Set<String> searchPatterns
     );
 
     Uni<Void> update(
-            final Todo todo,
-            final Option<String> someTitle,
-            final Option<String> someDescription,
-            final Option<LocalDateTime> someStart,
-            final Option<LocalDateTime> someEnd
+            Todo todo,
+            Option<String> someTitle,
+            Option<String> someDescription,
+            Option<LocalDateTime> someStart,
+            Option<LocalDateTime> someEnd
+    );
+
+    Uni<Void> deleteByTodoId(
+            TodoId id
     );
 
 }
