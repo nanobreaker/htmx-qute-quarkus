@@ -1,7 +1,6 @@
 package space.nanobreaker.configuration.monolith.resources.command;
 
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.keycloak.client.KeycloakTestClient;
 import io.restassured.RestAssured;
 import io.restassured.config.CsrfConfig;
 import io.restassured.http.ContentType;
@@ -51,11 +50,8 @@ public class CommandResourceTest {
                 );
     }
 
-    KeycloakTestClient keycloakClient = new KeycloakTestClient();
-
     @Test
     public void shouldCreateAndGetTodo() {
-        final String accessToken = keycloakClient.getAccessToken("alice");
         final String csrfToken = csrfToken();
 
         final Todo todo = new Todo(
@@ -66,14 +62,13 @@ public class CommandResourceTest {
                 LocalDateTime.of(2024, 8, 10, 0, 0),
                 LocalDateTime.of(2024, 8, 11, 0, 0)
         );
-        final TodoId todoId = createTodo(todo, accessToken, csrfToken);
+        final TodoId todoId = createTodo(todo, csrfToken);
         todo.getId().setId(todoId.getId());
         todo.getId().setUsername(todoId.getUsername());
 
         // @formatter:off
         final Response todoGetResponse =
             given()
-                .auth().oauth2(accessToken)
                 .contentType(ContentType.URLENC)
                 .cookie("csrf-token", csrfToken)
             .when()
@@ -92,7 +87,6 @@ public class CommandResourceTest {
 
     private TodoId createTodo(
             final Todo todo,
-            final String accessToken,
             final String csrfToken
     ) {
         final String query = "todo create \"%s\" -d\"%s\" -s\"%s\" -e\"%s\""
@@ -112,7 +106,6 @@ public class CommandResourceTest {
         // @formatter:off
         final Response todoCreateResponse =
                 given()
-                    .auth().oauth2(accessToken)
                     .contentType(ContentType.URLENC)
                     .formParams(params)
                     .cookie("csrf-token", csrfToken)
@@ -137,7 +130,6 @@ public class CommandResourceTest {
     private String csrfToken() {
         return
             given()
-                .auth().oauth2(keycloakClient.getAccessToken("alice"))
             .when()
                 .get("/")
             .then()

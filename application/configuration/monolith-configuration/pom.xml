@@ -71,10 +71,12 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-reactive-pg-client</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-oidc-db-token-state-manager</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
@@ -150,7 +152,7 @@
         <!-- TESTS -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-test-keycloak-server</artifactId>
+            <artifactId>quarkus-reactive-mysql-client</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
