@@ -327,6 +327,24 @@ class TokenizerTest {
         );
     }
 
+    @Test
+    void shouldNotFailOnOptionWithoutKey() {
+        final String input = "todo create \"test\" -\"22\" -\"24\"";
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+
+        assertThat(result.isOk()).isTrue();
+
+        final SequencedCollection<Token> tokens = result.unwrap();
+
+        assertThat(tokens.size()).isEqualTo(5);
+        assertThat(tokens).containsExactly(
+                new Prog.Todo(),
+                new Cmd.Create(),
+                new Arg("test"),
+                new Unk("22"),
+                new Unk("24")
+        );
+    }
 
     @Test
     void shouldReturnErrorWhenInputIsEmptyOrNull() {

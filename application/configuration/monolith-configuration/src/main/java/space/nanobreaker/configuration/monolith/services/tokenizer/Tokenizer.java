@@ -139,6 +139,11 @@ public class Tokenizer {
                                 character = iterator.next();
                             }
                         }
+                    } else if (character == ' ') {
+                        character = iterator.next();
+                    } else if (character == '"') {
+                        stateNext = new State.UnknownOptionValue();
+                        character = iterator.next();
                     }
                 }
 
