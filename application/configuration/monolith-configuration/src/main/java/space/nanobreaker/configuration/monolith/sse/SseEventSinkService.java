@@ -35,7 +35,7 @@ public class SseEventSinkService {
             final OutboundSseEvent event,
             final String username
     ) {
-        final Option<SseEventSink> optionalSink = Option.over(get(username));
+        final Option<SseEventSink> optionalSink = Option.of(get(username));
 
         switch (optionalSink) {
             case Some(SseEventSink sink) -> sink.send(event);

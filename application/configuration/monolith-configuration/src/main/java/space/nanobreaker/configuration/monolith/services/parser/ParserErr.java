@@ -9,7 +9,7 @@ public sealed interface ParserErr extends Error {
     record UnknownCommand() implements ParserErr { }
     record ArgumentNotFound() implements ParserErr { }
     record NotSupportedOperation() implements ParserErr { }
-    record DateTimeParseErr(String description) implements ParserErr { }
+    record FailedToParseDate(String description) implements ParserErr { }
     // @formatter:on
 
 }

@@ -9,7 +9,9 @@ import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
 import space.nanobreaker.library.Error;
 import space.nanobreaker.library.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
@@ -30,28 +32,28 @@ public class Parser {
         this.tokenizer = tokenizer;
     }
 
-    private static final StringBuilder pattern = new StringBuilder()
-            .append("[dd[/][.][-]MM[/][.][-]yyyy HH:mm]")
-            .append("[dd[/][.][-]MM[/][.][-]yyyy HH]")
+    private static final StringBuilder datePattern = new StringBuilder()
             .append("[dd[/][.][-]MM[/][.][-]yyyy]")
-            .append("[dd[/][.][-]MM[/][.][-]yy HH:mm]")
-            .append("[dd[/][.][-]MM[/][.][-]yy HH]")
             .append("[dd[/][.][-]MM[/][.][-]yy]")
-            .append("[dd[/][.][-]MM HH:mm]")
-            .append("[dd[/][.][-]MM HH]")
             .append("[dd[/][.][-]MM]")
-            .append("[dd HH:mm]")
-            .append("[dd HH]")
-            .append("[dd]")
+            .append("[dd]");
+
+    private static final StringBuilder timePattern = new StringBuilder()
             .append("[HH:mm]");
 
-    // todo: remove hardcoded values and use current date (year,month,day)
+    // todo: migrate to clock service
     private static final LocalDateTime now = LocalDateTime.now();
-    private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-            .appendPattern(pattern.toString())
+    private static final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder()
+            .appendPattern(datePattern.toString())
             .parseDefaulting(ChronoField.YEAR, now.getYear())
             .parseDefaulting(ChronoField.MONTH_OF_YEAR, now.getMonthValue())
             .parseDefaulting(ChronoField.DAY_OF_MONTH, now.getDayOfMonth())
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+            .toFormatter();
+    private static final DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
+            .appendPattern(timePattern.toString())
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
@@ -94,36 +96,29 @@ public class Parser {
             return Result.err(new ParserErr.ArgumentNotFound());
 
         final Arg arg = argumentResult.unwrap();
-        final Option<Opt.Description> descriptionOption = getOption(tokens, Opt.Description.class);
-        final Option<Opt.Start> startOption = getOption(tokens, Opt.Start.class);
-        final Option<Opt.End> endOption = getOption(tokens, Opt.End.class);
+        final Option<Opt.Description> descriptionTokenOption = getOption(tokens, Opt.Description.class);
+        final Option<Opt.Start> startTokenOption = getOption(tokens, Opt.Start.class);
+        final Option<Opt.End> endTokenOption = getOption(tokens, Opt.End.class);
 
         final String title = arg.value();
-        final String description = switch (descriptionOption) {
-            case Some(Opt.Description(final String d)) -> d;
-            case None<Opt.Description> ignored -> null;
-        };
-        final LocalDateTime start = switch (startOption) {
-            case Some(Opt.Start(final String startStr)) -> switch (parseDate(startStr)) {
-                case Ok(final LocalDateTime date) -> date;
-                case Err(final Error ignored) -> null;
-            };
-            case None<Opt.Start> ignored -> null;
-        };
-        final LocalDateTime end = switch (endOption) {
-            case Some(Opt.End(final String endStr)) -> switch (parseDate(endStr)) {
-                case Ok(final LocalDateTime date) -> date;
-                case Err(final Error ignored) -> null;
-            };
-            case None<Opt.End> ignored -> null;
-        };
+        final Option<String> descriptionOption = descriptionTokenOption.map(Opt.Description::value);
+        final Option<StartDateTime> startOption = startTokenOption
+                .map(token -> Parser.parseDateTimeString(token.value()))
+                .flatMap(Parser::getStartDateTimeOption);
+        final Option<EndDateTime> endOption = endTokenOption
+                .map(token -> Parser.parseDateTimeString(token.value()))
+                .flatMap(Parser::getEndDateTimeOption);
 
-        return CreateTodoCmd.of(
-                title,
-                description,
-                start,
-                end
-        );
+        final CreateTodoCmd.CreateTodoCmdBuilder builder = new CreateTodoCmd.CreateTodoCmdBuilder();
+        builder.withTitle(title);
+        if (descriptionOption instanceof Some(final String description))
+            builder.withDescription(description);
+        if (startOption instanceof Some(final StartDateTime start))
+            builder.withStart(start);
+        if (endOption instanceof Some(final EndDateTime end))
+            builder.withEnd(end);
+
+        return builder.build();
     }
 
     private Result<Command, Error> parseTodoListCommand(final SequencedCollection<Token> tokens) {
@@ -148,44 +143,35 @@ public class Parser {
             return Result.err(argumentResult.error());
 
         final Set<Arg> args = argumentResult.unwrap();
-        final Option<Opt.Title> titleOption = getOption(tokens, Opt.Title.class);
-        final Option<Opt.Description> descriptionOption = getOption(tokens, Opt.Description.class);
-        final Option<Opt.Start> startOption = getOption(tokens, Opt.Start.class);
-        final Option<Opt.End> endOption = getOption(tokens, Opt.End.class);
+        final Option<Opt.Title> titleTokenOption = getOption(tokens, Opt.Title.class);
+        final Option<Opt.Description> descriptionTokenOption = getOption(tokens, Opt.Description.class);
+        final Option<Opt.Start> startTokenOption = getOption(tokens, Opt.Start.class);
+        final Option<Opt.End> endTokenOption = getOption(tokens, Opt.End.class);
 
         final Set<String> filters = args.stream()
                 .map(Arg::value)
                 .collect(Collectors.toSet());
-        final String title = switch (titleOption) {
-            case Some(Opt.Title(final String t)) -> t;
-            case None<Opt.Title> ignored -> null;
-        };
-        final String description = switch (descriptionOption) {
-            case Some(Opt.Description(final String d)) -> d;
-            case None<Opt.Description> ignored -> null;
-        };
-        final LocalDateTime start = switch (startOption) {
-            case Some(Opt.Start(final String startStr)) -> switch (parseDate(startStr)) {
-                case Ok(final LocalDateTime date) -> date;
-                case Err(final Error ignored) -> null;
-            };
-            case None<Opt.Start> ignored -> null;
-        };
-        final LocalDateTime end = switch (endOption) {
-            case Some(Opt.End(final String endStr)) -> switch (parseDate(endStr)) {
-                case Ok(final LocalDateTime date) -> date;
-                case Err(final Error ignored) -> null;
-            };
-            case None<Opt.End> ignored -> null;
-        };
+        final Option<String> titleOption = titleTokenOption.map(Opt.Title::value);
+        final Option<String> descriptionOption = descriptionTokenOption.map(Opt.Description::value);
+        final Option<StartDateTime> startOption = startTokenOption
+                .map(token -> Parser.parseDateTimeString(token.value()))
+                .flatMap(Parser::getStartDateTimeOption);
+        final Option<EndDateTime> endOption = endTokenOption
+                .map(token -> Parser.parseDateTimeString(token.value()))
+                .flatMap(Parser::getEndDateTimeOption);
 
-        return UpdateTodoCmd.of(
-                filters,
-                title,
-                description,
-                start,
-                end
-        );
+        final UpdateTodoCmd.UpdateTodoCmdBuilder builder = new UpdateTodoCmd.UpdateTodoCmdBuilder();
+        builder.withFilters(filters);
+        if (titleOption instanceof Some(final String title))
+            builder.withTitle(title);
+        if (descriptionOption instanceof Some(final String description))
+            builder.withDescription(description);
+        if (startOption instanceof Some(final StartDateTime start))
+            builder.withStart(start);
+        if (endOption instanceof Some(final EndDateTime end))
+            builder.withEnd(end);
+
+        return builder.build();
     }
 
     private Result<Command, Error> parseTodoDeleteCommand(final SequencedCollection<Token> tokens) {
@@ -196,7 +182,7 @@ public class Parser {
 
         final Set<Arg> args = argumentResult.unwrap();
 
-        // always should be integer, move casting to tokenizer
+        // todo: always should be integer, move casting to tokenizer
         final Set<Integer> ids = args.stream()
                 .map(Arg::value)
                 .map(Integer::parseInt)
@@ -222,7 +208,7 @@ public class Parser {
                 .findFirst()
                 .map(target::cast);
 
-        return Option.over(optional);
+        return Option.of(optional);
     }
 
     private static <T> Result<T, Error> getArgument(
@@ -249,7 +235,7 @@ public class Parser {
         if (args.isEmpty())
             return Option.none();
 
-        return Option.over(args);
+        return Option.of(args);
     }
 
     private static <T> Result<Set<T>, Error> getArguments(
@@ -267,13 +253,106 @@ public class Parser {
         return Result.ok(args);
     }
 
-    private static Result<LocalDateTime, Error> parseDate(final String string) {
+    private static Option<StartDateTime> getStartDateTimeOption(
+            Result<Tuple<Option<LocalDate>, Option<LocalTime>>, Error> tupleResult
+    ) {
+        return switch (tupleResult) {
+            case Ok(
+                    Tuple(Some(final LocalDate date), Some(final LocalTime time))
+            ) -> Option.of(StartDateTime.of(date, time));
+            case Ok(
+                    Tuple(
+                            Some(final LocalDate date), None<LocalTime> ignored
+                    )
+            ) -> {
+                final LocalTime time = LocalTime.of(0, 0, 0);
+                yield Option.of(StartDateTime.of(date, time));
+            }
+            case Ok(
+                    Tuple(
+                            None<LocalDate> ignored, Some(final LocalTime time)
+                    )
+            ) -> {
+                final LocalDate date = LocalDate.now();
+                yield Option.of(StartDateTime.of(date, time));
+            }
+            default -> Option.none();
+        };
+    }
+
+    private static Option<EndDateTime> getEndDateTimeOption(
+            Result<Tuple<Option<LocalDate>, Option<LocalTime>>, Error> tupleResult
+    ) {
+        return switch (tupleResult) {
+            case Ok(
+                    Tuple(Some(final LocalDate date), Some(final LocalTime time))
+            ) -> Option.of(EndDateTime.of(date, time));
+            case Ok(
+                    Tuple(
+                            Some(final LocalDate date), None<LocalTime> ignored
+                    )
+            ) -> {
+                final LocalTime time = LocalTime.of(0, 0, 0);
+                yield Option.of(EndDateTime.of(date, time));
+            }
+            case Ok(
+                    Tuple(
+                            None<LocalDate> ignored, Some(final LocalTime time)
+                    )
+            ) -> {
+                final LocalDate date = LocalDate.now();
+                yield Option.of(EndDateTime.of(date, time));
+            }
+            default -> Option.none();
+        };
+    }
+
+    // todo: improve method implementation, meditate on how to do better
+    private static Result<Tuple<Option<LocalDate>, Option<LocalTime>>, Error> parseDateTimeString(final String dateTimeStr) {
         try {
-            // todo: make possible to parse with LocalTime
-            //          otherwise creation by pure time "12:30" is not possible
-            return Result.ok(LocalDateTime.parse(string, formatter));
+            final String[] dateTimeParts = dateTimeStr.split(" ", 2);
+
+            if (dateTimeParts.length == 2
+                    && isDateString(dateTimeParts[0])
+                    && isTimeString(dateTimeParts[1])
+            ) {
+                final String datePart = dateTimeParts[0];
+                final String timePart = dateTimeParts[1];
+                final LocalDate date = LocalDate.parse(datePart, dateFormatter);
+                final LocalTime time = LocalTime.parse(timePart, timeFormatter);
+
+                return Result.ok(new Tuple<>(
+                        Option.of(date),
+                        Option.of(time)
+                ));
+            } else if (isDateString(dateTimeStr)) {
+                final LocalDate date = LocalDate.parse(dateTimeStr, dateFormatter);
+
+                return Result.ok(new Tuple<>(
+                        Option.of(date),
+                        Option.none()
+                ));
+            } else if (isTimeString(dateTimeStr)) {
+                final LocalTime time = LocalTime.parse(dateTimeStr, timeFormatter);
+
+                return Result.ok(new Tuple<>(
+                        Option.none(),
+                        Option.of(time)
+                ));
+            }
+
+            return Result.err(new ParserErr.FailedToParseDate(dateTimeStr));
         } catch (DateTimeParseException e) {
-            return Result.err(new ParserErr.DateTimeParseErr(e.getParsedString()));
+            return Result.err(new ParserErr.FailedToParseDate(e.getParsedString()));
         }
+    }
+
+    private static boolean isTimeString(final String string) {
+        return string.contains(":");
+    }
+
+    private static boolean isDateString(final String string) {
+        final Set<String> indicators = Set.of(".", "/", "-");
+        return indicators.stream().anyMatch(string::contains) || string.length() == 2;
     }
 }

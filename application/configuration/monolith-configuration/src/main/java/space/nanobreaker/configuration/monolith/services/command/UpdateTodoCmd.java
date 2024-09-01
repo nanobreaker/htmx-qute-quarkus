@@ -3,7 +3,6 @@ package space.nanobreaker.configuration.monolith.services.command;
 import space.nanobreaker.library.Error;
 import space.nanobreaker.library.Result;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
@@ -11,8 +10,8 @@ public record UpdateTodoCmd(
         Set<String> filters,
         String title,
         String description,
-        LocalDateTime start,
-        LocalDateTime end
+        StartDateTime start,
+        EndDateTime end
 ) implements TodoCmd {
 
 
@@ -25,8 +24,8 @@ public record UpdateTodoCmd(
             final Set<String> searchPatterns,
             final String title,
             final String description,
-            final LocalDateTime start,
-            final LocalDateTime end) {
+            final StartDateTime start,
+            final EndDateTime end) {
         try {
             return Result.ok(new UpdateTodoCmd(searchPatterns, title, description, start, end));
         } catch (Exception e) {
@@ -58,5 +57,49 @@ public record UpdateTodoCmd(
                      todo update "doggy" -d"buy new bottle"
                    \s
                 """;
+    }
+
+    public static final class UpdateTodoCmdBuilder {
+        private Set<String> filters;
+        private String title;
+        private String description;
+        private StartDateTime start;
+        private EndDateTime end;
+
+        public UpdateTodoCmdBuilder() {
+        }
+
+        public static UpdateTodoCmdBuilder anUpdateTodoCmd() {
+            return new UpdateTodoCmdBuilder();
+        }
+
+        public UpdateTodoCmdBuilder withFilters(Set<String> filters) {
+            this.filters = filters;
+            return this;
+        }
+
+        public UpdateTodoCmdBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public UpdateTodoCmdBuilder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public UpdateTodoCmdBuilder withStart(StartDateTime start) {
+            this.start = start;
+            return this;
+        }
+
+        public UpdateTodoCmdBuilder withEnd(EndDateTime end) {
+            this.end = end;
+            return this;
+        }
+
+        public Result<Command, Error> build() {
+            return UpdateTodoCmd.of(filters, title, description, start, end);
+        }
     }
 }

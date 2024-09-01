@@ -28,6 +28,7 @@ import space.nanobreaker.library.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -121,8 +122,8 @@ public class CommandResource {
                 securityIdentity.getPrincipal().getName(),
                 cmd.title(),
                 cmd.description(),
-                cmd.start(),
-                cmd.end()
+                Objects.nonNull(cmd.start()) ? cmd.start().toDateTime() : null,
+                Objects.nonNull(cmd.end()) ? cmd.end().toDateTime() : null
         );
 
         final Uni<Result<TodoId, Error>> result = eventBus
@@ -147,10 +148,10 @@ public class CommandResource {
         final TodoUpdateCommand todoUpdateCommand = new TodoUpdateCommand(
                 cmd.filters(),
                 username,
-                Option.over(cmd.title()),
-                Option.over(cmd.description()),
-                Option.over(cmd.start()),
-                Option.over(cmd.end())
+                Option.of(cmd.title()),
+                Option.of(cmd.description()),
+                Objects.nonNull(cmd.start()) ? Option.of(cmd.start().toDateTime()) : Option.none(),
+                Objects.nonNull(cmd.end()) ? Option.of(cmd.end().toDateTime()) : Option.none()
         );
 
         final Uni<Result<Void, Error>> result = eventBus
@@ -232,7 +233,7 @@ public class CommandResource {
                 case ParserErr.NotSupportedOperation ignored -> "not supported";
                 case ParserErr.UnknownCommand ignored -> "unknown command";
                 case ParserErr.UnknownProgram ignored -> "unknown program";
-                case ParserErr.DateTimeParseErr e -> "can't parse date: " + e.description();
+                case ParserErr.FailedToParseDate e -> "can't parse date: " + e.description();
             };
             case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
                 case TokenizerErr.EmptyInput ignored -> "empty command line";

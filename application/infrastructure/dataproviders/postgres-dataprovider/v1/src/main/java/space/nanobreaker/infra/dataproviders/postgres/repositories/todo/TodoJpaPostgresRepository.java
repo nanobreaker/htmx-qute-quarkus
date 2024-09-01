@@ -39,10 +39,10 @@ public class TodoJpaPostgresRepository
                 .flatMap(session ->
                         session.find(TodoJpaEntity.class, jpaId)
                 )
-                .map(Option::over)
+                .map(Option::of)
                 .map(todoOption ->
                         switch (todoOption) {
-                            case Some(TodoJpaEntity e) -> Option.over(mapToDomainEntity(e));
+                            case Some(TodoJpaEntity e) -> Option.of(mapToDomainEntity(e));
                             case None() -> Option.none();
                         }
                 );

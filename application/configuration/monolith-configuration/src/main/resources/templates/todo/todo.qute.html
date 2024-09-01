@@ -17,12 +17,12 @@
     {#if todo.start.isPresent() && todo.start.isTimePresent() }
         <div class="start-label">=>></div>
         <div class="start-date-time">
-            <div class="start-date padding allcaps">{todo.start.formatDate}</div>
+            <div class="start-date padding">{todo.start.formatDate}</div>
             <div class="start-time padding">{todo.start.formatTime}</div>
         </div>
     {#else if todo.start.isPresent() }
         <div class="start-label">=>></div>
-        <div class="start-date-single padding allcaps">{todo.start.formatDate}</div>
+        <div class="start-date-single padding">{todo.start.formatDate}</div>
     {#else if todo.start.isTimePresent() }
         <div class="start-label">=>></div>
         <div class="start-time-single padding">{todo.start.formatTime}</div>
@@ -31,12 +31,12 @@
     {#if todo.end.isPresent() && todo.end.isTimePresent() }
         <div class="end-label"><<=</div>
         <div class="end-date-time">
-            <div class="end-date padding allcaps">{todo.end.formatDate}</div>
+            <div class="end-date padding">{todo.end.formatDate}</div>
             <div class="end-time padding">{todo.end.formatTime}</div>
         </div>
     {#else if todo.end.isPresent() }
         <div class="end-label"><<=</div>
-        <div class="end-date-single padding allcaps">{todo.end.formatDate}</div>
+        <div class="end-date-single padding">{todo.end.formatDate}</div>
     {#else if todo.end.isTimePresent() }
         <div class="end-label"><<=</div>
         <div class="end-time-single padding">{todo.end.formatTime}</div>

@@ -4,25 +4,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.CreateTodoCmd;
-import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCmd;
 import space.nanobreaker.configuration.monolith.services.tokenizer.Tokenizer;
+import space.nanobreaker.configuration.monolith.services.tokenizer.TokenizerErr;
 import space.nanobreaker.library.Error;
 import space.nanobreaker.library.Result;
-
-import java.time.LocalDateTime;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ParserTest {
 
-    private Tokenizer tokenizer;
     private Parser parser;
 
     @BeforeEach
     void setUp() {
-        tokenizer = new Tokenizer();
+        final Tokenizer tokenizer = new Tokenizer();
         parser = new Parser(tokenizer);
     }
 
@@ -31,56 +26,32 @@ class ParserTest {
     }
 
     @Test
-    void shouldReturnTodoCreateCmd() {
-        final String input = new InputBuilder("todo")
-                .append("create")
-                .append("\"test\"")
-                .append("-d\"description\"")
-                .append("-s\"27.06.24\"")
-                .append("-e\"27/06/2024\"")
-                .build();
-
+    void shouldReturnErrorOnBlankInput() {
+        final String input = "";
         final Result<Command, Error> result = parser.parse(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCmd(
-                "test",
-                "description",
-                LocalDateTime.of(2024, 6, 27, 0, 0),
-                LocalDateTime.of(2024, 6, 27, 0, 0)
-        );
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.error()).isInstanceOf(TokenizerErr.EmptyInput.class);
     }
 
     @Test
-    void shouldReturnTodoUpdateCmd() {
-        final String input = new InputBuilder("todo")
-                .append("update")
-                .append("\"title1\"")
-                .append("\"title2\"")
-                .append("-t\"new title\"")
-                .append("-d\"description\"")
-                .append("-s\"27/06/2024\"")
-                .append("-e\"27/06/2024\"")
-                .build();
-
+    void shouldReturnErrorOnUnknownProgram() {
+        final String input = new InputBuilder("test").build();
         final Result<Command, Error> result = parser.parse(input);
 
-        assertThat(result.isOk()).isTrue();
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.error()).isInstanceOf(ParserErr.UnknownProgram.class);
+    }
 
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new UpdateTodoCmd(
-                Set.of("title1", "title2"),
-                "new title",
-                "description",
-                LocalDateTime.of(2024, 6, 27, 0, 0),
-                LocalDateTime.of(2024, 6, 27, 0, 0)
-        );
+    @Test
+    void shouldReturnErrorOnUnknownCommand() {
+        final String input = new InputBuilder("todo")
+                .append("test")
+                .build();
+        final Result<Command, Error> result = parser.parse(input);
 
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.error()).isInstanceOf(ParserErr.UnknownCommand.class);
     }
 
     private static class InputBuilder {

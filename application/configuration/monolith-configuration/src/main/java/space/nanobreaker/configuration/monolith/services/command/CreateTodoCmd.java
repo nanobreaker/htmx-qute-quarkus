@@ -9,8 +9,8 @@ import java.util.Objects;
 public record CreateTodoCmd(
         String title,
         String description,
-        LocalDateTime start,
-        LocalDateTime end
+        StartDateTime start,
+        EndDateTime end
 ) implements TodoCmd {
 
     public CreateTodoCmd {
@@ -21,8 +21,8 @@ public record CreateTodoCmd(
     public static Result<Command, Error> of(
             final String title,
             final String description,
-            final LocalDateTime start,
-            final LocalDateTime end) {
+            final StartDateTime start,
+            final EndDateTime end) {
         try {
             return Result.ok(new CreateTodoCmd(title, description, start, end));
         } catch (Exception e) {
@@ -55,4 +55,41 @@ public record CreateTodoCmd(
                 """;
     }
 
+    public static final class CreateTodoCmdBuilder {
+        private String title;
+        private String description;
+        private StartDateTime start;
+        private EndDateTime end;
+
+        public CreateTodoCmdBuilder() {
+        }
+
+        public static CreateTodoCmdBuilder aCreateTodoCmd() {
+            return new CreateTodoCmdBuilder();
+        }
+
+        public CreateTodoCmdBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public CreateTodoCmdBuilder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public CreateTodoCmdBuilder withStart(StartDateTime start) {
+            this.start = start;
+            return this;
+        }
+
+        public CreateTodoCmdBuilder withEnd(EndDateTime end) {
+            this.end = end;
+            return this;
+        }
+
+        public Result<Command, Error> build() {
+            return CreateTodoCmd.of(title, description, start, end);
+        }
+    }
 }

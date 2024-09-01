@@ -47,7 +47,7 @@ public class Tokenizer {
         State stateNow = new State.New();
         State stateNext = new State.New();
 
-        StringBuilder currentTokenString = new StringBuilder();
+        StringBuffer currentTokenString = new StringBuffer();
         Token currentToken = null;
 
         boolean done = false;
@@ -59,7 +59,7 @@ public class Tokenizer {
 
             switch (stateNow) {
                 case State.New ignored -> {
-                    currentTokenString = new StringBuilder();
+                    currentTokenString = new StringBuffer();
                     if (Character.isLetterOrDigit(character)) {
                         currentTokenString.append(character);
                         stateNext = new State.StringLiteral();

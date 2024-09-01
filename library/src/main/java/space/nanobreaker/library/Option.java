@@ -1,19 +1,38 @@
 package space.nanobreaker.library;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 public sealed interface Option<T> permits None, Some {
 
-    static <T> Option<T> over(Optional<T> opt) {
+    static <T> Option<T> of(Optional<T> opt) {
         return opt.<Option<T>>map(Some::new).orElse(new None<>());
     }
 
-    static <T> Option<T> over(T value) {
-        return over(Optional.ofNullable(value));
+    static <T> Option<T> of(T value) {
+        return of(Optional.ofNullable(value));
     }
 
     static <T> Option<T> none() {
-        return over(Optional.empty());
+        return of(Optional.empty());
+    }
+
+    default <NV> Option<NV> map(
+            final Function<? super T, ? extends NV> valueMapper
+    ) {
+        return switch (this) {
+            case Some(T v) -> Option.of(valueMapper.apply(v));
+            case None() -> Option.none();
+        };
+    }
+
+    default <NV> Option<NV> flatMap(
+            final Function<? super T, ? extends Option<NV>> valueMapper
+    ) {
+        return switch (this) {
+            case Some(T v) -> valueMapper.apply(v);
+            case None() -> Option.none();
+        };
     }
 
     default T value() {
