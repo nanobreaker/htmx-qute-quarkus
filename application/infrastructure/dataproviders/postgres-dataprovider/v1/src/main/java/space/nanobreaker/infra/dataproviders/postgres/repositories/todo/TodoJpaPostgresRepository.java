@@ -1,6 +1,7 @@
 package space.nanobreaker.infra.dataproviders.postgres.repositories.todo;
 
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.quarkus.hibernate.reactive.panache.PanacheQuery;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.panache.common.Parameters;
@@ -72,24 +73,55 @@ public class TodoJpaPostgresRepository
                 );
     }
 
+
     @Override
     public Uni<Stream<Todo>> listBy(
             final String username,
-            final Set<String> filters
+            final Option<Set<TodoId>> idsOption,
+            final Option<List<String>> filtersOption
     ) {
-        final String query = """
-                select t from TodoJpaEntity t
-                where
-                 t.id.username = :username and
-                 t.title in :filters
-                """;
+        record Box(Option<Set<TodoId>> ids, Option<List<String>> filters) {
+        }
+        final Box box = new Box(idsOption, filtersOption);
+        final PanacheQuery<TodoJpaEntity> query = switch (box) {
+            case Box(
+                    Some(final Set<TodoId> ids),
+                    Some(final List<String> filters)
+            ) -> {
+                final List<TodoJpaId> jpaIds = ids.stream()
+                        .map(this::mapToJpaId)
+                        .toList();
+                final Parameters params = Parameters.with("ids", jpaIds)
+                        .and("filters", filters);
 
-        return this.getSession()
-                .flatMap(session ->
-                        session.createQuery(query, TodoJpaEntity.class)
-                                .setParameter("username", username)
-                                .setParameter("filters", filters).getResultList()
-                )
+                yield this.find("id in :ids and title in :filters", params);
+            }
+            case Box(
+                    Some(final Set<TodoId> ids),
+                    None<List<String>> ignored
+            ) -> {
+                final List<TodoJpaId> jpaIds = ids.stream()
+                        .map(this::mapToJpaId)
+                        .toList();
+                final Parameters params = Parameters.with("ids", jpaIds);
+
+                yield this.find("id in :ids", params);
+            }
+            case Box(
+                    None<Set<TodoId>> ignored,
+                    Some(final List<String> filters)
+            ) -> {
+                final Parameters params = Parameters.with("username", username)
+                        .and("filters", filters);
+                yield this.find("id.username = :username and title in :filters", params);
+            }
+            default -> {
+                final Parameters params = Parameters.with("username", username);
+                yield this.find("id.username = :username and title in :filters", params);
+            }
+        };
+
+        return query.list()
                 .map(jpaEntities ->
                         jpaEntities.stream()
                                 .map(this::mapToDomainEntity)
@@ -140,6 +172,11 @@ public class TodoJpaPostgresRepository
 
         return this.deleteById(jpaId)
                 .replaceWithVoid();
+    }
+
+    @Override
+    public Uni<Void> deleteByTodoIds(Set<TodoId> ids) {
+        return Uni.createFrom().voidItem();
     }
 
     protected TodoJpaId mapToJpaId(final TodoId id) {

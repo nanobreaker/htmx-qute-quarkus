@@ -1,9 +1,8 @@
-package space.nanobreaker.configuration.monolith.services.parser;
+package space.nanobreaker.configuration.monolith.services.tokenizer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.services.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
 import space.nanobreaker.library.Error;
 import space.nanobreaker.library.Result;

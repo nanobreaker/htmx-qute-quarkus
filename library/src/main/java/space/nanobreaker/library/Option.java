@@ -17,6 +17,20 @@ public sealed interface Option<T> permits None, Some {
         return of(Optional.empty());
     }
 
+    default boolean isSome(){
+        return switch (this) {
+            case Some<T> ignored -> true;
+            case None<T> ignored -> false;
+        };
+    }
+
+    default boolean isNone(){
+        return switch (this) {
+            case Some<T> ignored -> false;
+            case None<T> ignored -> true;
+        };
+    }
+
     default <NV> Option<NV> map(
             final Function<? super T, ? extends NV> valueMapper
     ) {

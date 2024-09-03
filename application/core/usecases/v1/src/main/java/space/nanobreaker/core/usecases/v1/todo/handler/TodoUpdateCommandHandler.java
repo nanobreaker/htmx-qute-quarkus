@@ -11,11 +11,14 @@ import jakarta.inject.Inject;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
+import space.nanobreaker.core.usecases.v1.todo.TodoErr;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoUpdateCommand;
 import space.nanobreaker.cqrs.CommandHandler;
 import space.nanobreaker.library.Error;
+import space.nanobreaker.library.Option;
 import space.nanobreaker.library.Result;
 
+import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
@@ -31,11 +34,15 @@ public class TodoUpdateCommandHandler implements CommandHandler<TodoUpdateComman
     @WithSpan("handleTodoUpdateCommand")
     @WithTransaction
     public Uni<Result<Void, Error>> handle(final TodoUpdateCommand command) {
-        final String username = command.username();
-        final Set<String> filters = command.filters();
+        final Option<Set<TodoId>> ids = command.ids();
+        final Option<List<String>> filters = command.filters();
+
+        if (ids.isNone() && filters.isNone())
+            return Uni.createFrom()
+                    .item(Result.err(new TodoErr.ArgumentOrOptionRequired()));
 
         final Multi<Todo> todosToUpdate = todoRepository
-                .listBy(username, filters)
+                .listBy(command.username(), ids, filters)
                 .onItem().transformToMulti(todos -> Multi.createFrom().items(todos));
 
         final Multi<TodoId> updatedTodosIds = todosToUpdate
@@ -64,5 +71,4 @@ public class TodoUpdateCommandHandler implements CommandHandler<TodoUpdateComman
                 .item(() -> eventBus.publish("todo.updated", todoId))
                 .replaceWithVoid();
     }
-
 }

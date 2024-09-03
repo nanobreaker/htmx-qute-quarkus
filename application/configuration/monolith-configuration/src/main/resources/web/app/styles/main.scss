@@ -175,6 +175,7 @@ html, body {
     .top-bar-title {
         grid-area: title;
         line-height: 1.6rem;
+        font-weight: 900;
     }
 
     .counter-uplink {
@@ -325,7 +326,7 @@ html, body {
     }
 
     .error {
-        background: var(--bad-faded-fg);
+        background: var(--red-6);
         color: var(--night);
         white-space: pre-line;
     }

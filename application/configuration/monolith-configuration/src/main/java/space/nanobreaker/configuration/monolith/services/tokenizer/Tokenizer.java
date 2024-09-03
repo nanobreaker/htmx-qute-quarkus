@@ -21,6 +21,8 @@ public class Tokenizer {
         record StringLiteral() implements State { }
         record OptionStart() implements State { }
         record ArgumentValue() implements State { }
+        record FilterOption() implements State { }
+        record FilterOptionValue() implements State { }
         record TitleOption() implements State { }
         record TitleOptionValue() implements State { }
         record DescriptionOption() implements State { }
@@ -118,6 +120,10 @@ public class Tokenizer {
                 case State.OptionStart ignored -> {
                     if (Character.isAlphabetic(character)) {
                         switch (character) {
+                            case 'f' -> {
+                                stateNext = new State.FilterOption();
+                                character = iterator.next();
+                            }
                             case 't' -> {
                                 stateNext = new State.TitleOption();
                                 character = iterator.next();
@@ -143,6 +149,17 @@ public class Tokenizer {
                         character = iterator.next();
                     } else if (character == '"') {
                         stateNext = new State.UnknownOptionValue();
+                        character = iterator.next();
+                    }
+                }
+
+                case State.FilterOption ignored -> {
+                    if (character == '"') {
+                        character = iterator.next();
+                        stateNext = new State.FilterOptionValue();
+                    } else if (character == CharacterIterator.DONE) {
+                        stateNext = new State.Exit();
+                    } else {
                         character = iterator.next();
                     }
                 }
@@ -199,6 +216,19 @@ public class Tokenizer {
                         stateNext = new State.Exit();
                     } else {
                         character = iterator.next();
+                    }
+                }
+
+                case State.FilterOptionValue ignored -> {
+                    if (character == CharacterIterator.DONE) {
+                        currentToken = new Unk(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
+                    } else if (character != '"') {
+                        currentTokenString.append(character);
+                        character = iterator.next();
+                    } else {
+                        currentToken = new Opt.Filters(currentTokenString.toString());
+                        stateNext = new State.FinalizeToken();
                     }
                 }
 

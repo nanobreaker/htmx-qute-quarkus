@@ -30,7 +30,7 @@ public record DeleteTodoCmd(
                    \s
                    usage
                    \s
-                     todo delete "<arg>"
+                     todo delete "<arg(s)>"
                    \s
                    argument
                    \s

@@ -65,22 +65,22 @@ public class CommandResource {
         return switch (commandResult) {
             case Ok(Command cmd) -> switch (cmd) {
                 case TodoCmd todoCmd -> switch (todoCmd) {
-                    case CreateTodoCmd createTodoCmd -> executeTodoCreateCommand(createTodoCmd);
-                    case UpdateTodoCmd updateTodoCmd -> executeTodoUpdateCommand(updateTodoCmd);
-                    case ListTodoCmd listTodoCmd -> executeTodoListCommand(listTodoCmd);
-                    case DeleteTodoCmd deleteTodoCmd -> executeTodoDeleteCommand(deleteTodoCmd);
+                    case CreateTodoCmd createTodoCmd -> this.execute(createTodoCmd);
+                    case UpdateTodoCmd updateTodoCmd -> this.execute(updateTodoCmd);
+                    case ListTodoCmd listTodoCmd -> this.execute(listTodoCmd);
+                    case DeleteTodoCmd deleteTodoCmd -> this.execute(deleteTodoCmd);
                 };
                 case CalendarCmd calendarCmd -> switch (calendarCmd) {
-                    case CalendarShowCmd calendarShowCmd -> executeCalendarShowCommand(calendarShowCmd);
+                    case CalendarShowCmd calendarShowCmd -> this.execute(calendarShowCmd);
                 };
                 case UserCmd userCmd -> switch (userCmd) {
-                    case UserShowCmd userShowCmd -> executeUserShowCommand(userShowCmd);
+                    case UserShowCmd userShowCmd -> this.execute(userShowCmd);
                 };
             };
             case Err(Error err) -> Uni.createFrom()
                     .item(
                             Response.serverError()
-                                    .entity(error.data("error", err.getClass().getName()))
+                                    .entity(error.data("error", this.describe(err)))
                                     .build()
                     );
         };
@@ -101,7 +101,7 @@ public class CommandResource {
                 case TokenizerErr tokenizerErr -> switch (tokenizerErr) {
                     case TokenizerErr.EmptyInput ignored -> new CommandSource.CommandClear(username);
                 };
-                default -> new CommandSource.CommandError(username, mapErrorToDescription(err));
+                default -> new CommandSource.CommandError(username, this.describe(err));
             };
         };
 
@@ -115,7 +115,7 @@ public class CommandResource {
                 .build();
     }
 
-    private Uni<Response> executeTodoCreateCommand(
+    private Uni<Response> execute(
             final CreateTodoCmd cmd
     ) {
         final TodoCreateCommand command = new TodoCreateCommand(
@@ -141,13 +141,20 @@ public class CommandResource {
         });
     }
 
-    private Uni<Response> executeTodoUpdateCommand(
+    private Uni<Response> execute(
             final UpdateTodoCmd cmd
     ) {
         final String username = securityIdentity.getPrincipal().getName();
+        final Option<Set<TodoId>> idsOption = Option.of(cmd.ids())
+                .map(ids -> ids.stream()
+                        .map(id -> new TodoId(id, username))
+                        .collect(Collectors.toSet())
+                );
+
         final TodoUpdateCommand todoUpdateCommand = new TodoUpdateCommand(
-                cmd.filters(),
                 username,
+                idsOption,
+                Option.of(cmd.filters()),
                 Option.of(cmd.title()),
                 Option.of(cmd.description()),
                 Objects.nonNull(cmd.start()) ? Option.of(cmd.start().toDateTime()) : Option.none(),
@@ -169,7 +176,7 @@ public class CommandResource {
         });
     }
 
-    private Uni<Response> executeTodoListCommand(
+    private Uni<Response> execute(
             final ListTodoCmd cmd
     ) {
         final String username = securityIdentity.getPrincipal().getName();
@@ -190,7 +197,7 @@ public class CommandResource {
         });
     }
 
-    private Uni<Response> executeTodoDeleteCommand(
+    private Uni<Response> execute(
             final DeleteTodoCmd cmd
     ) {
         final String username = securityIdentity.getPrincipal().getName();
@@ -212,19 +219,19 @@ public class CommandResource {
                 .map(ignored -> Response.ok().build());
     }
 
-    private Uni<Response> executeCalendarShowCommand(
+    private Uni<Response> execute(
             final CalendarShowCmd cmd
     ) {
         return Uni.createFrom().item(Response.serverError().build());
     }
 
-    private Uni<Response> executeUserShowCommand(
+    private Uni<Response> execute(
             final UserShowCmd cmd
     ) {
         return Uni.createFrom().item(Response.serverError().build());
     }
 
-    private String mapErrorToDescription(
+    private String describe(
             final Error err
     ) {
         return switch (err) {

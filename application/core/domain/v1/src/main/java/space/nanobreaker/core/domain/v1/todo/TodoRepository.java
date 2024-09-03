@@ -4,6 +4,7 @@ import io.smallrye.mutiny.Uni;
 import space.nanobreaker.library.Option;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -23,7 +24,8 @@ public interface TodoRepository {
 
     Uni<Stream<Todo>> listBy(
             String username,
-            Set<String> searchPatterns
+            Option<Set<TodoId>> ids,
+            Option<List<String>> filters
     );
 
     Uni<Void> update(
@@ -36,6 +38,10 @@ public interface TodoRepository {
 
     Uni<Void> deleteByTodoId(
             TodoId id
+    );
+
+    Uni<Void> deleteByTodoIds(
+            Set<TodoId> ids
     );
 
 }

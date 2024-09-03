@@ -5,7 +5,9 @@
          sse-connect="/command/feedback">
 
         <div id="top-bar" class="padding">
-            <label class="top-bar-title mono-font">alice@reactive-todos:1.0.0-snapshot</label>
+            <label class="top-bar-title mono-font">
+                {username}@{applicationName}:{applicationVersion}
+            </label>
             <div class="counter-uplink"
                  _="on htmx:responseError from document
                         remove .fine from me

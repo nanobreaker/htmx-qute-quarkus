@@ -16,10 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.SequencedCollection;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -137,20 +134,19 @@ public class Parser {
     }
 
     private Result<Command, Error> parseTodoUpdateCommand(final SequencedCollection<Token> tokens) {
-        final Result<Set<Arg>, Error> argumentResult = getArguments(tokens, Arg.class);
-
-        if (argumentResult.isErr())
-            return Result.err(argumentResult.error());
-
-        final Set<Arg> args = argumentResult.unwrap();
+        final Option<Set<Arg>> argumentResult = getOptionalArguments(tokens, Arg.class);
+        final Option<Opt.Filters> titleFiltersTokenOption = getOption(tokens, Opt.Filters.class);
         final Option<Opt.Title> titleTokenOption = getOption(tokens, Opt.Title.class);
         final Option<Opt.Description> descriptionTokenOption = getOption(tokens, Opt.Description.class);
         final Option<Opt.Start> startTokenOption = getOption(tokens, Opt.Start.class);
         final Option<Opt.End> endTokenOption = getOption(tokens, Opt.End.class);
 
-        final Set<String> filters = args.stream()
+        final Option<Set<Integer>> idsOption = argumentResult.map(args -> args.stream()
                 .map(Arg::value)
-                .collect(Collectors.toSet());
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet()));
+        final Option<List<String>> titleFiltersOption = titleFiltersTokenOption
+                .map(token -> Arrays.asList(token.value().split(",")));
         final Option<String> titleOption = titleTokenOption.map(Opt.Title::value);
         final Option<String> descriptionOption = descriptionTokenOption.map(Opt.Description::value);
         final Option<StartDateTime> startOption = startTokenOption
@@ -161,7 +157,10 @@ public class Parser {
                 .flatMap(Parser::getEndDateTimeOption);
 
         final UpdateTodoCmd.UpdateTodoCmdBuilder builder = new UpdateTodoCmd.UpdateTodoCmdBuilder();
-        builder.withFilters(filters);
+        if (idsOption instanceof Some(final Set<Integer> ids))
+            builder.withIds(ids);
+        if (titleFiltersOption instanceof Some(final List<String> titleFilters))
+            builder.withFilters(titleFilters);
         if (titleOption instanceof Some(final String title))
             builder.withTitle(title);
         if (descriptionOption instanceof Some(final String description))
@@ -182,7 +181,6 @@ public class Parser {
 
         final Set<Arg> args = argumentResult.unwrap();
 
-        // todo: always should be integer, move casting to tokenizer
         final Set<Integer> ids = args.stream()
                 .map(Arg::value)
                 .map(Integer::parseInt)
@@ -258,7 +256,9 @@ public class Parser {
     ) {
         return switch (tupleResult) {
             case Ok(
-                    Tuple(Some(final LocalDate date), Some(final LocalTime time))
+                    Tuple(
+                            Some(final LocalDate date), Some(final LocalTime time)
+                    )
             ) -> Option.of(StartDateTime.of(date, time));
             case Ok(
                     Tuple(
@@ -285,7 +285,9 @@ public class Parser {
     ) {
         return switch (tupleResult) {
             case Ok(
-                    Tuple(Some(final LocalDate date), Some(final LocalTime time))
+                    Tuple(
+                            Some(final LocalDate date), Some(final LocalTime time)
+                    )
             ) -> Option.of(EndDateTime.of(date, time));
             case Ok(
                     Tuple(

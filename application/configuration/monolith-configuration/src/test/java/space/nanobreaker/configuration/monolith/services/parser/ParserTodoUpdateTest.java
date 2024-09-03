@@ -13,6 +13,7 @@ import space.nanobreaker.library.Result;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,8 +36,8 @@ public class ParserTodoUpdateTest {
     void shouldReturnTodoUpdateCmd() {
         final String input = new ParserTodoUpdateTest.InputBuilder("todo")
                 .append("update")
-                .append("\"title1\"")
-                .append("\"title2\"")
+                .append("\"1\"")
+                .append("-f\"title1,title2\"")
                 .append("-t\"new title\"")
                 .append("-d\"description\"")
                 .append("-s\"27/06/2024 15:00\"")
@@ -49,7 +50,8 @@ public class ParserTodoUpdateTest {
 
         final Command actualCommand = result.unwrap();
         final Command expectedCommand = new UpdateTodoCmd(
-                Set.of("title1", "title2"),
+                Set.of(1),
+                List.of("title1", "title2"),
                 "new title",
                 "description",
                 StartDateTime.of(

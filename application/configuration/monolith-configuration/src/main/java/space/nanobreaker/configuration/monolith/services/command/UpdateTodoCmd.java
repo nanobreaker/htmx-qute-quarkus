@@ -3,31 +3,27 @@ package space.nanobreaker.configuration.monolith.services.command;
 import space.nanobreaker.library.Error;
 import space.nanobreaker.library.Result;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
 public record UpdateTodoCmd(
-        Set<String> filters,
+        Set<Integer> ids,
+        List<String> filters,
         String title,
         String description,
         StartDateTime start,
         EndDateTime end
 ) implements TodoCmd {
 
-
-    public UpdateTodoCmd {
-        Objects.requireNonNull(filters);
-        assert !filters.isEmpty();
-    }
-
     public static Result<Command, Error> of(
-            final Set<String> searchPatterns,
+            final Set<Integer> ids,
+            final List<String> titleFilters,
             final String title,
             final String description,
             final StartDateTime start,
             final EndDateTime end) {
         try {
-            return Result.ok(new UpdateTodoCmd(searchPatterns, title, description, start, end));
+            return Result.ok(new UpdateTodoCmd(ids, titleFilters, title, description, start, end));
         } catch (Exception e) {
             return Result.err(new CmdErr.CreationFailed(e.getMessage()));
         }
@@ -38,14 +34,15 @@ public record UpdateTodoCmd(
                    \s
                    usage
                    \s
-                     todo update "<titles....>" [-t"<title>"] [-d"<description>"] [-s"<start>"] [-e"<end>"]
+                     todo update "<arg(s)>" [-t"<title>"] [-d"<description>"] [-s"<start>"] [-e"<end>"]
                    \s
                    argument
                    \s
-                     arg       string                       title of todo
+                     arg       string                       id of todo
                    \s
                    options
                    \s
+                     -f        string                       filter by todo title
                      -t        string                       title of todo
                      -d        string                       description of todo
                      -s        template dd/mm/yy hh:mm      start date time
@@ -53,14 +50,16 @@ public record UpdateTodoCmd(
                    \s
                    examples
                    \s
-                     todo update "trip to barcelona" -d"check in day before" -s"21 09:00" -e"22 18:00"
-                     todo update "doggy" -d"buy new bottle"
+                     todo update -f"trip to barcelona" -d"check in day before" -s"21 09:00" -e"22 18:00"
+                     todo update -f"doggy" -d"buy new bottle"
+                     todo update "0" -d"buy new bottle"
                    \s
                 """;
     }
 
     public static final class UpdateTodoCmdBuilder {
-        private Set<String> filters;
+        private Set<Integer> ids;
+        private List<String> filters;
         private String title;
         private String description;
         private StartDateTime start;
@@ -73,7 +72,12 @@ public record UpdateTodoCmd(
             return new UpdateTodoCmdBuilder();
         }
 
-        public UpdateTodoCmdBuilder withFilters(Set<String> filters) {
+        public UpdateTodoCmdBuilder withIds(Set<Integer> ids) {
+            this.ids = ids;
+            return this;
+        }
+
+        public UpdateTodoCmdBuilder withFilters(List<String> filters) {
             this.filters = filters;
             return this;
         }
@@ -99,7 +103,7 @@ public record UpdateTodoCmd(
         }
 
         public Result<Command, Error> build() {
-            return UpdateTodoCmd.of(filters, title, description, start, end);
+            return UpdateTodoCmd.of(ids, filters, title, description, start, end);
         }
     }
 }

@@ -1,6 +1,9 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer.token;
 
 public sealed interface Opt extends Token {
+    record Filters(String value) implements Opt {
+    }
+
     record Title(String value) implements Opt {
     }
 
