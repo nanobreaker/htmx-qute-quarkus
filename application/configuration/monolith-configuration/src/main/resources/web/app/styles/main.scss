@@ -1,94 +1,69 @@
 @import "missing.css";
 
 @font-face {
-  font-family: 'heavy-data-nerd-font-regular';
-  src: url("../fonts/HeavyDataNerdFont-Regular.ttf") format("truetype");
+    font-family: 'heavy-data-nerd-font-regular';
+    src: url("../fonts/HeavyDataNerdFont-Regular.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'jetbrains-nerd-regular';
-  src: url("../fonts/JetBrainsMonoNerdFont-Regular.ttf") format("truetype");
+    font-family: 'jetbrains-nerd-regular';
+    src: url("../fonts/JetBrainsMonoNerdFont-Regular.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'jetbrains-nerd-bold';
-  src: url("../fonts/JetBrainsMonoNerdFont-Bold.ttf") format("truetype");
+    font-family: 'jetbrains-nerd-bold';
+    src: url("../fonts/JetBrainsMonoNerdFont-Bold.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'jetbrains-nerd-mono-regular';
-  src: url("../fonts/JetBrainsMonoNLNerdFontMono-Regular.ttf") format("truetype");
+    font-family: 'jetbrains-nerd-mono-regular';
+    src: url("../fonts/JetBrainsMonoNLNerdFontMono-Regular.ttf") format("truetype");
 }
 
 :root {
-  /* Lengths */
-  --rhythm: 1.1rem; /* Vertical rhythm, line height. */
-  --line-length: 42rem; /* Maximum line length for prose. */
-  --border-radius: .0rem;
+    /* Lengths */
+    --rhythm: 1.1rem; /* Vertical rhythm, line height. */
+    --line-length: 42rem; /* Maximum line length for prose. */
+    --border-radius: .0rem;
 
-  /* Fonts */
-  --title-font: 'heavy-data-nerd-font-regular', system-ui;
-  --main-font: 'jetbrains-nerd-regular', system-ui;
-  --secondary-font: 'jetbrains-nerd-bold', system-ui;
-  --mono-font: 'jetbrains-nerd-mono-regular', system-ui;
+    /* Fonts */
+    --title-font: 'heavy-data-nerd-font-regular', 'Source Sans 3', 'Source Sans Pro', -apple-system, system-ui;
+    --main-font: 'jetbrains-nerd-regular', 'Source Sans 3', 'Source Sans Pro', system-ui;
+    --secondary-font: 'jetbrains-nerd-bold', 'Source Sans 3', 'Source Sans Pro', system-ui;
+    --mono-font: 'jetbrains-nerd-mono-regular', "M Plus Code Latin", monospace;
 
-  /* Colors */
-  --night: #0a0c0fff;
-  --almost-night: #252422;
-  --french-gray: #bec3cbff;
-  --antiflash-white: #f0f3f5ff;
-  --fire-engine-red: #c42021ff;
-  --tangerine: #f18701ff;
-  --xanthous: #f0b72fff;
-  --mint: #68a27aff;
-  --true-blue: #576ca8ff;
-  --magenta: #e36588ff;
-
-  --bg: var(--night);
-  --fg: var(--antiflash-white);
-  --faded-fg: var(--french-gray);
-  --graphical-fg: var(--antiflash-white);
-  --box-bg: var(--night);
-  --interactive-bg: var(--night);
-  --accent: var(--tangerine);
-  --muted-accent: var(--xanthous);
-
-  --plain-fg: var(--antiflash-white);
-  --plain-bg: var(--night);
-  --plain-graphical-fg: var(--night);
-
-  --info-fg: var(--antiflash-white);
-  --info-bg: var(--true-blue);
-  --info-graphical-fg: var(--true-blue);
-
-  --ok-fg: var(--night);
-  --ok-bg: var(--mint);
-  --ok-graphical-fg: var(--mint);
-
-  --bad-fg: var(--antiflash-white);
-  --bad-bg: var(--fire-engine-red);
-  --bad-graphical-fg: var(--fire-engine-red);
-
-  --warn-fg: var(--night);
-  --warn-bg: var(--tangerine);
-  --warn-graphical-fg: var(--tangerine);
+    /* Colors */
+    --night: #0a0c0fff;
+    --almost-night: #252422;
+    --french-gray: #bec3cbff;
+    --antiflash-white: #f0f3f5ff;
+    --fire-engine-red: #c42021ff;
+    --tangerine: #f18701ff;
+    --xanthous: #f0b72fff;
+    --mint: #68a27aff;
+    --true-blue: #576ca8ff;
+    --magenta: #e36588ff;
+    --bg0: #f3eac7;
+    --bg1: #f9f5d7;
+    --bg2: #f5edca;
+    --bg3: #f3eac7;
+    --bg4: #f2e5bc;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.-no-dark-theme) {
-
-    --bg: var(--night);
-    --fg: var(--antiflash-white);
-    --faded-fg: var(--french-gray);
-    --graphical-fg: var(--antiflash-white);
-    --box-bg: var(--night);
-    --interactive-bg: var(--night);
+:root {
+    --bg: var(--bg1);
+    --secondary-bg: var(--bg4);
+    --fg: var(--night);
+    --faded-fg: var(--almost-night);
+    --graphical-fg: var(--bg1);
+    --box-bg: var(--bg1);
+    --interactive-bg: var(--french-gray);
     --accent: var(--tangerine);
     --muted-accent: var(--xanthous);
 
-    --plain-fg: var(--antiflash-white);
-    --plain-bg: var(--night);
-    --plain-graphical-fg: var(--night);
+    --plain-fg: var(--night);
+    --plain-bg: var(--antiflash-white);
+    --plain-graphical-fg: var(--antiflash-white);
 
     --info-fg: var(--antiflash-white);
     --info-bg: var(--true-blue);
@@ -105,525 +80,542 @@
     --warn-fg: var(--night);
     --warn-bg: var(--tangerine);
     --warn-graphical-fg: var(--tangerine);
-  }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.-no-dark-theme) {
+        --bg: var(--night);
+        --secondary-bg: var(--almost-night);
+        --fg: var(--antiflash-white);
+        --faded-fg: var(--almost-night);
+        --graphical-fg: var(--antiflash-white);
+        --box-bg: var(--night);
+        --interactive-bg: var(--night);
+        --accent: var(--tangerine);
+        --muted-accent: var(--xanthous);
+
+        --plain-fg: var(--antiflash-white);
+        --plain-bg: var(--night);
+        --plain-graphical-fg: var(--night);
+
+        --info-fg: var(--antiflash-white);
+        --info-bg: var(--true-blue);
+        --info-graphical-fg: var(--true-blue);
+
+        --ok-fg: var(--night);
+        --ok-bg: var(--mint);
+        --ok-graphical-fg: var(--mint);
+
+        --bad-fg: var(--antiflash-white);
+        --bad-bg: var(--fire-engine-red);
+        --bad-graphical-fg: var(--fire-engine-red);
+
+        --warn-fg: var(--night);
+        --warn-bg: var(--tangerine);
+        --warn-graphical-fg: var(--tangerine);
+    }
 }
 
 .title-font {
-  font-family: var(--title-font), system-ui;
-  font-style: normal;
+    font-family: var(--title-font), system-ui;
+    font-style: normal;
 }
 
 input[type="search"]::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-  height: 1em;
-  width: 1em;
-  border-radius: 50em;
-  background: url(https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times-circle.svg) no-repeat 50% 50%;
-  background-size: contain;
-  color: var(--fg);
-  opacity: 0;
-  pointer-events: none;
+    -webkit-appearance: none;
+    height: 1em;
+    width: 1em;
+    border-radius: 50em;
+    background: url(https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times-circle.svg) no-repeat 50% 50%;
+    background-size: contain;
+    color: var(--fg);
+    opacity: 0;
+    pointer-events: none;
 }
 
 input[type="search"]:focus::-webkit-search-cancel-button {
-  opacity: .3;
-  pointer-events: all;
-  filter: invert(1);
+    opacity: .3;
+    pointer-events: all;
+    filter: invert(1);
 }
 
 html {
-  cursor: text;
+    cursor: text;
 }
 
 html, body {
-  margin: 0;
-  height: 100%;
-  overflow: hidden
-}
-
-.bg-primary {
-  color: var(--night);
-}
-
-.bg-secondary {
-  color: var(--almost-night);
+    margin: 0;
+    height: 100%;
+    overflow: hidden
 }
 
 .accent {
-  color: var(--night);
-  background: var(--accent);
+    color: var(--night);
+    background: var(--accent);
 }
 
 .fine {
-  color: var(--fg);
-  background: var(--almost-night);
+    color: var(--fg);
+    background: var(--almost-night);
 }
 
 #dashboard {
-  display: grid;
-  grid-template-rows: 1.6rem 1fr 1.6rem 1.6rem;
+    display: grid;
+    grid-template-rows: 1.6rem 1fr 1.6rem 1.6rem;
+}
 
-  #top-bar {
+#top-bar {
     display: grid;
     grid-template:   [prompt] "title conup condown data" [prompt];
     grid-template-columns: 1fr fit-content(14rch) fit-content(14rch) fit-content(14rch);
     line-height: 1.6rem;
 
+    background: var(--secondary-bg);
+
+    .top-bar-title {
+        grid-area: title;
+        line-height: 1.6rem;
+    }
+
     .counter-uplink {
-      grid-area: conup;
-      display: grid;
-      grid-template-columns: 2rch min(4rch, 8rch, 12rch);
+        grid-area: conup;
+        display: grid;
+        grid-template-columns: 2rch min(4rch, 8rch, 12rch);
+        background: inherit;
     }
 
     .counter-downlink {
-      grid-area: condown;
-      display: grid;
-      grid-template-columns: 2rch min(4rch, 8rch, 12rch);
+        grid-area: condown;
+        display: grid;
+        grid-template-columns: 2rch min(4rch, 8rch, 12rch);
+        background: inherit;
     }
 
     .arrow-container-up {
-      position: relative;
-      width: 1ch;
-      overflow: hidden;
-      height: 1.6rem;
-      margin-inline: 0.5rch;
+        position: relative;
+        width: 1ch;
+        overflow: hidden;
+        height: 1.6rem;
+        margin-inline: 0.5rch;
     }
 
     .arrow-container-down {
-      position: relative;
-      width: 1ch;
-      overflow: hidden;
-      height: 1.6rem;
-      margin-inline: 0.5rch;
+        position: relative;
+        width: 1ch;
+        overflow: hidden;
+        height: 1.6rem;
+        margin-inline: 0.5rch;
     }
 
     .arrow-up {
-      position: absolute;
+        position: absolute;
     }
 
     .arrow-down {
-      position: absolute;
+        position: absolute;
+    }
+
+    .icon {
+        font-style: normal;
     }
 
     .icon-container {
-      width: 2ch;
-      height: 1.6rem;
-      margin-inline: 0.5rch;
+        width: 2ch;
+        height: 1.6rem;
+        margin-inline: 0.5rch;
     }
 
     .counter-data {
-      grid-area: data;
-      display: grid;
-      grid-template-columns: 2rch min(12rch) 3rch;
+        grid-area: data;
+        display: grid;
+        grid-template-columns: 2rch min(12rch) 3rch;
     }
 
     .counter {
-      border-style: none;
-      background: none;
-      color: inherit;
-      font-size: larger;
-      width: 100%;
-      text-align: center;
-      padding: unset;
-      margin: unset;
+        border-style: none;
+        background: none;
+        color: inherit;
+        font-size: larger;
+        width: 100%;
+        text-align: center;
+        padding: unset;
+        margin: unset;
     }
 
     .slide-up-animation {
-      animation: slide-up 1s ease-in-out;
-    }
-
-    @keyframes slide-up {
-      0% {
-        opacity: 1;
-        transform: translateY(0ch);
-      }
-      50% {
-        opacity: 0;
-        transform: translateY(-2ch);
-      }
-      51% {
-        opacity: 0;
-        transform: translateY(4ch);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0ch)
-      }
+        animation: slide-up 1s ease-in-out;
     }
 
     .slide-down-animation {
-      animation: slide-down 1s ease-in-out;
+        animation: slide-down 1s ease-in-out;
+    }
+
+    @keyframes slide-up {
+        0% {
+            opacity: 1;
+            transform: translateY(0ch);
+        }
+        50% {
+            opacity: 0;
+            transform: translateY(-2ch);
+        }
+        51% {
+            opacity: 0;
+            transform: translateY(4ch);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0ch)
+        }
     }
 
     @keyframes slide-down {
-      0% {
-        opacity: 1;
-        transform: translateY(0ch);
-      }
-      50% {
-        opacity: 0;
-        transform: translateY(2ch);
-      }
-      51% {
-        opacity: 0;
-        transform: translateY(-4ch);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0ch)
-      }
+        0% {
+            opacity: 1;
+            transform: translateY(0ch);
+        }
+        50% {
+            opacity: 0;
+            transform: translateY(2ch);
+        }
+        51% {
+            opacity: 0;
+            transform: translateY(-4ch);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0ch)
+        }
     }
+}
 
-    .top-bar-conup {
-      font-style: normal;
-    }
+#bottom-bar {
+    line-height: 1.6rem;
 
-    .top-bar-condown {
-      font-style: normal;
-    }
-
-    .top-bar-title {
-      grid-area: title;
-      line-height: 1.6rem;
-    }
-
-    .top-bar-connection {
-      grid-area: connection;
-      padding-inline: 0.4rem;
-      line-height: 1.6rem;
-      border: unset;
-    }
-
-    .top-bar-version {
-      grid-area: version;
-      padding-inline: 0.4rem;
-      line-height: 1.6rem;
-      border: unset;
-      background: var(--xanthous);
-      color: var(--night);
-    }
-  }
-
-  #bottom-bar {
     label {
-      line-height: 1.6rem;
+        line-height: 1.6rem;
     }
-  }
 }
 
 #content {
-  display: grid;
-  position: relative;
+    display: grid;
+    position: relative;
 }
 
 #feedback {
-  display: contents;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
+    display: contents;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
 
-  pre {
-    position: inherit;
-    padding: 0.3rem;
-    width: 100%;
-    max-height: fit-content;
-    align-self: end;
-    margin-bottom: unset;
-  }
+    pre {
+        position: inherit;
+        padding: 0.3rem;
+        width: 100%;
+        max-height: fit-content;
+        align-self: end;
+        margin-bottom: unset;
+    }
 
-  .info {
-    background: var(--night);
-    color: var(--fg);
-  }
+    .info {
+        background: var(--bg);
+        color: var(--fg);
+    }
 
-  .error {
-    background: var(--bad-faded-fg);
-    color: var(--night);
-    white-space: pre-line;
-  }
+    .error {
+        background: var(--bad-faded-fg);
+        color: var(--night);
+        white-space: pre-line;
+    }
 }
 
 .command-line {
-  display: grid;
-  grid-template:   [prompt] "p c" [prompt];
-  grid-template-columns: auto 1fr;
+    display: grid;
+    grid-template:   [prompt] "p c" [prompt];
+    grid-template-columns: auto 1fr;
 
-  border-color: var(--faded-fg);
+    border-color: var(--faded-fg);
 
-  .command-prompt {
-    grid-area: p;
-    padding-block: unset;
-    padding-left: 0.1rem;
-    line-height: 1.6rem;
-  }
+    .command-prompt {
+        grid-area: p;
+        padding-block: unset;
+        padding-left: 0.1rem;
+        line-height: 1.6rem;
+    }
 
-  .command-input {
-    grid-area: c;
-    height: 1.6rem;
-    line-height: 1.6rem;
-    border: unset;
-    outline: none;
-    caret-shape: block;
-  }
+    .command-input {
+        grid-area: c;
+        height: 1.6rem;
+        line-height: 1.6rem;
+        border: unset;
+        outline: none;
+        caret-shape: block;
+    }
 
-  .command-input:focus {
-    outline: none;
-    border: unset;
-  }
+    .command-input:focus {
+        outline: none;
+        border: unset;
+    }
 }
 
 .bar-element-arrow-right {
-  display: grid;
-  grid-template: "label arrow";
-  grid-template-columns: 1fr max-content;
+    display: grid;
+    grid-template: "label arrow";
+    grid-template-columns: 1fr max-content;
 
-  label {
-    grid-area: label;
-  }
+    label {
+        grid-area: label;
+        color: var(--fg);
+        background: var(--secondary-bg);
+    }
 
-  div {
-    grid-area: arrow;
+    div {
+        grid-area: arrow;
 
-    display: inline-block;
-    border-left: 13px solid;
-    border-top: 13px solid transparent;
-    border-bottom: 13px solid transparent;
-  }
+        color: var(--secondary-bg);
+
+        display: inline-block;
+        border-left: 13px solid;
+        border-top: 13px solid transparent;
+        border-bottom: 13px solid transparent;
+    }
 }
 
 .bar-element-arrow-left {
-  display: grid;
-  grid-template: "arrow label";
-  grid-template-columns: max-content 1fr;
+    display: grid;
+    grid-template: "arrow label";
+    grid-template-columns: max-content 1fr;
 
-  div {
-    grid-area: arrow;
+    div {
+        display: inline-block;
+        grid-area: arrow;
+        color: var(--secondary-bg);
+        border-right: 13px solid;
+        border-top: 13px solid transparent;
+        border-bottom: 13px solid transparent;
+    }
 
-    display: inline-block;
-    border-right: 13px solid;
-    border-top: 13px solid transparent;
-    border-bottom: 13px solid transparent;
-  }
+    label {
+        grid-area: label;
+        color: var(--fg);
+        background: var(--secondary-bg);
+    }
 
-  label {
-    grid-area: label;
-  }
-
-  label::before {
-    padding-right: 1ch;
-    content: "\f00f0";
-  }
+    label::before {
+        padding-right: 1ch;
+        content: "\f00f0";
+    }
 }
 
 .command-line-parser:hover {
-  .legend {
-    color: var(--accent);
-  }
+    .legend {
+        color: var(--accent);
+    }
 
-  border-color: var(--accent);
+    border-color: var(--accent);
 }
 
 .todo-grid {
-  display: grid;
-  max-width: 100%;
-  gap: 0;
-  grid-template-columns: repeat(auto-fill, minmax(9rch, 36rch));
-  grid-auto-rows: min-content;
-  justify-items: center;
+    display: grid;
+    max-width: 100%;
+    gap: 0;
+    grid-template-columns: repeat(auto-fill, minmax(9rch, 36rch));
+    grid-auto-rows: min-content;
+    justify-items: center;
 }
 
 .todo {
-  display: grid;
-  grid-template:    "identifier     title "
+    display: grid;
+    grid-template:    "identifier     title "
                     "start-label    start "
                     "end-label      end   "
                     "desc-label     desc  ";
 
-  grid-template-columns: 4rch fit-content(18rch);
-  grid-template-rows: fit-content(5.7rch) fit-content(2rch) fit-content(2rch) fit-content(9rch);
+    grid-template-columns: 4rch fit-content(18rch);
+    grid-template-rows: fit-content(5.7rch) fit-content(2rch) fit-content(2rch) fit-content(9rch);
 
-  grid-row-gap: 0;
+    grid-row-gap: 0;
 
-  background: var(--fg);
-  border: var(--fg);
-  border-style: solid;
-  border-width: 0.1rem;
-  margin: var(--rhythm) var(--rhythm) 0 var(--rhythm);
-
-  height: min-content;
-
-  .identifier {
-    grid-area: identifier;
-
-    text-align: center;
-    font-size: larger;
-    align-self: center;
-
-    color: var(--night);
-  }
-
-  .title {
-    grid-area: title;
-
-    text-align: center;
-    font-size: medium;
-    text-wrap: pretty;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    width: 100%;
-    height: 100%;
-
-    background: var(--almost-night);
-    color: var(--fg);
-  }
-
-  .title:hover {
     background: var(--fg);
-    color: var(--night);
-  }
+    border: var(--fg);
+    border-style: solid;
+    border-width: 0.1rem;
+    margin: var(--rhythm) var(--rhythm) 0 var(--rhythm);
 
-  .start-label {
-    grid-area: start-label;
-    font-style: normal;
-    font-size: larger;
-    text-align: center;
-    align-self: center;
-    color: var(--night);
-  }
+    height: min-content;
 
-  .start-date-time {
-    grid-area: start;
-    display: grid;
-    grid-template-columns: auto auto;
+    .identifier {
+        grid-area: identifier;
 
-    border-top-style: solid;
-    border-top-width: 0.1rem;
+        text-align: center;
+        font-size: larger;
+        align-self: center;
 
-    .start-date {
-      grid-area: unset;
-      text-align: center;
-      background: var(--almost-night);
+        color: var(--bg);
     }
 
-    .start-time {
-      grid-area: unset;
-      text-align: center;
-      background: var(--almost-night);
-    }
-  }
+    .title {
+        grid-area: title;
 
-  .start-date-single {
-    grid-area: start;
-    text-align: center;
-    background: var(--almost-night);
+        text-align: center;
+        font-size: medium;
+        text-wrap: pretty;
 
-    border-top-style: solid;
-    border-top-width: 0.1rem;
-  }
+        overflow: hidden;
+        text-overflow: ellipsis;
 
-  .start-time-single {
-    grid-area: start;
-    text-align: center;
-    background: var(--almost-night);
+        width: 100%;
+        height: 100%;
 
-    border-top-style: solid;
-    border-top-width: 0.1rem;
-  }
-
-  .end-label {
-    grid-area: end-label;
-    font-style: normal;
-    font-size: larger;
-    text-align: center;
-    align-self: center;
-    color: var(--night);
-  }
-
-  .end-date-time {
-    grid-area: end;
-    display: grid;
-    grid-template-columns: auto auto;
-
-    border-top-style: solid;
-    border-top-width: 0.1rem;
-
-    .end-date {
-      grid-area: unset;
-      text-align: center;
-      background: var(--almost-night);
+        background: var(--secondary-bg);
+        color: var(--fg);
     }
 
-    .end-time {
-      grid-area: unset;
-      text-align: center;
-      background: var(--almost-night);
+    .title:hover {
+        background: var(--fg);
+        color: var(--bg);
     }
-  }
 
-  .end-date-single {
-    grid-area: end;
-    text-align: center;
-    background: var(--almost-night);
+    .start-label {
+        grid-area: start-label;
+        font-style: normal;
+        font-size: larger;
+        text-align: center;
+        align-self: center;
+        color: var(--bg);
+    }
 
-    border-top-style: solid;
-    border-top-width: 0.1rem;
-  }
+    .start-date-time {
+        grid-area: start;
+        display: grid;
+        grid-template-columns: auto auto;
 
-  .end-time-single {
-    grid-area: end;
-    text-align: center;
-    background: var(--almost-night);
+        border-top-style: solid;
+        border-top-width: 0.1rem;
 
-    border-top-style: solid;
-    border-top-width: 0.1rem;
-  }
+        .start-date {
+            grid-area: unset;
+            text-align: center;
+            background: var(--secondary-bg);
+        }
 
-  .description-label {
-    grid-area: desc-label;
-    font-style: normal;
-    font-size: larger;
-    text-align: center;
-    align-self: center;
-    color: var(--night);
-  }
+        .start-time {
+            grid-area: unset;
+            text-align: center;
+            background: var(--secondary-bg);
+        }
+    }
 
-  .description {
-    grid-area: desc;
-    background: var(--almost-night);
-    max-height: 18ch;
-    font-size: medium;
-    text-wrap: wrap;
-    text-align: center;
-    margin: unset;
+    .start-date-single {
+        grid-area: start;
+        text-align: center;
+        background: var(--secondary-bg);
 
-    border-top-style: solid;
-    border-top-width: 0.1rem;
-  }
+        border-top-style: solid;
+        border-top-width: 0.1rem;
+    }
+
+    .start-time-single {
+        grid-area: start;
+        text-align: center;
+        background: var(--secondary-bg);
+
+        border-top-style: solid;
+        border-top-width: 0.1rem;
+    }
+
+    .end-label {
+        grid-area: end-label;
+        font-style: normal;
+        font-size: larger;
+        text-align: center;
+        align-self: center;
+        color: var(--bg);
+    }
+
+    .end-date-time {
+        grid-area: end;
+        display: grid;
+        grid-template-columns: auto auto;
+
+        border-top-style: solid;
+        border-top-width: 0.1rem;
+
+        .end-date {
+            grid-area: unset;
+            text-align: center;
+            background: var(--secondary-bg);
+        }
+
+        .end-time {
+            grid-area: unset;
+            text-align: center;
+            background: var(--secondary-bg);
+        }
+    }
+
+    .end-date-single {
+        grid-area: end;
+        text-align: center;
+        background: var(--secondary-bg);
+
+        border-top-style: solid;
+        border-top-width: 0.1rem;
+    }
+
+    .end-time-single {
+        grid-area: end;
+        text-align: center;
+        background: var(--secondary-bg);
+
+        border-top-style: solid;
+        border-top-width: 0.1rem;
+    }
+
+    .description-label {
+        grid-area: desc-label;
+        font-style: normal;
+        font-size: larger;
+        text-align: center;
+        align-self: center;
+        color: var(--bg);
+    }
+
+    .description {
+        grid-area: desc;
+        background: var(--secondary-bg);
+        max-height: 18ch;
+        font-size: medium;
+        text-wrap: wrap;
+        text-align: center;
+        margin: unset;
+
+        border-top-style: solid;
+        border-top-width: 0.1rem;
+    }
 }
 
 .todo:hover {
-  border-color: var(--fg);
+    border-color: var(--fg);
 }
 
 .todo button {
-  min-height: var(--rhythm);
-  background: var(--bg);
-  box-shadow: unset;
-  border: unset;
-  border-radius: unset;
+    min-height: var(--rhythm);
+    background: var(--bg);
+    box-shadow: unset;
+    border: unset;
+    border-radius: unset;
 }
 
 .todo :is(button,.\<button\>):hover, :is(button,.\<button\>):focus-visible {
-  filter: brightness(1.1);
-  box-shadow: 0 3px 6px -2px var(--accent);
-  text-decoration: none;
+    filter: brightness(1.1);
+    box-shadow: 0 3px 6px -2px var(--accent);
+    text-decoration: none;
 }
 
 .fade-me-out.htmx-swapping {
-  opacity: 0;
-  transition: opacity 1s ease-out;
+    opacity: 0;
+    transition: opacity 1s ease-out;
 }
