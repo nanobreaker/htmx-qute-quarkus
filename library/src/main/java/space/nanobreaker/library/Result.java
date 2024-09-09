@@ -30,7 +30,7 @@ public sealed interface Result<V, E>
 
     default E error() {
         return switch (this) {
-            case Ok(V ignored) -> throw new IllegalStateException("Ok can not be error");
+            case Ok(V ignored) -> throw new IllegalStateException("Ok can not be Err");
             case Err(E e) -> e;
         };
     }
