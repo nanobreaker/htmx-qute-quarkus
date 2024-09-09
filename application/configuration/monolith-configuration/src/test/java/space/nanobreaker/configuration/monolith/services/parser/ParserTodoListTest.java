@@ -3,7 +3,7 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.DeleteTodoCmd;
+import space.nanobreaker.configuration.monolith.services.command.ListTodoCmd;
 import space.nanobreaker.library.Error;
 import space.nanobreaker.library.Result;
 
@@ -11,27 +11,28 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ParserTodoDeleteTest extends ParserTestBase {
+public class ParserTodoListTest extends ParserTestBase {
 
     @Test
-    void shouldNotCreateDeleteCmd() {
+    void shouldCreateListCmd() {
         final String input = new InputBuilder("todo")
-                .append("delete")
+                .append("list")
                 .build();
 
         final Result<Command, Error> result = parser.parse(input);
 
-        assertThat(result.isOk()).isFalse();
+        assertThat(result.isOk()).isTrue();
 
-        final Error error = result.error();
+        final Command actualCommand = result.unwrap();
+        final Command expectedCommand = new ListTodoCmd(Set.of());
 
-        assertThat(error).isInstanceOf(ParserErr.ArgumentNotFound.class);
+        assertThat(actualCommand).isEqualTo(expectedCommand);
     }
 
     @Test
-    void shouldCreateDeleteCmdWithArgs() {
+    void shouldCreateListCmdWithArgs() {
         final String input = new InputBuilder("todo")
-                .append("delete")
+                .append("list")
                 .append("\"1\"")
                 .append("\"2\"")
                 .append("\"3\"")
@@ -42,7 +43,7 @@ public class ParserTodoDeleteTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new DeleteTodoCmd(Set.of(1, 2, 3));
+        final Command expectedCommand = new ListTodoCmd(Set.of(1, 2, 3));
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
     }
