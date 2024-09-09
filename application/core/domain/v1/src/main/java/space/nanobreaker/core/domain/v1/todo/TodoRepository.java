@@ -23,6 +23,10 @@ public interface TodoRepository {
     );
 
     Uni<Stream<Todo>> listBy(
+            Set<TodoId> ids
+    );
+
+    Uni<Stream<Todo>> listBy(
             String username,
             Option<Set<TodoId>> ids,
             Option<List<String>> filters

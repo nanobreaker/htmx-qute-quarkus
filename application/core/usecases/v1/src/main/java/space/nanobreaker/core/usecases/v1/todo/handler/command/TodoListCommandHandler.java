@@ -1,7 +1,6 @@
-package space.nanobreaker.core.usecases.v1.todo.handler;
+package space.nanobreaker.core.usecases.v1.todo.handler.command;
 
 import io.opentelemetry.instrumentation.annotations.WithSpan;
-import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;

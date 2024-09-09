@@ -73,6 +73,20 @@ public class TodoJpaPostgresRepository
                 );
     }
 
+    @Override
+    public Uni<Stream<Todo>> listBy(Set<TodoId> ids) {
+        final List<TodoJpaId> jpaIds = ids.stream()
+                .map(this::mapToJpaId)
+                .toList();
+        final Parameters params = Parameters.with("ids", jpaIds);
+
+        return this.find("id in :ids", params)
+                .list()
+                .map(jpaEntities ->
+                        jpaEntities.stream()
+                                .map(this::mapToDomainEntity)
+                );
+    }
 
     @Override
     public Uni<Stream<Todo>> listBy(

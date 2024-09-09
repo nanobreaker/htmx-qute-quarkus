@@ -19,6 +19,8 @@ import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoDeleteCommand;
 import space.nanobreaker.core.usecases.v1.todo.command.TodoListCommand;
 
+import java.util.stream.Collectors;
+
 @Path("command")
 public class CommandSource {
 
@@ -72,7 +74,11 @@ public class CommandSource {
     ) {
         final String username = command.username();
         final String key = "todo.listed";
-        sseEventSink.dispatchOutboundSseEvent(sse.newEvent(key, ""), username);
+        final String ids = command.ids().stream()
+                .map(id -> "id=" + id.toString())
+                .collect(Collectors.joining("&"));
+
+        sseEventSink.dispatchOutboundSseEvent(sse.newEvent(key, ids), username);
     }
 
     @ConsumeEvent(value = "todo.to.delete")

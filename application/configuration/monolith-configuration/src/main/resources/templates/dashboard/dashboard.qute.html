@@ -89,8 +89,9 @@
         <div id="content">
             <div id="todo-grid-loader"
                  hx-get="/todo"
-                 hx-trigger="load,sse:todo.listed"
-                 hx-swap="innerHTML">
+                 hx-trigger="load"
+                 hx-swap="outerHTML"
+            >
             </div>
             <div id="feedback"
                  sse-swap="help,empty,internal_error"
