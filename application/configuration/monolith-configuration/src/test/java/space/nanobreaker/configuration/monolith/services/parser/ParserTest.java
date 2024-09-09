@@ -3,6 +3,7 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
 import space.nanobreaker.configuration.monolith.services.tokenizer.Tokenizer;
 import space.nanobreaker.configuration.monolith.services.tokenizer.TokenizerErr;
@@ -52,24 +53,5 @@ class ParserTest {
 
         assertThat(result.isErr()).isTrue();
         assertThat(result.error()).isInstanceOf(ParserErr.UnknownCommand.class);
-    }
-
-    private static class InputBuilder {
-
-        private final StringBuffer input;
-
-        private InputBuilder(final String initial) {
-            this.input = new StringBuffer(initial).append(" ");
-        }
-
-        InputBuilder append(String input) {
-            this.input.append(input);
-            this.input.append(" ");
-            return this;
-        }
-
-        String build() {
-            return input.toString().trim();
-        }
     }
 }

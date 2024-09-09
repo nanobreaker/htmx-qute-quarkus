@@ -3,6 +3,7 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
 import space.nanobreaker.configuration.monolith.services.command.EndDateTime;
 import space.nanobreaker.configuration.monolith.services.command.StartDateTime;
@@ -34,7 +35,7 @@ public class ParserTodoUpdateTest {
 
     @Test
     void shouldReturnTodoUpdateCmd() {
-        final String input = new ParserTodoUpdateTest.InputBuilder("todo")
+        final String input = new InputBuilder("todo")
                 .append("update")
                 .append("\"1\"")
                 .append("-f\"title1,title2\"")
@@ -65,25 +66,6 @@ public class ParserTodoUpdateTest {
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
-    }
-
-    private static class InputBuilder {
-
-        private final StringBuffer input;
-
-        private InputBuilder(final String initial) {
-            this.input = new StringBuffer(initial).append(" ");
-        }
-
-        InputBuilder append(String input) {
-            this.input.append(input);
-            this.input.append(" ");
-            return this;
-        }
-
-        String build() {
-            return input.toString().trim();
-        }
     }
 
 }
