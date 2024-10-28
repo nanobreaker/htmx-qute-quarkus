@@ -1,0 +1,83 @@
+{#include base}
+    <div id="dashboard" class="fullscreen bg">
+
+        <div id="top-bar"
+             hx-get="/topbar"
+             hx-trigger="load"
+             hx-swap="outerHTML">
+        </div>
+
+        <div id="content">
+            <div hidden="hidden"
+                 hx-target="body"
+                 hx-get="/todos/create"
+                 hx-swap="beforeend"
+                 hx-trigger="keyup[ctrlKey&&key=='a'] from:body">
+            </div>
+
+            <div id="todo-grid" class="todo-grid">
+                {#fragment id = items}
+                    {#for todo in todos}
+                        {#fragment id = item}
+                            <div id="todo-{todo.id.id}"
+                                 hx-get="/todo/{todo.id.id}"
+                                 hx-trigger="sse:todo.updated.{todo.id.id}"
+                                 hx-swap="outerHTML"
+                                 class="todo crowded fade-me-out">
+
+                                <div class="identifier fade-me-out"
+                                     hx-delete="/todo/{todo.id.id}"
+                                     hx-trigger="sse:todo.to.delete.{todo.id.id}"
+                                     hx-target="#todo-{todo.id.id}"
+                                     hx-swap="outerHTML swap:1s">
+                                    {todo.id.id.formatId}
+                                </div>
+
+                                <div class="title padding">{todo.title}</div>
+
+                                {#if todo.start.isSome() && todo.start.isTimePresent() }
+                                    <div class="start-label">=>></div>
+                                    <div class="start-date-time">
+                                        <div class="start-date padding">{todo.start.formatDate}</div>
+                                        <div class="start-time padding">{todo.start.formatTime}</div>
+                                    </div>
+                                {#else if todo.start.isSome() }
+                                    <div class="start-label">=>></div>
+                                    <div class="start-date-single padding">{todo.start.formatDate}</div>
+                                {#else if todo.start.isTimePresent() }
+                                    <div class="start-label">=>></div>
+                                    <div class="start-time-single padding">{todo.start.formatTime}</div>
+                                {/if}
+
+                                {#if todo.end.isSome() && todo.end.isTimePresent() }
+                                    <div class="end-label"><<=</div>
+                                    <div class="end-date-time">
+                                        <div class="end-date padding">{todo.end.formatDate}</div>
+                                        <div class="end-time padding">{todo.end.formatTime}</div>
+                                    </div>
+                                {#else if todo.end.isSome() }
+                                    <div class="end-label"><<=</div>
+                                    <div class="end-date-single padding">{todo.end.formatDate}</div>
+                                {#else if todo.end.isTimePresent() }
+                                    <div class="end-label"><<=</div>
+                                    <div class="end-time-single padding">{todo.end.formatTime}</div>
+                                {/if}
+
+                                {#if todo.description.isSome()}
+                                    <div class="description-label">*</div>
+                                    <div class="description padding">{todo.description.value()}</div>
+                                {/if}
+                            </div>
+                        {/fragment}
+                    {/for}
+                {/fragment}
+            </div>
+        </div>
+
+        <div id="bottom-bar"
+             hx-get="/bottombar"
+             hx-trigger="load"
+             hx-swap="outerHTML">
+        </div>
+    </div>
+{/include}

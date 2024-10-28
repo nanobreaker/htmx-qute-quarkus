@@ -1,0 +1,75 @@
+<div id="top-bar" class="padding">
+    <label class="top-bar-title mono-font">
+        {username}@{applicationName}:{applicationVersion}
+    </label>
+    <div class="counter-uplink">
+        <div class="arrow-container">
+            <i id="counter-sent-arrow" class="icon arrow-up nf-fa-arrow_up_long"></i>
+        </div>
+        <div id="counter-sent-value" type="number" class="counter"></div>
+    </div>
+    <div class="counter-downlink">
+        <div class="arrow-container">
+            <i id="counter-received-arrow" class="icon arrow-down nf-fa-arrow_down_long"></i>
+        </div>
+        <div id="counter-received-value" type="number" class="counter"></div>
+    </div>
+    <div class="counter-data">
+        <div class="icon-container">
+            <i class="icon nf-md-database_sync_outline"></i>
+        </div>
+        <div id="counter-data" type="number" class="counter"></div>
+        <div style="text-align: center; font-size: larger">MB</div>
+    </div>
+</div>
+
+<script type="text/hyperscript">
+    // counter for sent requests
+
+    init
+        put '000' into #counter-sent-value.innerHTML
+
+    on htmx:afterRequest or fetch:afterRequest from document
+        add .slide-up-animation to #counter-sent-arrow
+        then wait 1s
+        then remove .slide-up-animation from #counter-sent-arrow
+
+    on htmx:afterRequest or fetch:afterRequest from document
+        increment #counter-sent-value.innerHTML
+        set #counter-sent-value.innerHTML to #counter-sent-value.innerHTML.toString().padStart(3, '0')
+
+    // counter for received requests
+    init
+        put '000' into #counter-received-value.innerHTML
+
+    on htmx:sseBeforeMessage or htmx:sseOpen from document
+        add .slide-down-animation to #counter-received-arrow
+        then wait 1s
+        then remove .slide-down-animation from #counter-received-arrow
+
+    on htmx:sseBeforeMessage or htmx:sseOpen from document
+        increment #counter-received-value.innerHTML
+        set #counter-received-value.innerHTML to #counter-received-value.innerHTML.toString().padStart(3, '0')
+
+    // counter for data transferred
+    init put '0000.0000' into #counter-data.innerHTML
+        on fetch:afterRequest from document
+        get metric()
+        set #counter-data.innerHTML to it.padStart(9, '0')
+
+    js
+        function metric() {
+            const entries = performance.getEntriesByType("resource");
+            let total = 0;
+
+            entries.forEach((entry) => {
+                if (entry.transferSize) {
+                    total += (entry.transferSize / 1024 / 1024);
+                }
+            });
+            return total.toFixed(4);
+        }
+
+        return { metric };
+    end
+</script>

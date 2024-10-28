@@ -116,6 +116,34 @@
     }
 }
 
+#login-content {
+
+    #login-title {
+        font-size: 4.4rem;
+        font-style: italic;
+        text-align: right;
+
+        sub-title {
+            font-size: x-large;
+            font-style: italic;
+            text-align: right;
+        }
+    }
+
+    #login-subtitle {
+        font-size: medium;
+        text-align: center;
+    }
+
+    #buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        justify-content: center;
+    }
+}
+
+
 .title-font {
     font-family: var(--title-font), system-ui;
     font-style: normal;
@@ -192,7 +220,7 @@ html, body {
         background: inherit;
     }
 
-    .arrow-container-up {
+    .arrow-container {
         position: relative;
         width: 1ch;
         overflow: hidden;
@@ -291,11 +319,8 @@ html, body {
 }
 
 #bottom-bar {
-    line-height: 1.6rem;
-
-    label {
-        line-height: 1.6rem;
-    }
+    display: grid;
+    grid-template-rows: auto 1.6rem 1.6rem;
 }
 
 #content {
@@ -429,13 +454,13 @@ html, body {
 
 .todo {
     display: grid;
-    grid-template:    "identifier     title "
+    grid-template:  "identifier     title "
                     "start-label    start "
                     "end-label      end   "
                     "desc-label     desc  ";
 
     grid-template-columns: 4rch fit-content(18rch);
-    grid-template-rows: fit-content(5.7rch) fit-content(2rch) fit-content(2rch) fit-content(9rch);
+    grid-template-rows: fit-content(5.7rch) fit-content(2rch) fit-content(2rch) fit-content(4rch);
 
     grid-row-gap: 0;
 
@@ -619,4 +644,143 @@ html, body {
 .fade-me-out.htmx-swapping {
     opacity: 0;
     transition: opacity 1s ease-out;
+}
+
+.todo-field-form {
+    display: grid;
+    grid-template-rows: 1.6rem 1.6rem 1.6rem 3.2rem 1.6rem;
+    width: 100%;
+
+    background: var(--fg);
+
+    .field-group {
+        display: grid;
+        grid-template-columns: 22rch 1fr 7rch;
+    }
+
+    .field-label {
+        color: var(--bg);
+        background: var(--fg);
+        text-align: center;
+        text-align: center;
+        align-self: center;
+    }
+
+    .field-input {
+        height: 100%;
+        color: var(--fg);
+        background: var(--bg);
+    }
+
+    .field-icon {
+        color: var(--bg);
+        background: var(--fg);
+        text-align: center;
+        font-size: larger;
+        text-align: center;
+        align-self: center;
+    }
+
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+#modal {
+    /* Underlay covers entire screen. */
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+
+    /* Flexbox centers the .modal-content vertically and horizontally */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /* Animate when opening */
+    animation-name: fadeIn;
+    animation-duration: 150ms;
+    animation-timing-function: ease;
+}
+
+#modal > .modal-underlay {
+    /* underlay takes up the entire viewport. This is only
+    required if you want to click to dismiss the popup */
+    position: absolute;
+    z-index: -1;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+
+    backdrop-filter: blur(0.7px);
+}
+
+#modal > .modal-content {
+    /* Position visible dialog near the top of the window */
+    margin-top: 20vh;
+
+    /* Sizing for visible dialog */
+    width: 80%;
+    max-width: 600px;
+
+    /* Animate when opening */
+    animation-name: zoomIn;
+    animation-duration: 150ms;
+    animation-timing-function: ease;
+}
+
+#modal.closing {
+    /* Animate when closing */
+    animation-name: fadeOut;
+    animation-duration: 150ms;
+    animation-timing-function: ease;
+}
+
+#modal.closing > .modal-content {
+    /* Animate when closing */
+    animation-name: zoomOut;
+    animation-duration: 150ms;
+    animation-timing-function: ease;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes zoomOut {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0.9);
+    }
 }

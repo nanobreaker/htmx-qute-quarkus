@@ -6,17 +6,17 @@ import java.util.SequencedCollection;
 
 public abstract class AggregateRoot<Id> extends Entity<Id> {
 
-    private final SequencedCollection<DomainEvent> domainEvents = new ArrayList<>();
+    private final SequencedCollection<Event> domainEvents = new ArrayList<>();
 
     protected AggregateRoot(Id id) {
         super(Objects.requireNonNull(id));
     }
 
-    protected void registerEvent(DomainEvent event) {
+    protected void registerEvent(Event event) {
         domainEvents.add(event);
     }
 
-    public SequencedCollection<DomainEvent> getDomainEvents() {
+    public SequencedCollection<Event> getDomainEvents() {
         return domainEvents;
     }
 }

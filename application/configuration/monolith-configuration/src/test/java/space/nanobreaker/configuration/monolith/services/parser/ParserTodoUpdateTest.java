@@ -5,9 +5,9 @@ import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
 import space.nanobreaker.configuration.monolith.services.command.EndDateTime;
 import space.nanobreaker.configuration.monolith.services.command.StartDateTime;
-import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCmd;
-import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCommand;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.result.Result;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -35,7 +35,7 @@ public class ParserTodoUpdateTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new UpdateTodoCmd(
+        final Command expectedCommand = new UpdateTodoCommand(
                 Set.of(1),
                 List.of("title1", "title2"),
                 "new title",

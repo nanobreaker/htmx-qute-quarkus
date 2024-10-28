@@ -1,5 +1,5 @@
 package space.nanobreaker.cqrs;
 
-public interface Command {
+public non-sealed interface Command extends Event {
 
 }

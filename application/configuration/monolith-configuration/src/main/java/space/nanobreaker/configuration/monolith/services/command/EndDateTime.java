@@ -19,13 +19,13 @@ public record EndDateTime(
     public static EndDateTime of(
             final LocalDate date
     ) {
-        return new EndDateTime(date, null);
+        return new EndDateTime(date, LocalTime.of(0, 0, 0));
     }
 
     public static EndDateTime of(
             final LocalTime time
     ) {
-        return new EndDateTime(null, time);
+        return new EndDateTime(LocalDate.now(), time);
     }
 
     public LocalDateTime toDateTime() {

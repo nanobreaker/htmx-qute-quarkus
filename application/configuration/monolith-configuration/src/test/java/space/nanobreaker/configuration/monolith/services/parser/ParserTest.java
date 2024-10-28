@@ -3,9 +3,9 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.tokenizer.TokenizerErr;
-import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.configuration.monolith.services.tokenizer.TokenizerError;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.result.Result;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +17,7 @@ class ParserTest extends ParserTestBase {
         final Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isErr()).isTrue();
-        assertThat(result.error()).isInstanceOf(TokenizerErr.EmptyInput.class);
+        assertThat(result.error()).isInstanceOf(TokenizerError.EmptyInput.class);
     }
 
     @Test
@@ -26,7 +26,7 @@ class ParserTest extends ParserTestBase {
         final Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isErr()).isTrue();
-        assertThat(result.error()).isInstanceOf(ParserErr.UnknownProgram.class);
+        assertThat(result.error()).isInstanceOf(ParserError.UnknownProgram.class);
     }
 
     @Test
@@ -37,6 +37,6 @@ class ParserTest extends ParserTestBase {
         final Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isErr()).isTrue();
-        assertThat(result.error()).isInstanceOf(ParserErr.UnknownCommand.class);
+        assertThat(result.error()).isInstanceOf(ParserError.UnknownCommand.class);
     }
 }

@@ -1,6 +1,8 @@
 package space.nanobreaker.library;
 
 import org.junit.jupiter.api.Test;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.result.Result;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatRuntimeException;
@@ -9,6 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ResultTest {
 
     record ResultTestError() implements Error {
+        @Override
+        public String describe() {
+            return "test error";
+        }
     }
 
     @Test

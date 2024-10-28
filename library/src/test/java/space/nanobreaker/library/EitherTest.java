@@ -1,6 +1,10 @@
 package space.nanobreaker.library;
 
 import org.junit.jupiter.api.Test;
+import space.nanobreaker.library.either.Either;
+import space.nanobreaker.library.either.Left;
+import space.nanobreaker.library.either.Right;
+import space.nanobreaker.library.option.Option;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

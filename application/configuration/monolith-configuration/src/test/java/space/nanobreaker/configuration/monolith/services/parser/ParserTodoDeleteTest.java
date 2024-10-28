@@ -3,9 +3,9 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.DeleteTodoCmd;
-import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.configuration.monolith.services.command.DeleteTodoCommand;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.result.Result;
 
 import java.util.Set;
 
@@ -25,7 +25,7 @@ public class ParserTodoDeleteTest extends ParserTestBase {
 
         final Error error = result.error();
 
-        assertThat(error).isInstanceOf(ParserErr.ArgumentNotFound.class);
+        assertThat(error).isInstanceOf(ParserError.ArgumentNotFound.class);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ParserTodoDeleteTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new DeleteTodoCmd(Set.of(1, 2, 3));
+        final Command expectedCommand = new DeleteTodoCommand(Set.of(1, 2, 3));
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
     }

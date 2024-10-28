@@ -19,13 +19,13 @@ public record StartDateTime(
     public static StartDateTime of(
             final LocalDate date
     ) {
-        return new StartDateTime(date, null);
+        return new StartDateTime(date, LocalTime.of(0, 0, 0));
     }
 
     public static StartDateTime of(
             final LocalTime time
     ) {
-        return new StartDateTime(null, time);
+        return new StartDateTime(LocalDate.now(), time);
     }
 
     public LocalDateTime toDateTime() {

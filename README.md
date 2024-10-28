@@ -1,27 +1,70 @@
-<div align="center">
-    <img src="/logo/logo.png">
+<div style="margin-top: 2rem" align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="/logo/demo-dark.png">
+      <img alt="demo" src="/logo/demo-light.png">
+    </picture>
 </div>
 
 <h3 align="center">HTMX QUTE QUARKUS</h3>
 
-## About The Project
+## Description
 
-The 'htmx-qute-quarkus' project demonstrates how to efficiently build a web application using the Quarkus framework with
-HTMX for hypermedia driven UI interactions and the Qute template engine for HTML rendering. This project leverages Java 21's
-latest features, including pattern matching, structured concurrency, and advanced garbage collection. It incorporates
-the Ports & Adapters architecture to facilitate the transition from monolithic structures to microservices, enhancing
-maintainability and scalability. Additionally, the project includes CI/CD configurations to simplify setting up a local
-environment with a single command, complete with E2E testing and GitHub pipelines integration. This project is an
-exploratory journey into building distributed systems, providing valuable insights for similar endeavors.
+It began as a simple project, a way to learn how to build hypermedia applications using HTMX. But as
+you dive deeper, new ideas emerge, leading to more exploration in search of insights. This journey
+is fascinating but time-consuming. Eventually, I found myself building a scalable, high-performance,
+and maintainable web application. With an enterprise Java background, the journey took shape
+quickly!
+
+For the server side, I chose Quarkus to embrace the reactive programming model offered by the Mutiny
+library. Quarkus itself has a robust and well-developed ecosystem, including tools like Qute for
+template rendering, Quarkus REST, CSRF protection, authorization, Hibernate Panache, and more—all of
+which sped up development. I’ve never been a big fan of the Spring ecosystem and had been looking
+for a replacement; Quarkus has more than fulfilled that role.
+
+Coming from a background in enterprise microservices, I wanted to deepen my understanding of
+architectural design and used this project as a means to explore these patterns. I ended up adopting
+the Ports & Adapters (Hexagonal) architecture. The resulting structure made the project remarkably
+flexible and scalable, especially useful for larger applications. It allows the application to be
+modularized into smaller, manageable instances. EventBus from Vert.x was invaluable, enabling
+communication between REST and domain layers using the CQRS pattern, which naturally supports
+scalability through its request/reply model. Scaling the application with additional instances
+became almost seamless.
+
+Of course, the heart of this project was HTMX. I’m not a fan of the current state of web
+development, especially when simple enterprise web pages require a new language and a mountain of
+libraries just to manage basic operations. To me, this approach adds unnecessary mental overhead and
+resource strain. Ideally, the client should be lightweight and resource-efficient. HTMX was exactly
+what I’d been seeking—a way to develop without the bulk and redundancy. For years, I struggled to
+resonate with REST, until I began reading Hypermedia Systems and traced the evolution of the web. I
+had a revelation: modern web practices had drifted from the fundamentals, resulting in bloated and
+convoluted stacks.
+
+The learning curve was steep; mastering HTMX meant rewriting the entire application multiple times.
+Impatience cost me initially, as I hadn’t yet grounded myself in the basics of the hypermedia
+approach.
+
+Oh, I almost forgot—the core idea behind this project was to create a simple but effective to-do
+application. I’ve used plenty of note-taking apps, calendars, and other tools, but I wanted
+something I could deploy on my Raspberry Pi and rely on daily for managing life’s tasks. Inspired by
+the elegance of Vim, I aimed for simplicity and high functionality, with a similar minimalist vibe.
+The application even includes a command-line interface to manage tasks and other functions, which
+was a fun challenge to implement.
+
+To build the command-line interface, I learned how to create a parser using a state machine, and I
+added real-time updates with Server-Sent Events (SSE), a technology that allows the server to push
+updates to clients asynchronously—a feature I’m thrilled with! I’m not a designer, but I’m really
+happy with the final look; it’s simple, functional, and fits my needs, and that’s what matters.
+
+Now, I’m thrilled to finally launch this project and share it with the community. The journey taught
+me so much, taking over a year—but it was worth every moment.
 
 ## Getting Started
 
-To get a local copy up and running follow these simple example steps.
-
 ### Prerequisites
 
-* java 21+
-* docker
+* maven 3.8.6+
+* java 23+
+* docker (database, identity-provider)
 
 ### Installation
 
@@ -75,11 +118,7 @@ To get a local copy up and running follow these simple example steps.
 
 ### Ports & Adapters Diagram
 
-This project is based on popular architecture "Ports & Adapters" also some creeps call it "Hexagon" 'till they figure
-out what it is actually is.
-
-The idea is really simple, we have ports & adapters, which can be primary (driving) or secondary (driven).
-For this project I've implemented CQRS based on VertX EventBus which can act as Mediator.
+##### Simplified structure
 
 * **Primary Adapters**
     * REST
@@ -93,14 +132,7 @@ For this project I've implemented CQRS based on VertX EventBus which can act as 
         * User Queries
         * Todo Queries
         * Calendar Queries
-* **Secondary Adapters**
-    * Database drivers
-        * postgresql
-* **Secondary Ports**
-    * Repositories
-        * User Repository
-        * Todo Repository
-        * Calendar Repository
+
 * **Domain**
     * Domain Models
         * User Model
@@ -115,6 +147,15 @@ For this project I've implemented CQRS based on VertX EventBus which can act as 
         * Todo Query Handlers
         * Calendar Query Handlers
 
+* **Secondary Adapters**
+    * Database drivers
+        * postgresql
+* **Secondary Ports**
+    * Repositories
+        * User Repository
+        * Todo Repository
+        * Calendar Repository
+
 #### High level overview
 
 ![P&A High Level](documentation/diagrams/ports-adapters-high-level.png)
@@ -127,7 +168,7 @@ For this project I've implemented CQRS based on VertX EventBus which can act as 
 
 ![CDC Diagram](documentation/diagrams/cdc.png)
 
-
 ## Licensing
 
-The code in this project is licensed under MIT license. Check [LICENSE](LICENSE) for further details.
+The code in this project is licensed under MIT license. Check [LICENSE](LICENSE) for further
+details.

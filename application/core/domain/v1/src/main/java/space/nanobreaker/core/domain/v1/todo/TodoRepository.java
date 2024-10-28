@@ -1,38 +1,32 @@
 package space.nanobreaker.core.domain.v1.todo;
 
 import io.smallrye.mutiny.Uni;
-import space.nanobreaker.library.Option;
+import space.nanobreaker.jpa.Repository;
+import space.nanobreaker.library.either.Either;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.option.Option;
+import space.nanobreaker.library.result.Result;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
-public interface TodoRepository {
+public interface TodoRepository extends Repository {
 
-    Uni<Todo> save(
-            Todo Todo
-    );
+    Uni<Result<Todo, Error>> save(Todo Todo);
 
-    Uni<Option<Todo>> findById(
-            TodoId id
-    );
+    Uni<Result<Todo, Error>> find(TodoId id);
 
-    Uni<Stream<Todo>> list(
-            String username
-    );
+    Uni<Result<Set<Todo>, Error>> list(String username);
 
-    Uni<Stream<Todo>> listBy(
-            Set<TodoId> ids
-    );
+    Uni<Result<Set<Todo>, Error>> list(Set<TodoId> ids);
 
-    Uni<Stream<Todo>> listBy(
-            String username,
-            Option<Set<TodoId>> ids,
+    Uni<Result<Set<Todo>, Error>> list(
+            Either<String, Set<TodoId>> usernameOrIds,
             Option<List<String>> filters
     );
 
-    Uni<Void> update(
+    Uni<Result<Void, Error>> update(
             Todo todo,
             Option<String> someTitle,
             Option<String> someDescription,
@@ -40,12 +34,15 @@ public interface TodoRepository {
             Option<LocalDateTime> someEnd
     );
 
-    Uni<Void> deleteByTodoId(
-            TodoId id
+    Uni<Result<Void, Error>> update(
+            Set<Todo> todos,
+            Option<String> someTitle,
+            Option<String> someDescription,
+            Option<LocalDateTime> someStart,
+            Option<LocalDateTime> someEnd
     );
 
-    Uni<Void> deleteByTodoIds(
-            Set<TodoId> ids
-    );
+    Uni<Result<Void, Error>> delete(TodoId id);
 
+    Uni<Result<Void, Error>> delete(Set<TodoId> ids);
 }

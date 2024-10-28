@@ -1,0 +1,30 @@
+{#include base}
+    <main class="padding" style="display: grid;place-items: center;height: 80vh;"
+          xmlns="http://www.w3.org/1999/html">
+        <div id="login-content">
+            <h1 id="login-title" class="title-font">
+                REACTIVE TODOS
+                <sub-title>version 1.0.0</sub-title>
+            </h1>
+            <h2 id="login-subtitle" class="secondary-font">
+                In swift code it flows<br>
+                tasks arise and fade like waves<br>
+                scaling without end
+            </h2>
+            <div id="buttons">
+                <a class="<button> big color plain"
+                   href="/todos"
+                   hx-boost="true"
+                   hx-trigger="keyup[key=='a'] from:body">
+                    AUTHENTICATE [A]
+                </a>
+                <a class="<button> big color plain"
+                   href="/todos"
+                   hx-boost="true"
+                   hx-trigger="keyup[key=='r'] from:body">
+                    REGISTER [R]
+                </a>
+            </div>
+        </div>
+    </main>
+{/include}

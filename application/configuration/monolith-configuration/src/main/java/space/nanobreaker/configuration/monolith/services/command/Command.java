@@ -1,9 +1,9 @@
 package space.nanobreaker.configuration.monolith.services.command;
 
 public sealed interface Command permits
-        TodoCmd,
-        UserCmd,
-        CalendarCmd {
+        TodoCommand,
+        UserCommand,
+        CalendarCommand {
 
     static String help() {
         return """
@@ -20,5 +20,4 @@ public sealed interface Command permits
                   \s
                 """;
     }
-
 }

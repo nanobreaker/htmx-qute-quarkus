@@ -3,11 +3,11 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.CreateTodoCmd;
+import space.nanobreaker.configuration.monolith.services.command.CreateTodoCommand;
 import space.nanobreaker.configuration.monolith.services.command.EndDateTime;
 import space.nanobreaker.configuration.monolith.services.command.StartDateTime;
-import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.result.Result;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCmd(
+        final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "description",
                 StartDateTime.of(
@@ -64,7 +64,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCmd(
+        final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "description",
                 StartDateTime.of(
@@ -95,7 +95,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCmd(
+        final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "description",
                 StartDateTime.of(
@@ -127,7 +127,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCmd(
+        final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "description",
                 StartDateTime.of(
@@ -159,7 +159,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCmd(
+        final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "description",
                 StartDateTime.of(

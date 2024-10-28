@@ -1,0 +1,52 @@
+<div id="modal" _="on closeModal add .closing then wait for animationend then remove me">
+    <div class="modal-underlay" _="on click trigger closeModal"></div>
+    <div class="modal-content">
+        <form class="todo-field-form"
+              hx-post="/todo"
+              hx-target="#todo-grid"
+              hx-swap="beforeend">
+            <div class="field-group">
+                <label class="field-label">title</label>
+                <input id="title"
+                       class="field-input"
+                       name="title"
+                       type="text">
+                <div class="field-icon">#</div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">start datetime</label>
+                <input id="start-date"
+                       class="field-input"
+                       name="start"
+                       type="datetime-local">
+                <div class="field-icon">=>></div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">end datetime</label>
+                <input id="end-date"
+                       class="field-input"
+                       name="end"
+                       type="datetime-local">
+                <div class="field-icon"><<=</div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">description</label>
+                <input id="-description"
+                       class="field-input"
+                       name="description"
+                       type="text">
+                <div class="field-icon">*</div>
+            </div>
+            <div class="button-group">
+                <button class="<button> bg fg warn"
+                        _="on click trigger closeModal">
+                    CANCEL
+                </button>
+                <button class="<button> bg fg ok"
+                        type="submit">
+                    SUBMIT
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

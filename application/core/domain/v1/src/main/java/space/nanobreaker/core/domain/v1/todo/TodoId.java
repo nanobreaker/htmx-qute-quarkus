@@ -20,7 +20,6 @@ public class TodoId {
     }
 
     public TodoId() {
-
     }
 
     public void setId(Integer id) {

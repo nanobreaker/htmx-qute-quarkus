@@ -2,6 +2,7 @@ package space.nanobreaker.infra.dataproviders.postgres.repositories.todo;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Version;
 import space.nanobreaker.core.domain.v1.todo.TodoState;
 
 import java.time.LocalDateTime;
@@ -9,8 +10,9 @@ import java.time.LocalDateTime;
 @Entity
 public class TodoJpaEntity {
 
-    @EmbeddedId
-    private TodoJpaId id;
+    @Version private Integer version;
+    @EmbeddedId private TodoJpaId id;
+
     private String title;
     private String description;
     private TodoState state;
@@ -59,5 +61,9 @@ public class TodoJpaEntity {
 
     public LocalDateTime getEndDateTime() {
         return endDateTime;
+    }
+
+    public int getVersion() {
+        return version;
     }
 }

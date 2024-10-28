@@ -1,33 +1,35 @@
 package space.nanobreaker.core.domain.v1.todo;
 
 import space.nanobreaker.ddd.AggregateRoot;
+import space.nanobreaker.library.option.Option;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Todo extends AggregateRoot<TodoId> {
 
     private String title;
     private String description;
-    private TodoState state;
     private LocalDateTime start;
     private LocalDateTime end;
+    private TodoState state;
 
     public Todo(
             final TodoId todoId,
             final String title,
             final String description,
-            final TodoState state,
             final LocalDateTime start,
-            final LocalDateTime end
+            final LocalDateTime end,
+            final TodoState state
     ) {
         super(todoId);
         this.title = Objects.requireNonNull(title);
         this.description = description;
-        this.state = state;
         this.start = start;
         this.end = end;
+        this.state = state;
+        // todo: consider moving to the CreateTodoHandler?
+        this.registerEvent(new TodoEvent.Created(todoId));
     }
 
     public void setTitle(String title) {
@@ -38,10 +40,6 @@ public class Todo extends AggregateRoot<TodoId> {
         this.description = description;
     }
 
-    public void setState(TodoState state) {
-        this.state = state;
-    }
-
     public void setStart(LocalDateTime start) {
         this.start = start;
     }
@@ -50,23 +48,69 @@ public class Todo extends AggregateRoot<TodoId> {
         this.end = end;
     }
 
+    public void setState(TodoState state) {
+        this.state = state;
+    }
+
     public String getTitle() {
         return title;
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    public Option<String> getDescription() {
+        return Option.of(description);
+    }
+
+    public Option<LocalDateTime> getStart() {
+        return Option.of(start);
+    }
+
+    public Option<LocalDateTime> getEnd() {
+        return Option.of(end);
     }
 
     public TodoState getState() {
         return state;
     }
 
-    public Optional<LocalDateTime> getStart() {
-        return Optional.ofNullable(start);
-    }
+    public static final class Builder {
 
-    public Optional<LocalDateTime> getEnd() {
-        return Optional.ofNullable(end);
+        private final TodoId id;
+        private final String title;
+        private LocalDateTime start;
+        private LocalDateTime end;
+        private String description;
+        private TodoState state;
+
+        public Builder(
+                TodoId id,
+                String title
+        ) {
+            this.id = id;
+            this.title = title;
+        }
+
+        public Builder withState(TodoState state) {
+            this.state = state;
+            return this;
+        }
+
+        public Builder withEnd(LocalDateTime end) {
+            this.end = end;
+            return this;
+        }
+
+        public Builder withStart(LocalDateTime start) {
+            this.start = start;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Todo build() {
+            return new Todo(id, title, description, start, end, state);
+        }
     }
 }

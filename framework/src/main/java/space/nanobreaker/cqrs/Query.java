@@ -1,5 +1,5 @@
 package space.nanobreaker.cqrs;
 
-public interface Query {
+public non-sealed interface Query extends Event {
 
 }

@@ -3,9 +3,10 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.ListTodoCmd;
-import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.configuration.monolith.services.command.ListTodoCommand;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.option.Option;
+import space.nanobreaker.library.result.Result;
 
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class ParserTodoListTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new ListTodoCmd(Set.of());
+        final Command expectedCommand = new ListTodoCommand(Option.none());
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
     }
@@ -43,9 +44,8 @@ public class ParserTodoListTest extends ParserTestBase {
         assertThat(result.isOk()).isTrue();
 
         final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new ListTodoCmd(Set.of(1, 2, 3));
+        final Command expectedCommand = new ListTodoCommand(Option.of(Set.of(1, 2, 3)));
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
     }
-
 }

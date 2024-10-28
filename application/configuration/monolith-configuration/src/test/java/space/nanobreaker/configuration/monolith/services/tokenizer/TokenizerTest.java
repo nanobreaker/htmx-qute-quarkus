@@ -2,8 +2,8 @@ package space.nanobreaker.configuration.monolith.services.tokenizer;
 
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
-import space.nanobreaker.library.Error;
-import space.nanobreaker.library.Result;
+import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.result.Result;
 
 import java.util.SequencedCollection;
 
