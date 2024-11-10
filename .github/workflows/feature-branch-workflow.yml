@@ -20,4 +20,4 @@ jobs:
           distribution: 'liberica'
           cache: maven
       - name: Maven build
-        run: ./mvnw clean package -Pmonolith
+        run: ./mvnw clean install -Pmonolith -Dquarkus.profile=test

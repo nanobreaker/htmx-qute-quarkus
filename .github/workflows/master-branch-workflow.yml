@@ -19,7 +19,7 @@ jobs:
           distribution: 'liberica'
           cache: maven
       - name: Maven build
-        run: ./mvnw clean package -Pmonolith
+        run: ./mvnw clean install -Pmonolith -Dquarkus.profile=test
       - run: mvn --batch-mode --update-snapshots verify
       - uses: actions/upload-artifact@v4
         with:

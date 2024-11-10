@@ -11,13 +11,6 @@ import java.time.format.DateTimeFormatterBuilder;
 @TemplateExtension
 public class TodoExtensions {
 
-    enum DateTimeState {
-        DATETIME,
-        DATE,
-        TIME,
-        NONE
-    }
-
     private static final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder()
             .appendPattern("dd LLL")
             .toFormatter();
