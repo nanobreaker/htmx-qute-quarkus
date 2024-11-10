@@ -3,14 +3,12 @@ package space.nanobreaker.configuration.monolith.services.parser;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.EndDateTime;
-import space.nanobreaker.configuration.monolith.services.command.StartDateTime;
 import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCommand;
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.result.Result;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +23,7 @@ public class ParserTodoUpdateTest extends ParserTestBase {
                 .append("\"1\"")
                 .append("-f\"title1,title2\"")
                 .append("-t\"new title\"")
-                .append("-d\"description\"")
+                .append("-d\"getDescription\"")
                 .append("-s\"27/06/2024 15:00\"")
                 .append("-e\"27/06/2024 16:00\"")
                 .build();
@@ -39,18 +37,11 @@ public class ParserTodoUpdateTest extends ParserTestBase {
                 Set.of(1),
                 List.of("title1", "title2"),
                 "new title",
-                "description",
-                StartDateTime.of(
-                        LocalDate.of(2024, 6, 27),
-                        LocalTime.of(15, 0)
-                ),
-                EndDateTime.of(
-                        LocalDate.of(2024, 6, 27),
-                        LocalTime.of(16, 0)
-                )
+                "getDescription",
+                ZonedDateTime.of(2024, 6, 27, 15, 0, 0, 0, ZoneId.of("UTC")),
+                ZonedDateTime.of(2024, 6, 27, 16, 0, 0, 0, ZoneId.of("UTC"))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
     }
-
 }

@@ -20,7 +20,7 @@ import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.option.Some;
 import space.nanobreaker.library.result.Result;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -165,8 +165,8 @@ public class TodoJpaPostgresRepository
             final Todo todo,
             final Option<String> someTitle,
             final Option<String> someDescription,
-            final Option<LocalDateTime> someStart,
-            final Option<LocalDateTime> someEnd
+            final Option<ZonedDateTime> someStart,
+            final Option<ZonedDateTime> someEnd
     ) {
         final TodoJpaId id = mapToJpaId(todo.getId());
         final Parameters parameters = Parameters.with("id", id);
@@ -180,11 +180,11 @@ public class TodoJpaPostgresRepository
             parameters.and("description", description);
             fields.add("description = :description");
         }
-        if (someStart instanceof Some(final LocalDateTime start)) {
+        if (someStart instanceof Some(final ZonedDateTime start)) {
             parameters.and("start", start);
             fields.add("startDateTime = :start");
         }
-        if (someEnd instanceof Some(final LocalDateTime end)) {
+        if (someEnd instanceof Some(final ZonedDateTime end)) {
             parameters.and("end", end);
             fields.add("endDateTime = :end");
         }
@@ -204,8 +204,8 @@ public class TodoJpaPostgresRepository
             final Set<Todo> todos,
             final Option<String> someTitle,
             final Option<String> someDescription,
-            final Option<LocalDateTime> someStart,
-            final Option<LocalDateTime> someEnd
+            final Option<ZonedDateTime> someStart,
+            final Option<ZonedDateTime> someEnd
     ) {
         final Set<TodoJpaId> jpaIds = todos
                 .stream()
@@ -224,11 +224,11 @@ public class TodoJpaPostgresRepository
             parameters.and("description", description);
             fields.add("description = :description");
         }
-        if (someStart instanceof Some(final LocalDateTime start)) {
+        if (someStart instanceof Some(final ZonedDateTime start)) {
             parameters.and("start", start);
             fields.add("startDateTime = :start");
         }
-        if (someEnd instanceof Some(final LocalDateTime end)) {
+        if (someEnd instanceof Some(final ZonedDateTime end)) {
             parameters.and("end", end);
             fields.add("endDateTime = :end");
         }

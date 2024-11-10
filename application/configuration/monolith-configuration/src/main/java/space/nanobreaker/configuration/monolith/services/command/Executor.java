@@ -38,8 +38,8 @@ public class Executor {
                 securityIdentity.getPrincipal().getName(),
                 cmd.title(),
                 cmd.description(),
-                cmd.start().map(StartDateTime::toDateTime),
-                cmd.end().map(EndDateTime::toDateTime)
+                cmd.start(),
+                cmd.end()
         );
 
         return eventBus
@@ -65,8 +65,8 @@ public class Executor {
                 cmd.filters(),
                 cmd.title(),
                 cmd.description(),
-                cmd.start().map(StartDateTime::toDateTime),
-                cmd.end().map(EndDateTime::toDateTime)
+                cmd.start(),
+                cmd.end()
         );
 
         return eventBus

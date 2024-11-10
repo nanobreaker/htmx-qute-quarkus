@@ -1,37 +1,28 @@
 package space.nanobreaker.configuration.monolith.dto;
 
+import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.FormParam;
-import space.nanobreaker.configuration.monolith.services.command.EndDateTime;
-import space.nanobreaker.configuration.monolith.services.command.StartDateTime;
 import space.nanobreaker.library.option.Option;
 
-public class TodoCreateRequest {
+import java.time.LocalDateTime;
 
-    @FormParam("title")
-    String title;
+public record TodoCreateRequest(
+        @CookieParam("time-zone") String zone,
+        @FormParam("title") String title,
+        @FormParam("description") String description,
+        @FormParam("start") LocalDateTime start,
+        @FormParam("end") LocalDateTime end
+) {
 
-    @FormParam("description")
-    String description;
-
-    @FormParam("start")
-    StartDateTime start;
-
-    @FormParam("end")
-    EndDateTime end;
-
-    public Option<String> title() {
-        return Option.of(title);
-    }
-
-    public Option<String> description() {
+    public Option<String> getDescription() {
         return Option.of(description);
     }
 
-    public Option<StartDateTime> start() {
+    public Option<LocalDateTime> getStart() {
         return Option.of(start);
     }
 
-    public Option<EndDateTime> end() {
+    public Option<LocalDateTime> getEnd() {
         return Option.of(end);
     }
 }

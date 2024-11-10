@@ -7,7 +7,7 @@ import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.result.Result;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -30,16 +30,16 @@ public interface TodoRepository extends Repository {
             Todo todo,
             Option<String> someTitle,
             Option<String> someDescription,
-            Option<LocalDateTime> someStart,
-            Option<LocalDateTime> someEnd
+            Option<ZonedDateTime> someStart,
+            Option<ZonedDateTime> someEnd
     );
 
     Uni<Result<Void, Error>> update(
             Set<Todo> todos,
             Option<String> someTitle,
             Option<String> someDescription,
-            Option<LocalDateTime> someStart,
-            Option<LocalDateTime> someEnd
+            Option<ZonedDateTime> someStart,
+            Option<ZonedDateTime> someEnd
     );
 
     Uni<Result<Void, Error>> delete(TodoId id);

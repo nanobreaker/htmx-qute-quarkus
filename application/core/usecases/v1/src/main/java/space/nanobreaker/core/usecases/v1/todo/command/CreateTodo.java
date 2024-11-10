@@ -4,14 +4,14 @@ import space.nanobreaker.cqrs.Command;
 import space.nanobreaker.library.option.Option;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public record CreateTodo(
         String username,
         String title,
         Option<String> description,
-        Option<LocalDateTime> start,
-        Option<LocalDateTime> end
+        Option<ZonedDateTime> start,
+        Option<ZonedDateTime> end
 ) implements Serializable, Command {
 
 }

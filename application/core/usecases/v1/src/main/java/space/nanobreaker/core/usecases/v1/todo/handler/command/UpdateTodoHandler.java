@@ -5,6 +5,11 @@ import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoEvent;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
@@ -19,13 +24,8 @@ import space.nanobreaker.library.result.Err;
 import space.nanobreaker.library.result.Ok;
 import space.nanobreaker.library.result.Result;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @ApplicationScoped
-public class UpdateTodoHandler
-        implements CommandHandler<UpdateTodo, Result<Void, Error>> {
+public class UpdateTodoHandler implements CommandHandler<UpdateTodo, Result<Void, Error>> {
 
     private final EventDispatcher eventDispatcher;
     private final TodoRepository todoRepository;
@@ -46,19 +46,19 @@ public class UpdateTodoHandler
         final Either<String, Set<TodoId>> usernameOrIds = command.usernameOrIds();
         final Option<List<String>> filters = command.filters();
 
-        final Uni<Result<Set<Todo>, Error>> todos = todoRepository
-                .list(usernameOrIds, filters);
+        final Uni<Result<Set<Todo>, Error>> todos = todoRepository.list(usernameOrIds, filters);
 
-        return todos
-                .flatMap(result -> switch (result) {
+        return todos.flatMap(result ->
+                switch (result) {
                     case Ok(Set<Todo> todoSet) -> {
-                        final var ids = todoSet.stream()
+                        final var ids = todoSet
+                                .stream()
                                 .map(Todo::getId)
                                 .collect(Collectors.toUnmodifiableSet());
 
                         yield eventDispatcher.on(
-                                () -> todoRepository
-                                        .update(
+                                () ->
+                                        todoRepository.update(
                                                 todoSet,
                                                 command.title(),
                                                 command.description(),
@@ -69,9 +69,9 @@ public class UpdateTodoHandler
                         );
                     }
                     case Err(Error error) -> {
-                        yield Uni.createFrom()
-                                .item(Result.err(error));
+                        yield Uni.createFrom().item(Result.err(error));
                     }
-                });
+                }
+        );
     }
 }

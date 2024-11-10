@@ -18,17 +18,16 @@ import space.nanobreaker.library.result.Ok;
 import space.nanobreaker.library.result.Result;
 
 @ApplicationScoped
-public class CreateTodoHandler
-        implements CommandHandler<CreateTodo, Result<Todo, Error>> {
+public class CreateTodoHandler implements CommandHandler<CreateTodo, Result<Todo, Error>> {
 
     private final EventDispatcher eventDispatcher;
     private final TodoIdSequenceGenerator idSeq;
     private final TodoRepository todoRepository;
 
     public CreateTodoHandler(
-            TodoRepository todoRepository,
-            TodoIdSequenceGenerator idSeq,
-            EventDispatcher eventDispatcher
+            final TodoRepository todoRepository,
+            final TodoIdSequenceGenerator idSeq,
+            final EventDispatcher eventDispatcher
     ) {
         this.todoRepository = todoRepository;
         this.idSeq = idSeq;
@@ -44,8 +43,8 @@ public class CreateTodoHandler
         final Uni<TodoId> id = idSeq.next(username);
         final Uni<Result<Todo, Error>> createdTodo = id
                 .map(todoId -> {
-                    final var title = command.title();
-                    final var builder = new Todo.Builder(todoId, title);
+                    var title = command.title();
+                    var builder = new Todo.Builder(todoId, title);
 
                     command.start().map(builder::withStart);
                     command.end().map(builder::withEnd);
@@ -55,15 +54,15 @@ public class CreateTodoHandler
                 })
                 .flatMap(t -> eventDispatcher.on(() -> todoRepository.save(t), t));
 
-        return createdTodo
-                .flatMap(result -> switch (result) {
+        return createdTodo.flatMap(result ->
+                switch (result) {
                     case Ok(Todo todo) -> {
-                        yield idSeq.increment(username)
-                                .replaceWith(Result.ok(todo));
+                        yield idSeq.increment(username).replaceWith(Result.ok(todo));
                     }
                     case Err(Error error) -> {
                         yield Uni.createFrom().item(Result.err(error));
                     }
-                });
+                }
+        );
     }
 }

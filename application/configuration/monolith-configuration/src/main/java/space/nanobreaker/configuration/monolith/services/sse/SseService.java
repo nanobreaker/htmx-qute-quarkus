@@ -8,25 +8,32 @@ import jakarta.ws.rs.sse.OutboundSseEvent;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
 import org.keycloak.common.util.ConcurrentMultivaluedHashMap;
-import space.nanobreaker.library.tuple.Tuple;
 
 import java.util.function.Predicate;
 
 @ApplicationScoped
 public class SseService {
 
-    // todo: how will gc handle closed SseEventSinks?
-    private final ConcurrentMultivaluedHashMap<String, Tuple<String, SseEventSink>> connections = new ConcurrentMultivaluedHashMap<>();
+    // @formatter:off
+    record SidSinkPair(String sid, SseEventSink sink){}
+    // @formatter:on
+    private final ConcurrentMultivaluedHashMap<String, SidSinkPair> connections;
 
-    @Context Sse sse;
+    @Context
+    private final Sse sse;
+
+    public SseService(Sse sse) {
+        this.sse = sse;
+        this.connections = new ConcurrentMultivaluedHashMap<>();
+    }
 
     @WithSpan("SseService: register")
     public void register(
             final String upn,
             final String sid,
-            final SseEventSink eventSink
+            final SseEventSink sink
     ) {
-        connections.add(upn, Tuple.of(sid, eventSink));
+        connections.add(upn, new SidSinkPair(sid, sink));
     }
 
     @WithSpan("SseService: publish")
@@ -37,9 +44,9 @@ public class SseService {
     ) {
         connections.getList(upn)
                 .stream()
-                .filter(Predicate.not(tuple -> tuple.first().equals(sid)))
-                .filter(Predicate.not(tuple -> tuple.second().isClosed()))
-                .forEach(sink -> sink.second().send(event));
+                .filter(Predicate.not(v -> v.sid().equals(sid)))
+                .filter(Predicate.not(v -> v.sink().isClosed()))
+                .forEach(v -> v.sink().send(event));
     }
 
     @ConsumeEvent(value = "sse.todo.created")

@@ -2,7 +2,6 @@ package space.nanobreaker.configuration.monolith.resources.command;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.resources.TestBase;
 import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
@@ -11,6 +10,7 @@ import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.domain.v1.todo.TodoState;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -20,72 +20,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 @QuarkusTest
 public class CommandResourceTest extends TestBase {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
     @Test
-    public void shouldCreateAndGetTodo() {
-        final String accessToken = keycloakClient.getAccessToken("alice");
-        final String csrfToken = csrfToken();
-        final Todo todo = new Todo(
-                new TodoId(),
-                "yoga",
-                "test",
-                LocalDateTime.of(2024, 8, 10, 0, 0),
-                LocalDateTime.of(2024, 8, 11, 0, 0),
-                TodoState.ACTIVE
-        );
-        final String query = "todo create \"%s\" -d\"%s\" -s\"%s\" -e\"%s\""
-                .formatted(
-                        todo.getTitle(),
-                        todo.getDescription().orElseThrow(),
-                        todo.getStart()
-                                .map(start -> start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                                .orElseThrow(),
-                        todo.getEnd()
-                                .map(end -> end.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                                .orElseThrow()
-                );
-        final Map<String, String> params = Map
-                .of("command", query);
+    public void post() {
+        var title = "title";
+        var description = "description";
+        var start = LocalDateTime.of(2024, 11, 10, 0, 0);
+        var end = LocalDateTime.of(2024, 11, 11, 0, 0);
+        var query = "todo create \"%s\" -d\"%s\" -s\"%s\" -e\"%s\""
+                .formatted(title, description, start.format(formatter), end.format(formatter));
 
         // @formatter:off
-        final Response todoCreateResponse =
+        var postResponse =
                 given()
-                    .auth().oauth2(accessToken)
-                    .cookie("csrf-token", csrfToken)
+                    .auth().oauth2(ACCESS_TOKEN)
+                    .header("X-CSRF-TOKEN", CSRF_TOKEN)
+                    .cookie("csrf-token", CSRF_TOKEN)
+                    .cookie("time-zone", TIME_ZONE)
                     .contentType(ContentType.URLENC)
-                    .formParams(params)
+                    .formParams(Map.of("command", query))
                 .when()
                     .post("/commands/submit")
                 .then()
                     .assertThat()
-                    .statusCode(201)
-                .extract().response();
+                    .statusCode(201);
         // @formatter:on
 
-        final String location = todoCreateResponse.getHeader("Location");
-        final String id = location.replaceAll(".*/", ""); // Extract the id from the URL
-        final TodoId todoId = new TodoId(
-                Integer.parseInt(id),
-                "alice"
+        var id = postResponse.extract().header("Location").split("/todos/")[1];
+        var expectedTodoId = new TodoId(Integer.parseInt(id), USERNAME);
+        var expectedTodo = new Todo(
+                expectedTodoId,
+                title,
+                description,
+                start.atZone(ZoneId.of("UTC")),
+                end.atZone(ZoneId.of("UTC")),
+                TodoState.ACTIVE
         );
-        todo.getId().setId(todoId.getId());
-        todo.getId().setUsername(todoId.getUsername());
+        var expectedHtml = TodoTemplates.todo(expectedTodo).render();
+        var actualHtml = postResponse.extract().body().asString();
 
-        // @formatter:off
-        final Response todoGetResponse =
-            given()
-                .auth().oauth2(accessToken)
-                .cookie("csrf-token", csrfToken)
-            .when()
-                .get("/todos/" + todoId.getId())
-            .then()
-                .assertThat()
-                .contentType(ContentType.HTML)
-                .statusCode(200)
-            .extract().response();
-        // @formatter:on
-
-        final String expectedTodoHtml = TodoTemplates.todo(todo).render();
-        final String actualTodoHtml = todoGetResponse.body().print();
-        assertThat(actualTodoHtml).isEqualTo(expectedTodoHtml);
+        assertThat(actualHtml).isEqualTo(expectedHtml);
     }
 }

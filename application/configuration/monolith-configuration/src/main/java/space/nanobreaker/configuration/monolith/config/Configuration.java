@@ -11,11 +11,19 @@ import space.nanobreaker.ddd.EventDispatcher;
 import space.nanobreaker.infra.dataproviders.postgres.repositories.todo.TodoIdPostgresSequenceGenerator;
 import space.nanobreaker.infra.dataproviders.postgres.repositories.todo.TodoJpaPostgresRepository;
 
+import java.time.Clock;
+
 @Dependent
 public class Configuration {
 
     @Inject
     EventBus eventBus;
+
+    @Produces
+    @DefaultBean
+    public Clock clock() {
+        return Clock.systemUTC();
+    }
 
     @Produces
     @DefaultBean

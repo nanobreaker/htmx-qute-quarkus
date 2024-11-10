@@ -6,6 +6,7 @@ import jakarta.persistence.Version;
 import space.nanobreaker.core.domain.v1.todo.TodoState;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 public class TodoJpaEntity {
@@ -16,16 +17,16 @@ public class TodoJpaEntity {
     private String title;
     private String description;
     private TodoState state;
-    private LocalDateTime startDateTime;
-    private LocalDateTime endDateTime;
+    private ZonedDateTime startDateTime;
+    private ZonedDateTime endDateTime;
 
     public TodoJpaEntity(
             final TodoJpaId id,
             final String title,
             final String description,
             final TodoState state,
-            final LocalDateTime startDateTime,
-            final LocalDateTime endDateTime
+            final ZonedDateTime startDateTime,
+            final ZonedDateTime endDateTime
     ) {
         this.id = id;
         this.title = title;
@@ -55,11 +56,11 @@ public class TodoJpaEntity {
         return state;
     }
 
-    public LocalDateTime getStartDateTime() {
+    public ZonedDateTime getStartDateTime() {
         return startDateTime;
     }
 
-    public LocalDateTime getEndDateTime() {
+    public ZonedDateTime getEndDateTime() {
         return endDateTime;
     }
 

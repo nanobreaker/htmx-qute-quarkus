@@ -5,6 +5,7 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -56,7 +57,10 @@ public class CommandResource {
     @WithSpan("submit")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Uni<Response> execute(@FormParam("command") final String input) {
+    public Uni<Response> execute(
+            @CookieParam("time-zone") final String zone,
+            @FormParam("command") final String input
+    ) {
         final String upn = jwt.getClaim("upn");
         final String sid = jwt.getClaim("sid");
 
@@ -69,11 +73,11 @@ public class CommandResource {
                             .createTodo(command)
                             .map(result -> switch (result) {
                                 case Ok(Todo todo) -> {
-                                    final var location = "/todos/%d".formatted(todo.getId().getId());
-                                    final var uri = URI.create(location);
+                                    var location = "/todos/%d".formatted(todo.getId().getId());
+                                    var uri = URI.create(location);
                                     // todo: consider using 'item' fragment from todos template?
-                                    final var html = TodoTemplates.todo(todo);
-                                    final var event = new SseEvent.TodoCreated(upn, sid, html.render());
+                                    var html = TodoTemplates.todo(todo);
+                                    var event = new SseEvent.TodoCreated(upn, sid, html.render());
                                     eventBus.publish("sse.todo.created", event);
 
                                     yield Response.created(uri)
@@ -92,7 +96,7 @@ public class CommandResource {
                             .listTodo(listTodoCommand)
                             .map(result -> switch (result) {
                                 case Ok(Set<Todo> todos) -> {
-                                    final String html = TodoTemplates.todos(todos)
+                                    var html = TodoTemplates.todos(todos)
                                             .getFragment("items")
                                             .instance()
                                             .data("todos", todos)
@@ -114,10 +118,10 @@ public class CommandResource {
                             .map(result -> switch (result) {
                                 case Ok(Void _) -> switch (updateTodoCommand.ids()) {
                                     case Some(Set<Integer> ids) -> {
-                                        final var query = ids.stream()
+                                        var query = ids.stream()
                                                 .map("id=%d"::formatted)
                                                 .collect(Collectors.joining("&"));
-                                        final var location = URI.create("/todos/search?%s".formatted(query));
+                                        var location = URI.create("/todos/search?%s".formatted(query));
 
                                         ids.forEach(id -> {
                                             final var event = new SseEvent.TodoUpdated(upn, sid, id);
@@ -128,7 +132,7 @@ public class CommandResource {
                                                 .build();
                                     }
                                     case None() -> {
-                                        final var location = URI.create("/todos/search");
+                                        var location = URI.create("/todos/search");
 
                                         yield Response.seeOther(location)
                                                 .header("HX-Trigger", "command.empty")
@@ -145,14 +149,14 @@ public class CommandResource {
                             .deleteTodos(deleteTodoCommand)
                             .map(result -> switch (result) {
                                 case Ok(_) -> {
-                                    final var ids = deleteTodoCommand.ids();
+                                    var ids = deleteTodoCommand.ids();
 
                                     ids.forEach(id -> {
-                                        final var event = new SseEvent.TodoDeleted(upn, sid, id);
+                                        var event = new SseEvent.TodoDeleted(upn, sid, id);
                                         eventBus.publish("sse.todo.deleted", event);
                                     });
 
-                                    final var html = TodoTemplates.todosDelete(ids)
+                                    var html = TodoTemplates.todosDelete(ids)
                                             .render();
 
                                     yield Response.ok(html)
@@ -221,7 +225,7 @@ public class CommandResource {
     public Response analyze(@FormParam("command") String command) {
         return switch (analyzer.analyze(command)) {
             case Ok(String help) -> {
-                final var html = HelpTemplates.help(help);
+                var html = HelpTemplates.help(help);
 
                 yield Response.ok(html)
                         .build();
@@ -234,7 +238,7 @@ public class CommandResource {
                                 .build();
                     }
                     default -> {
-                        final var html = ErrorTemplates.error(err.describe());
+                        var html = ErrorTemplates.error(err.describe());
 
                         yield Response.serverError()
                                 .entity(html)

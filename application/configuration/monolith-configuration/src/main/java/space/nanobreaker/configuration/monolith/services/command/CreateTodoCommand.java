@@ -4,13 +4,14 @@ import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.result.Result;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 public record CreateTodoCommand(
         String title,
         Option<String> description,
-        Option<StartDateTime> start,
-        Option<EndDateTime> end
+        Option<ZonedDateTime> start,
+        Option<ZonedDateTime> end
 ) implements TodoCommand {
 
     public CreateTodoCommand {
@@ -21,8 +22,8 @@ public record CreateTodoCommand(
     public CreateTodoCommand(
             final String title,
             final String description,
-            final StartDateTime start,
-            final EndDateTime end
+            final ZonedDateTime start,
+            final ZonedDateTime end
     ) {
         this(
                 title,
@@ -35,8 +36,8 @@ public record CreateTodoCommand(
     public static Result<Command, Error> of(
             final String title,
             final String description,
-            final StartDateTime start,
-            final EndDateTime end
+            final ZonedDateTime start,
+            final ZonedDateTime end
     ) {
         return CreateTodoCommand.of(
                 title,
@@ -49,8 +50,9 @@ public record CreateTodoCommand(
     public static Result<Command, Error> of(
             final String title,
             final Option<String> description,
-            final Option<StartDateTime> start,
-            final Option<EndDateTime> end) {
+            final Option<ZonedDateTime> start,
+            final Option<ZonedDateTime> end
+    ) {
         try {
             return Result.ok(
                     new CreateTodoCommand(

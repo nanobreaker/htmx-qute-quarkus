@@ -3,23 +3,23 @@ package space.nanobreaker.core.domain.v1.todo;
 import space.nanobreaker.ddd.AggregateRoot;
 import space.nanobreaker.library.option.Option;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 public class Todo extends AggregateRoot<TodoId> {
 
-    private String title;
-    private String description;
-    private LocalDateTime start;
-    private LocalDateTime end;
-    private TodoState state;
+    private final String title;
+    private final String description;
+    private final ZonedDateTime start;
+    private final ZonedDateTime end;
+    private final TodoState state;
 
     public Todo(
             final TodoId todoId,
             final String title,
             final String description,
-            final LocalDateTime start,
-            final LocalDateTime end,
+            final ZonedDateTime start,
+            final ZonedDateTime end,
             final TodoState state
     ) {
         super(todoId);
@@ -32,26 +32,6 @@ public class Todo extends AggregateRoot<TodoId> {
         this.registerEvent(new TodoEvent.Created(todoId));
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setStart(LocalDateTime start) {
-        this.start = start;
-    }
-
-    public void setEnd(LocalDateTime end) {
-        this.end = end;
-    }
-
-    public void setState(TodoState state) {
-        this.state = state;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -60,11 +40,11 @@ public class Todo extends AggregateRoot<TodoId> {
         return Option.of(description);
     }
 
-    public Option<LocalDateTime> getStart() {
+    public Option<ZonedDateTime> getStart() {
         return Option.of(start);
     }
 
-    public Option<LocalDateTime> getEnd() {
+    public Option<ZonedDateTime> getEnd() {
         return Option.of(end);
     }
 
@@ -76,8 +56,8 @@ public class Todo extends AggregateRoot<TodoId> {
 
         private final TodoId id;
         private final String title;
-        private LocalDateTime start;
-        private LocalDateTime end;
+        private ZonedDateTime start;
+        private ZonedDateTime end;
         private String description;
         private TodoState state;
 
@@ -94,12 +74,12 @@ public class Todo extends AggregateRoot<TodoId> {
             return this;
         }
 
-        public Builder withEnd(LocalDateTime end) {
+        public Builder withEnd(ZonedDateTime end) {
             this.end = end;
             return this;
         }
 
-        public Builder withStart(LocalDateTime start) {
+        public Builder withStart(ZonedDateTime start) {
             this.start = start;
             return this;
         }

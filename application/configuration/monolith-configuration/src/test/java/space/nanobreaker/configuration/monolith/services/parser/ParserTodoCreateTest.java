@@ -4,14 +4,11 @@ import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
 import space.nanobreaker.configuration.monolith.services.command.CreateTodoCommand;
-import space.nanobreaker.configuration.monolith.services.command.EndDateTime;
-import space.nanobreaker.configuration.monolith.services.command.StartDateTime;
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.result.Result;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +19,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
-                .append("-d\"description\"")
+                .append("-d\"getDescription\"")
                 .append("-s\"27.06.24 12:30\"")
                 .append("-e\"27/06/2024 13:30\"")
                 .build();
@@ -34,15 +31,9 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command actualCommand = result.unwrap();
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
-                "description",
-                StartDateTime.of(
-                        LocalDate.of(2024, 6, 27),
-                        LocalTime.of(12, 30)
-                ),
-                EndDateTime.of(
-                        LocalDate.of(2024, 6, 27),
-                        LocalTime.of(13, 30)
-                )
+                "getDescription",
+                ZonedDateTime.of(2024, 6, 27, 12, 30, 0, 0, ZoneId.of("UTC")),
+                ZonedDateTime.of(2024, 6, 27, 13, 30, 0, 0, ZoneId.of("UTC"))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -50,11 +41,10 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmdWhenStartAndEndOptionsAreTimes() {
-        final LocalDateTime now = LocalDateTime.now();
         final String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
-                .append("-d\"description\"")
+                .append("-d\"getDescription\"")
                 .append("-s\"12:30\"")
                 .append("-e\"13:30\"")
                 .build();
@@ -66,15 +56,9 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command actualCommand = result.unwrap();
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
-                "description",
-                StartDateTime.of(
-                        LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth()),
-                        LocalTime.of(12, 30)
-                ),
-                EndDateTime.of(
-                        LocalDate.of(now.getYear(), now.getMonth(), now.getDayOfMonth()),
-                        LocalTime.of(13, 30)
-                )
+                "getDescription",
+                ZonedDateTime.of(this.year, this.month, this.day, 12, 30, 0, 0, ZoneId.of("UTC")),
+                ZonedDateTime.of(this.year, this.month, this.day, 13, 30, 0, 0, ZoneId.of("UTC"))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -85,7 +69,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
-                .append("-d\"description\"")
+                .append("-d\"getDescription\"")
                 .append("-s\"27.06.24\"")
                 .append("-e\"27.06.24\"")
                 .build();
@@ -97,15 +81,9 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command actualCommand = result.unwrap();
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
-                "description",
-                StartDateTime.of(
-                        LocalDate.of(2024, 6, 27),
-                        LocalTime.of(0, 0)
-                ),
-                EndDateTime.of(
-                        LocalDate.of(2024, 6, 27),
-                        LocalTime.of(0, 0)
-                )
+                "getDescription",
+                ZonedDateTime.of(2024, 6, 27, 0, 0, 0, 0, ZoneId.of("UTC")),
+                ZonedDateTime.of(2024, 6, 27, 0, 0, 0, 0, ZoneId.of("UTC"))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -113,11 +91,10 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmdWhenStartAndEndOptionsAreJustDayOfTheMonth() {
-        final LocalDateTime now = LocalDateTime.now();
         final String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
-                .append("-d\"description\"")
+                .append("-d\"getDescription\"")
                 .append("-s\"27\"")
                 .append("-e\"28\"")
                 .build();
@@ -129,15 +106,9 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command actualCommand = result.unwrap();
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
-                "description",
-                StartDateTime.of(
-                        LocalDate.of(now.getYear(), now.getMonth(), 27),
-                        LocalTime.of(0, 0)
-                ),
-                EndDateTime.of(
-                        LocalDate.of(now.getYear(), now.getMonth(), 28),
-                        LocalTime.of(0, 0)
-                )
+                "getDescription",
+                ZonedDateTime.of(this.year, this.month, 27, 0, 0, 0, 0, ZoneId.of("UTC")),
+                ZonedDateTime.of(this.year, this.month, 28, 0, 0, 0, 0, ZoneId.of("UTC"))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -145,11 +116,10 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmdWhenStartAndEndOptionsAreDayOfTheMonthAndMonth() {
-        final LocalDateTime now = LocalDateTime.now();
         final String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
-                .append("-d\"description\"")
+                .append("-d\"getDescription\"")
                 .append("-s\"27.06\"")
                 .append("-e\"28.06\"")
                 .build();
@@ -161,18 +131,11 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command actualCommand = result.unwrap();
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
-                "description",
-                StartDateTime.of(
-                        LocalDate.of(now.getYear(), 6, 27),
-                        LocalTime.of(0, 0)
-                ),
-                EndDateTime.of(
-                        LocalDate.of(now.getYear(), 6, 28),
-                        LocalTime.of(0, 0)
-                )
+                "getDescription",
+                ZonedDateTime.of(this.year, 6, 27, 0, 0, 0, 0, ZoneId.of("UTC")),
+                ZonedDateTime.of(this.year, 6, 28, 0, 0, 0, 0, ZoneId.of("UTC"))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
     }
-
 }

@@ -1,5 +1,9 @@
 {#include base}
-    <div id="dashboard" class="fullscreen bg">
+    <div id="dashboard"
+         class="fullscreen bg"
+         _="init
+                set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+                set cookies['time-zone'] to { value: zone, maxAge: 600 }">
 
         <div id="top-bar"
              hx-get="/topbar"

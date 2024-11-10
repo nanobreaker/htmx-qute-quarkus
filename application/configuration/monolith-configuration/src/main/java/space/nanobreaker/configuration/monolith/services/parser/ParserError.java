@@ -25,11 +25,11 @@ public sealed interface ParserError extends Error {
             case UnknownCommand _ -> "parser error: unknown command";
             case UnknownProgram _ -> "parser error: unknown program";
             case DateTimeParseError e ->
-                    "parser error: string \"%s\" is not a valid date time".formatted(e.description());
+                "parser error: string \"%s\" is not a valid date time".formatted(e.description());
             case DateParseError e ->
-                    "parser error: string \"%s\" is not a valid date".formatted(e.description());
+                "parser error: string \"%s\" is not a valid date".formatted(e.description());
             case TimeParseError e ->
-                    "parser error: string \"%s\" is not a valid date".formatted(e.description());
+                "parser error: string \"%s\" is not a valid date".formatted(e.description());
             case EmptyDateTime _,
                  EmptyDate _,
                  EmptyTime _ -> "<ignored>";

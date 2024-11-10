@@ -4,6 +4,7 @@ import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.result.Result;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -12,13 +13,13 @@ public record UpdateTodoCommand(
         Option<List<String>> filters,
         Option<String> title,
         Option<String> description,
-        Option<StartDateTime> start,
-        Option<EndDateTime> end
+        Option<ZonedDateTime> start,
+        Option<ZonedDateTime> end
 ) implements TodoCommand {
 
     public UpdateTodoCommand {
         if (ids.isNone() && filters.isNone())
-            throw new IllegalArgumentException("idsOrUsername and filters cannot be empty");
+            throw new IllegalStateException("idsOrUsername and filters cannot be empty");
     }
 
     public UpdateTodoCommand(
@@ -26,8 +27,8 @@ public record UpdateTodoCommand(
             List<String> filters,
             String title,
             String description,
-            StartDateTime start,
-            EndDateTime end
+            ZonedDateTime start,
+            ZonedDateTime end
     ) {
         this(
                 Option.of(ids),
@@ -44,8 +45,8 @@ public record UpdateTodoCommand(
             Option<List<String>> filters,
             Option<String> title,
             Option<String> description,
-            Option<StartDateTime> start,
-            Option<EndDateTime> end
+            Option<ZonedDateTime> start,
+            Option<ZonedDateTime> end
     ) {
         try {
             return Result.ok(
@@ -68,8 +69,9 @@ public record UpdateTodoCommand(
             final List<String> titleFilters,
             final String title,
             final String description,
-            final StartDateTime start,
-            final EndDateTime end) {
+            final ZonedDateTime start,
+            final ZonedDateTime end
+    ) {
         try {
             return Result.ok(
                     new UpdateTodoCommand(

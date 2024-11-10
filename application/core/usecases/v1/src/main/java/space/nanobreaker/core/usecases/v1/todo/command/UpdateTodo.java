@@ -6,7 +6,7 @@ import space.nanobreaker.library.either.Either;
 import space.nanobreaker.library.option.Option;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +15,8 @@ public record UpdateTodo(
         Option<List<String>> filters,
         Option<String> title,
         Option<String> description,
-        Option<LocalDateTime> start,
-        Option<LocalDateTime> end
+        Option<ZonedDateTime> start,
+        Option<ZonedDateTime> end
 ) implements Serializable, Command {
+
 }

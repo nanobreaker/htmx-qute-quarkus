@@ -6,122 +6,217 @@ import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.resources.TestBase;
 import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
 import space.nanobreaker.core.domain.v1.todo.Todo;
+import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.core.domain.v1.todo.TodoState;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.ZoneId;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 
 @QuarkusTest
 public class TodosResourceTest extends TestBase {
 
     @Test
-    public void shouldCreateTodo() {
-        final String accessToken = keycloakClient.getAccessToken("alice");
-        final String csrfToken = csrfToken();
-        final Map<String, String> params = Map.of("title", "test");
-
+    public void post() {
         // @formatter:off
         given()
-                .auth().oauth2(accessToken)
-                .contentType(ContentType.URLENC)
-                .formParams(params)
-                .cookie("csrf-token", csrfToken)
-            .when()
-                .post("/todos")
-            .then()
-                .assertThat()
-                .statusCode(201)
-                .header("Location", matchesPattern(".+/todos/\\d+"));
+            .auth().oauth2(ACCESS_TOKEN)
+            .header("X-CSRF-TOKEN", CSRF_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", TIME_ZONE)
+            .contentType(ContentType.URLENC)
+            .formParams(
+                   TodoParams.params()
+                           .title("test")
+                           .description("test")
+                           .start(LocalDateTime.of(2024, 11, 10, 0, 0))
+                           .end(LocalDateTime.of(2024, 11, 10, 0, 0))
+                           .build()
+            )
+        .when()
+            .post("/todos")
+        .then()
+            .assertThat()
+            .statusCode(201)
+            .contentType(ContentType.HTML)
+            .header("Location", matchesPattern(".+/todos/\\d+"));
         // @formatter:on
     }
 
     @Test
-    public void shouldGetTodo() {
-        final String username = "alice";
-        final String accessToken = keycloakClient.getAccessToken(username);
-        final String csrfToken = csrfToken();
-        final Todo todo = this.createAndGetTodo(
-                "test title",
-                "test description",
-                LocalDateTime.of(2024, 1, 1, 12, 0),
-                LocalDateTime.of(2024, 1, 2, 16, 0)
-        );
-        final String expectedHtml = TodoTemplates.todo(todo).render();
+    public void get() {
+        // @formatter:off
+        var title = "test";
+        var description = "test";
+        var start = LocalDateTime.of(2024, 11, 10, 0, 0);
+        var end = LocalDateTime.of(2024, 11, 11, 0, 0);
+        var postResponse = given()
+            .auth().oauth2(ACCESS_TOKEN)
+            .header("X-CSRF-TOKEN", CSRF_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", TIME_ZONE)
+            .contentType(ContentType.URLENC)
+            .formParams(
+                    TodoParams.params()
+                            .title(title)
+                            .description(description)
+                            .start(start)
+                            .end(end)
+                            .build()
+            )
+        .when()
+            .post("/todos")
+        .then()
+            .assertThat()
+            .statusCode(201)
+            .contentType(ContentType.HTML)
+            .header("Location", matchesPattern(".+/todos/\\d+"));
+        // @formatter:on
+
+        var id = postResponse.extract().header("Location").split("/todos/")[1];
 
         // @formatter:off
-        given()
-            .auth().oauth2(accessToken)
-            .cookie("csrf-token", csrfToken)
+        var getResponse = given()
+            .auth().oauth2(ACCESS_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", TIME_ZONE)
         .when()
-            .get("/todos/" + todo.getId().getId())
+            .get("/todos/%s".formatted(id))
         .then()
             .assertThat()
             .statusCode(200)
-            .contentType(ContentType.HTML)
-            .body(equalTo(expectedHtml));
+            .contentType(ContentType.HTML);
         // @formatter:on
+
+        var expectedHtml = postResponse.extract().body().asPrettyString();
+        var actualHtml = getResponse.extract().body().asPrettyString();
+        assertThat(actualHtml).isEqualTo(expectedHtml);
     }
 
     @Test
-    public void shouldUpdateTodo() {
-        final String username = "alice";
-        final String accessToken = keycloakClient.getAccessToken(username);
-        final String csrfToken = csrfToken();
-        final Todo todo = this.createAndGetTodo(
-                "test title",
-                "test description",
-                LocalDateTime.of(2024, 1, 1, 12, 0),
-                LocalDateTime.of(2024, 1, 2, 16, 0)
-        );
+    public void patch() {
+        // @formatter:off
+        var title = "title";
+        var description = "description";
+        var start = LocalDateTime.of(2024, 11, 10, 0, 0);
+        var end = LocalDateTime.of(2024, 11, 11, 0, 0);
+        var postResponse = given()
+            .auth().oauth2(ACCESS_TOKEN)
+            .header("X-CSRF-TOKEN", CSRF_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", TIME_ZONE)
+            .contentType(ContentType.URLENC)
+            .formParams(
+                    TodoParams.params()
+                            .title(title)
+                            .description(description)
+                            .start(start)
+                            .end(end)
+                            .build()
+            )
+            .when()
+            .post("/todos")
+            .then()
+            .assertThat()
+            .statusCode(201)
+            .contentType(ContentType.HTML)
+            .header("Location", matchesPattern(".+/todos/\\d+"));
+        // @formatter:on
 
-        final Map<String, String> params = new HashMap<>();
-        params.put("title", "new title");
-        params.put("description", "new description");
-
+        var id = postResponse.extract().header("Location").split("/todos/")[1];
+        var updated_title = "updated title";
+        var updated_description = "updated description";
+        var updated_start = LocalDateTime.of(2024, 12, 10, 0, 0);
+        var updated_end = LocalDateTime.of(2024, 12, 11, 0, 0);
         // @formatter:off
         given()
-            .auth().oauth2(accessToken)
+            .auth().oauth2(ACCESS_TOKEN)
+            .header("X-CSRF-TOKEN", CSRF_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", TIME_ZONE)
             .contentType(ContentType.URLENC)
-            .formParams(params)
-            .cookie("csrf-token", csrfToken)
+            .formParams(
+                    TodoParams.params()
+                        .title(updated_title)
+                        .description(updated_description)
+                        .start(updated_start)
+                        .end(updated_end)
+                        .build()
+            )
         .when()
-            .patch("/todos/" + todo.getId().getId())
+            .patch("/todos/%s".formatted(id))
         .then()
             .assertThat()
             .statusCode(204);
         // @formatter:on
 
-        todo.setTitle("new title");
-        todo.setDescription("new description");
-        final String expectedHtml = TodoTemplates.todo(todo).render();
-        final String actualHtml = this.getTodoAsHtml(todo.getId());
+        // @formatter:off
+        var getResponse = given()
+            .auth().oauth2(ACCESS_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", TIME_ZONE)
+        .when()
+            .get("/todos/%s".formatted(id))
+        .then()
+            .assertThat()
+            .statusCode(200)
+            .contentType(ContentType.HTML);
+        // @formatter:on
 
-        assertThat(expectedHtml).isEqualTo(actualHtml);
+        var expectedTodoId = new TodoId(Integer.parseInt(id), USERNAME);
+        var expectedTodo = new Todo(
+                expectedTodoId,
+                updated_title,
+                updated_description,
+                updated_start.atZone(ZoneId.of("UTC")),
+                updated_end.atZone(ZoneId.of("UTC")),
+                TodoState.ACTIVE
+        );
+        var expectedHtml = TodoTemplates.todo(expectedTodo).render();
+        var actualHtml = getResponse.extract().body().asString();
+
+        assertThat(actualHtml).isEqualTo(expectedHtml);
     }
 
     @Test
-    public void shouldDeleteTodo() {
-        final String username = "alice";
-        final String accessToken = keycloakClient.getAccessToken(username);
-        final String csrfToken = csrfToken();
-        final Todo todo = this.createAndGetTodo(
-                "test title",
-                "test description",
-                LocalDateTime.of(2024, 1, 1, 12, 0),
-                LocalDateTime.of(2024, 1, 2, 16, 0)
-        );
+    public void delete() {
+        // @formatter:off
+        var id = given()
+            .auth().oauth2(ACCESS_TOKEN)
+            .header("X-CSRF-TOKEN", CSRF_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", TIME_ZONE)
+            .contentType(ContentType.URLENC)
+            .formParams(
+                    TodoParams.params()
+                            .title("test")
+                            .description("test")
+                            .start(LocalDateTime.of(2024, 11, 10, 0, 0))
+                            .end(LocalDateTime.of(2024, 11, 10, 0, 0))
+                            .build()
+            )
+        .when()
+            .post("/todos")
+        .then()
+            .assertThat()
+            .statusCode(201)
+            .contentType(ContentType.HTML)
+            .header("Location", matchesPattern(".+/todos/\\d+"))
+        .extract()
+            .header("Location")
+            .split("/todos/")[1];
+        // @formatter:on
 
         // @formatter:off
         given()
-            .auth().oauth2(accessToken)
-            .cookie("csrf-token", csrfToken)
+            .auth().oauth2(ACCESS_TOKEN)
+            .header("X-CSRF-TOKEN", CSRF_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
         .when()
-            .delete("/todos/" + todo.getId().getId())
+            .delete("/todos/%s".formatted(id))
         .then()
             .assertThat()
             .statusCode(200);
@@ -129,14 +224,13 @@ public class TodosResourceTest extends TestBase {
 
         // @formatter:off
         given()
-            .auth().oauth2(accessToken)
-            .cookie("csrf-token", csrfToken)
+            .auth().oauth2(ACCESS_TOKEN)
+            .cookie("csrf-token", CSRF_TOKEN)
         .when()
-            .get("/todos/" + todo.getId().getId())
+            .get("/todos/%s".formatted(id))
         .then()
             .assertThat()
             .statusCode(404);
         // @formatter:on
     }
-
 }

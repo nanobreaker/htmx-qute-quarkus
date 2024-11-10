@@ -20,8 +20,6 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.Cache;
 import space.nanobreaker.configuration.monolith.dto.TodoCreateRequest;
 import space.nanobreaker.configuration.monolith.dto.TodoUpdateRequest;
-import space.nanobreaker.configuration.monolith.services.command.EndDateTime;
-import space.nanobreaker.configuration.monolith.services.command.StartDateTime;
 import space.nanobreaker.configuration.monolith.templates.ErrorTemplates;
 import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
 import space.nanobreaker.core.domain.v1.todo.Todo;
@@ -42,6 +40,9 @@ import space.nanobreaker.library.result.Ok;
 import space.nanobreaker.library.result.Result;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,15 +66,13 @@ public class TodosResource {
         return resultUni
                 .map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        final String html = TodoTemplates.todos(todos)
-                                .render();
+                        var html = TodoTemplates.todos(todos).render();
 
                         yield Response.ok(html)
                                 .build();
                     }
                     case Err(Error err) -> {
-                        final String html = ErrorTemplates.error(err.toString())
-                                .render();
+                        var html = ErrorTemplates.error(err.toString()).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -102,7 +101,7 @@ public class TodosResource {
         return resultUni
                 .map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        final String html = TodoTemplates.todos(todos)
+                        var html = TodoTemplates.todos(todos)
                                 .getFragment("items")
                                 .instance()
                                 .data("todos", todos)
@@ -112,8 +111,7 @@ public class TodosResource {
                                 .build();
                     }
                     case Err(Error err) -> {
-                        final String html = ErrorTemplates.error(err.toString())
-                                .render();
+                        var html = ErrorTemplates.error(err.toString()).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -137,8 +135,9 @@ public class TodosResource {
                 .map(result -> switch (result) {
                     case Ok(Todo todo) -> {
                         // todo: consider using 'item' fragment from todos template?
-                        final String template = TodoTemplates.todo(todo).render();
-                        yield Response.ok(template)
+                        var html = TodoTemplates.todo(todo).render();
+
+                        yield Response.ok(html)
                                 .build();
                     }
                     case Err(Error err) -> switch (err) {
@@ -147,11 +146,10 @@ public class TodosResource {
                                     .build();
                         }
                         default -> {
-                            final String template = ErrorTemplates.error(err.toString())
-                                    .render();
+                            var html = ErrorTemplates.error(err.toString()).render();
 
                             yield Response.serverError()
-                                    .entity(template)
+                                    .entity(html)
                                     .build();
                         }
                     };
@@ -163,10 +161,11 @@ public class TodosResource {
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> create(@BeanParam final TodoCreateRequest request) {
         final String username = jwt.getClaim("upn");
-        final var title = request.title().orElseThrow();
-        final var description = request.description();
-        final var start = request.start().map(StartDateTime::toDateTime);
-        final var end = request.end().map(EndDateTime::toDateTime);
+        final var zone = URLDecoder.decode(request.zone(), StandardCharsets.UTF_8);
+        final var title = request.title();
+        final var description = request.getDescription();
+        final var start = request.getStart().map(dt -> dt.atZone(ZoneId.of(zone)));
+        final var end = request.getEnd().map(dt -> dt.atZone(ZoneId.of(zone)));
         final var command = new CreateTodo(
                 username,
                 title,
@@ -182,18 +181,19 @@ public class TodosResource {
         return resultUni
                 .map(result -> switch (result) {
                     case Ok(Todo todo) -> {
-                        final var id = todo.getId().getId();
-                        final URI location = URI.create("/todos/%s".formatted(id));
+                        var id = todo.getId().getId();
+                        var location = URI.create("/todos/%s".formatted(id));
+                        var html = TodoTemplates.todo(todo).render();
 
                         yield Response.created(location)
+                                .entity(html)
                                 .build();
                     }
                     case Err(Error err) -> {
-                        final String template = ErrorTemplates.error(err.toString())
-                                .render();
+                        var html = ErrorTemplates.error(err.toString()).render();
 
                         yield Response.serverError()
-                                .entity(template)
+                                .entity(html)
                                 .build();
                     }
                 });
@@ -205,14 +205,15 @@ public class TodosResource {
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> patch(@BeanParam final TodoUpdateRequest request) {
         final String username = jwt.getClaim("upn");
-        final var start = request.start().map(StartDateTime::toDateTime);
-        final var end = request.end().map(EndDateTime::toDateTime);
+        final var zone = URLDecoder.decode(request.zone(), StandardCharsets.UTF_8);
+        final var start = request.getStart().map(dt -> dt.atZone(ZoneId.of(zone)));
+        final var end = request.getEnd().map(dt -> dt.atZone(ZoneId.of(zone)));
         final Either<String, Set<TodoId>> usernameEither = new Left<>(username);
         final var command = new UpdateTodo(
                 usernameEither,
                 Option.none(),
-                request.title(),
-                request.description(),
+                request.getTitle(),
+                request.getDescription(),
                 start,
                 end
         );
@@ -224,13 +225,13 @@ public class TodosResource {
         return resultUni
                 .map(result -> switch (result) {
                     case Ok(_) -> {
-                        yield Response.noContent()
-                                .build();
+                        yield Response.noContent().build();
                     }
                     case Err(Error err) -> {
-                        final String template = ErrorTemplates.error(err.toString()).render();
+                        var html = ErrorTemplates.error(err.toString()).render();
+
                         yield Response.serverError()
-                                .entity(template)
+                                .entity(html)
                                 .build();
                     }
                 });
@@ -254,7 +255,7 @@ public class TodosResource {
                                 .build();
                     }
                     case Err(Error err) -> {
-                        final var html = ErrorTemplates.error(err.toString())
+                        var html = ErrorTemplates.error(err.toString())
                                 .render();
 
                         yield Response.serverError()
