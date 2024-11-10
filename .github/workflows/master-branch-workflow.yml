@@ -12,13 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: install java 23 [liberica-jdk]
-        uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           java-version: '23'
           distribution: 'liberica'
           cache: maven
-      - name: Maven build
+      - name: mvn clean install
         run: ./mvnw clean install -Pmonolith -Dquarkus.profile=test
       - run: mvn --batch-mode --update-snapshots verify
       - uses: actions/upload-artifact@v4
