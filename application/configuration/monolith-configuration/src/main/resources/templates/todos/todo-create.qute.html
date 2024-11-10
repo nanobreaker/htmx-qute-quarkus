@@ -2,6 +2,7 @@
     <div class="modal-underlay" _="on click trigger closeModal"></div>
     <div class="modal-content">
         <form class="todo-field-form"
+              hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
               hx-post="/todos"
               hx-target="#todo-grid"
               hx-swap="beforeend">
