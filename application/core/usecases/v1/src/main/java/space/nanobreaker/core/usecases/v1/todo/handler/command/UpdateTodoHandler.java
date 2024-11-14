@@ -5,11 +5,6 @@ import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoEvent;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
@@ -24,6 +19,10 @@ import space.nanobreaker.library.result.Err;
 import space.nanobreaker.library.result.Ok;
 import space.nanobreaker.library.result.Result;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @ApplicationScoped
 public class UpdateTodoHandler implements CommandHandler<UpdateTodo, Result<Void, Error>> {
 
@@ -31,8 +30,8 @@ public class UpdateTodoHandler implements CommandHandler<UpdateTodo, Result<Void
     private final TodoRepository todoRepository;
 
     public UpdateTodoHandler(
-            EventDispatcher eventDispatcher,
-            TodoRepository todoRepository
+            final EventDispatcher eventDispatcher,
+            final TodoRepository todoRepository
     ) {
         this.eventDispatcher = eventDispatcher;
         this.todoRepository = todoRepository;

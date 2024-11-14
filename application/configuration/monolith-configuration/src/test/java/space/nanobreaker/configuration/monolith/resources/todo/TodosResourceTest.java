@@ -7,10 +7,8 @@ import space.nanobreaker.configuration.monolith.resources.TestBase;
 import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
-import space.nanobreaker.core.domain.v1.todo.TodoState;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +24,7 @@ public class TodosResourceTest extends TestBase {
             .auth().oauth2(ACCESS_TOKEN)
             .header("X-CSRF-TOKEN", CSRF_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
-            .cookie("time-zone", TIME_ZONE)
+            .cookie("time-zone", USER_TIME_ZONE)
             .contentType(ContentType.URLENC)
             .formParams(
                    TodoParams.params()
@@ -57,7 +55,7 @@ public class TodosResourceTest extends TestBase {
             .auth().oauth2(ACCESS_TOKEN)
             .header("X-CSRF-TOKEN", CSRF_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
-            .cookie("time-zone", TIME_ZONE)
+            .cookie("time-zone", USER_TIME_ZONE)
             .contentType(ContentType.URLENC)
             .formParams(
                     TodoParams.params()
@@ -82,7 +80,7 @@ public class TodosResourceTest extends TestBase {
         var getResponse = given()
             .auth().oauth2(ACCESS_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
-            .cookie("time-zone", TIME_ZONE)
+            .cookie("time-zone", USER_TIME_ZONE)
         .when()
             .get("/todos/%s".formatted(id))
         .then()
@@ -107,7 +105,7 @@ public class TodosResourceTest extends TestBase {
             .auth().oauth2(ACCESS_TOKEN)
             .header("X-CSRF-TOKEN", CSRF_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
-            .cookie("time-zone", TIME_ZONE)
+            .cookie("time-zone", USER_TIME_ZONE)
             .contentType(ContentType.URLENC)
             .formParams(
                     TodoParams.params()
@@ -136,7 +134,7 @@ public class TodosResourceTest extends TestBase {
             .auth().oauth2(ACCESS_TOKEN)
             .header("X-CSRF-TOKEN", CSRF_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
-            .cookie("time-zone", TIME_ZONE)
+            .cookie("time-zone", USER_TIME_ZONE)
             .contentType(ContentType.URLENC)
             .formParams(
                     TodoParams.params()
@@ -157,7 +155,7 @@ public class TodosResourceTest extends TestBase {
         var getResponse = given()
             .auth().oauth2(ACCESS_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
-            .cookie("time-zone", TIME_ZONE)
+            .cookie("time-zone", USER_TIME_ZONE)
         .when()
             .get("/todos/%s".formatted(id))
         .then()
@@ -171,11 +169,10 @@ public class TodosResourceTest extends TestBase {
                 expectedTodoId,
                 updated_title,
                 updated_description,
-                updated_start.atZone(ZoneId.of("UTC")),
-                updated_end.atZone(ZoneId.of("UTC")),
-                TodoState.ACTIVE
+                updated_start.atZone(USER_TIME_ZONE_ID),
+                updated_end.atZone(USER_TIME_ZONE_ID)
         );
-        var expectedHtml = TodoTemplates.todo(expectedTodo).render();
+        var expectedHtml = TodoTemplates.todo(expectedTodo, USER_TIME_ZONE_ID).render();
         var actualHtml = getResponse.extract().body().asString();
 
         assertThat(actualHtml).isEqualTo(expectedHtml);
@@ -188,7 +185,7 @@ public class TodosResourceTest extends TestBase {
             .auth().oauth2(ACCESS_TOKEN)
             .header("X-CSRF-TOKEN", CSRF_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
-            .cookie("time-zone", TIME_ZONE)
+            .cookie("time-zone", USER_TIME_ZONE)
             .contentType(ContentType.URLENC)
             .formParams(
                     TodoParams.params()
@@ -226,6 +223,7 @@ public class TodosResourceTest extends TestBase {
         given()
             .auth().oauth2(ACCESS_TOKEN)
             .cookie("csrf-token", CSRF_TOKEN)
+            .cookie("time-zone", USER_TIME_ZONE)
         .when()
             .get("/todos/%s".formatted(id))
         .then()

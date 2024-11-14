@@ -23,7 +23,6 @@ import space.nanobreaker.library.result.Result;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
@@ -64,18 +63,18 @@ public class Parser {
 
     @WithSpan("parseInputString")
     public Result<Command, Error> parse(final String input) {
-        final Result<SequencedCollection<Token>, Error> tokenizerResult = tokenizer.tokenize(input);
+        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
-        if (tokenizerResult.isErr())
-            return Result.err(tokenizerResult.error());
+        if (result.isErr())
+            return Result.err(result.error());
 
-        final SequencedCollection<Token> tokens = tokenizerResult.unwrap();
+        final SequencedCollection<Token> tokens = result.unwrap();
         final Token programToken = tokens.removeFirst();
 
         return switch (programToken) {
-            case Prog.Todo ignored -> parseTodoProgram(tokens);
-            case Prog.Calendar ignored -> parseCalendarProgram(tokens);
-            case Prog.User ignored -> parseUserProgram(tokens);
+            case Prog.Todo _ -> parseTodoProgram(tokens);
+            case Prog.Calendar _ -> parseCalendarProgram(tokens);
+            case Prog.User _ -> parseUserProgram(tokens);
             default -> Result.err(new ParserError.UnknownProgram());
         };
     }
@@ -84,10 +83,10 @@ public class Parser {
         final Token commandToken = tokens.removeFirst();
 
         return switch (commandToken) {
-            case Cmd.Create ignored -> parseTodoCreateCommand(tokens);
-            case Cmd.List ignored -> parseTodoListCommand(tokens);
-            case Cmd.Update ignored -> parseTodoUpdateCommand(tokens);
-            case Cmd.Delete ignored -> parseTodoDeleteCommand(tokens);
+            case Cmd.Create _ -> parseTodoCreateCommand(tokens);
+            case Cmd.List _ -> parseTodoListCommand(tokens);
+            case Cmd.Update _ -> parseTodoUpdateCommand(tokens);
+            case Cmd.Delete _ -> parseTodoDeleteCommand(tokens);
             default -> Result.err(new ParserError.UnknownCommand());
         };
     }
@@ -106,9 +105,9 @@ public class Parser {
         final String title = arg.value();
         final Option<String> descriptionOption = descriptionToken
                 .map(Opt.Description::value);
-        final Option<ZonedDateTime> start = startToken
+        final Option<LocalDateTime> start = startToken
                 .flatMap(t -> this.parseDateTime(t.value()).ok());
-        final Option<ZonedDateTime> end = endToken
+        final Option<LocalDateTime> end = endToken
                 .flatMap(t -> this.parseDateTime(t.value()).ok());
 
         return CreateTodoCommand.of(
@@ -124,7 +123,7 @@ public class Parser {
 
         return switch (argumentsOption) {
             case Some(final Set<Arg> args) -> {
-                final Set<Integer> ids = args.stream()
+                var ids = args.stream()
                         .map(a -> Integer.parseInt(a.value()))
                         .collect(Collectors.toSet());
 
@@ -152,9 +151,9 @@ public class Parser {
                 .map(Opt.Title::value);
         final Option<String> description = descriptionToken
                 .map(Opt.Description::value);
-        final Option<ZonedDateTime> start = startToken
+        final Option<LocalDateTime> start = startToken
                 .flatMap(t -> this.parseDateTime(t.value()).ok());
-        final Option<ZonedDateTime> end = endToken
+        final Option<LocalDateTime> end = endToken
                 .flatMap(t -> this.parseDateTime(t.value()).ok());
 
         return UpdateTodoCommand.of(
@@ -245,9 +244,8 @@ public class Parser {
         return Result.ok(args);
     }
 
-    public Result<ZonedDateTime, Error> parseDateTime(final String string) {
-        final var zone = ZoneId.of("UTC");
-        final var current = clock.instant().atZone(zone);
+    public Result<LocalDateTime, Error> parseDateTime(final String string) {
+        final var current = clock.instant().atZone(ZoneId.of("UTC"));
         final var formatter = new DateTimeFormatterBuilder()
                 .appendPattern(datePattern)
                 .parseDefaulting(ChronoField.YEAR, current.getYear())
@@ -259,12 +257,11 @@ public class Parser {
                 .toFormatter();
 
         try {
-            final var local = LocalDateTime.parse(string, formatter);
-            final var utc = local.atZone(zone);
-
-            return Result.ok(utc);
+            var local = LocalDateTime.parse(string, formatter);
+            return Result.ok(local);
         } catch (DateTimeParseException exception) {
-            return Result.err(new ParserError.DateParseError(exception.getMessage()));
+            var error = new ParserError.DateParseError(exception.getMessage());
+            return Result.err(error);
         }
     }
 }

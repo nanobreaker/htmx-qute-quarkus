@@ -49,14 +49,13 @@ public class TodoJpaPostgresRepository
 
         return this.getSession()
                 .flatMap(session -> session.find(TodoJpaEntity.class, jpaId))
-                .map(Option::of)
-                .map(todoOption -> switch (todoOption) {
-                    case Some(TodoJpaEntity e) -> {
-                        final var todo = mapToDomainEntity(e);
-                        yield Result.<Todo, Error>ok(todo);
+                .map(todoJpaEntity -> {
+                    if (todoJpaEntity == null) {
+                        return Result.<Todo, Error>err(new None());
+                    } else {
+                        var todo = this.mapToDomainEntity(todoJpaEntity);
+                        return Result.<Todo, Error>ok(todo);
                     }
-                    case space.nanobreaker.library.option.None() ->
-                            Result.<Todo, Error>err(new None());
                 })
                 .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
     }
@@ -160,45 +159,6 @@ public class TodoJpaPostgresRepository
     }
 
     @Override
-    @WithSpan("updateTodo")
-    public Uni<Result<Void, Error>> update(
-            final Todo todo,
-            final Option<String> someTitle,
-            final Option<String> someDescription,
-            final Option<ZonedDateTime> someStart,
-            final Option<ZonedDateTime> someEnd
-    ) {
-        final TodoJpaId id = mapToJpaId(todo.getId());
-        final Parameters parameters = Parameters.with("id", id);
-        final List<String> fields = new ArrayList<>();
-
-        if (someTitle instanceof Some(final String title)) {
-            parameters.and("title", title);
-            fields.add("title = :title");
-        }
-        if (someDescription instanceof Some(final String description)) {
-            parameters.and("description", description);
-            fields.add("description = :description");
-        }
-        if (someStart instanceof Some(final ZonedDateTime start)) {
-            parameters.and("start", start);
-            fields.add("startDateTime = :start");
-        }
-        if (someEnd instanceof Some(final ZonedDateTime end)) {
-            parameters.and("end", end);
-            fields.add("endDateTime = :end");
-        }
-
-        final String fieldsJoined = String.join(",", fields);
-        final String query = "%s where id = :id".formatted(fieldsJoined);
-
-        return Panache.withTransaction(() -> this.update(query, parameters)
-                .chain(this::flush)
-                .replaceWith(Result.<Error>okVoid())
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t))));
-    }
-
-    @Override
     @WithSpan("updateTodos")
     public Uni<Result<Void, Error>> update(
             final Set<Todo> todos,
@@ -225,11 +185,11 @@ public class TodoJpaPostgresRepository
             fields.add("description = :description");
         }
         if (someStart instanceof Some(final ZonedDateTime start)) {
-            parameters.and("start", start);
+            parameters.and("start", start.toInstant());
             fields.add("startDateTime = :start");
         }
         if (someEnd instanceof Some(final ZonedDateTime end)) {
-            parameters.and("end", end);
+            parameters.and("end", end.toInstant());
             fields.add("endDateTime = :end");
         }
 
@@ -291,7 +251,6 @@ public class TodoJpaPostgresRepository
                 id,
                 todo.getTitle(),
                 todo.getDescription().orElse(null),
-                todo.getState(),
                 todo.getStart().orElse(null),
                 todo.getEnd().orElse(null)
         );
@@ -302,14 +261,13 @@ public class TodoJpaPostgresRepository
     }
 
     private Todo mapToDomainEntity(final TodoJpaEntity jpaEntity) {
-        final TodoId id = mapToDomainId(jpaEntity.getId());
+        final TodoId id = this.mapToDomainId(jpaEntity.getId());
         return new Todo(
                 id,
                 jpaEntity.getTitle(),
                 jpaEntity.getDescription(),
                 jpaEntity.getStartDateTime(),
-                jpaEntity.getEndDateTime(),
-                jpaEntity.getState()
+                jpaEntity.getEndDateTime()
         );
     }
 }

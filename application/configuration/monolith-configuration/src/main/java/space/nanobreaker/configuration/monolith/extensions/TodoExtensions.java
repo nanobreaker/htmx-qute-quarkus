@@ -3,6 +3,7 @@ package space.nanobreaker.configuration.monolith.extensions;
 import io.quarkus.qute.TemplateExtension;
 import space.nanobreaker.library.option.Option;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -23,24 +24,24 @@ public class TodoExtensions {
         return String.format("%03d", id);
     }
 
-    public static String formatDate(final Option<ZonedDateTime> dateTime) {
-        return dateTime.map(date -> date.format(dateFormatter))
-                .orElseGet(() -> "");
-    }
-
-    public static String formatTime(final Option<ZonedDateTime> dateTime) {
-        return dateTime.map(date -> date.format(timeFormatter))
-                .orElseGet(() -> "");
-    }
-
-    public static Boolean isTimePresent(final Option<ZonedDateTime> dateTime) {
+    public static String formatDate(final Option<ZonedDateTime> dateTime, ZoneId zoneId) {
         return dateTime
-                .map(date -> {
-                    int hour = date.getHour();
-                    int minute = date.getMinute();
+                .map(date -> date.withZoneSameLocal(zoneId))
+                .map(date -> date.format(dateFormatter))
+                .orElseGet(() -> "");
+    }
 
-                    return hour != 0 || minute != 0;
-                })
+    public static String formatTime(final Option<ZonedDateTime> dateTime, ZoneId zoneId) {
+        return dateTime
+                .map(date -> date.withZoneSameLocal(zoneId))
+                .map(date -> date.format(timeFormatter))
+                .orElseGet(() -> "");
+    }
+
+    public static Boolean isTimePresent(final Option<ZonedDateTime> dateTime, ZoneId zoneId) {
+        return dateTime
+                .map(date -> date.withZoneSameLocal(zoneId))
+                .map(date -> !(date.getHour() == 0 && date.getMinute() == 0))
                 .orElse(false);
     }
 }

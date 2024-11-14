@@ -7,8 +7,7 @@ import space.nanobreaker.configuration.monolith.services.command.UpdateTodoComma
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.result.Result;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -38,8 +37,8 @@ public class ParserTodoUpdateTest extends ParserTestBase {
                 List.of("title1", "title2"),
                 "new title",
                 "getDescription",
-                ZonedDateTime.of(2024, 6, 27, 15, 0, 0, 0, ZoneId.of("UTC")),
-                ZonedDateTime.of(2024, 6, 27, 16, 0, 0, 0, ZoneId.of("UTC"))
+                LocalDateTime.of(2024, 6, 27, 15, 0),
+                LocalDateTime.of(2024, 6, 27, 16, 0)
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);

@@ -6,6 +6,7 @@ import io.vertx.mutiny.core.eventbus.Message;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
@@ -54,7 +55,10 @@ public class TodosResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Uni<Response> todos() {
+    public Uni<Response> todos(
+            @CookieParam("time-zone") String zone
+    ) {
+        final var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         final String username = jwt.getClaim("upn");
         final Either<Set<TodoId>, String> usernameOrIds = new Right<>(username);
         final var query = new GetTodosQuery(usernameOrIds);
@@ -66,7 +70,7 @@ public class TodosResource {
         return resultUni
                 .map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos(todos).render();
+                        var html = TodoTemplates.todos(todos, zoneId).render();
 
                         yield Response.ok(html)
                                 .build();
@@ -84,7 +88,11 @@ public class TodosResource {
     @GET
     @Path("search")
     @Produces(MediaType.TEXT_HTML)
-    public Uni<Response> search(@QueryParam("id") final Set<Integer> ids) {
+    public Uni<Response> search(
+            @CookieParam("time-zone") String zone,
+            @QueryParam("id") final Set<Integer> ids
+    ) {
+        final var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         final String username = jwt.getClaim("upn");
         final Set<TodoId> todoIds = ids.stream()
                 .map(id -> new TodoId(id, username))
@@ -101,7 +109,7 @@ public class TodosResource {
         return resultUni
                 .map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos(todos)
+                        var html = TodoTemplates.todos(todos, zoneId)
                                 .getFragment("items")
                                 .instance()
                                 .data("todos", todos)
@@ -123,7 +131,11 @@ public class TodosResource {
     @GET
     @Path("{id}")
     @Produces(MediaType.TEXT_HTML)
-    public Uni<Response> get(@PathParam("id") Integer id) {
+    public Uni<Response> get(
+            @CookieParam("time-zone") String zone,
+            @PathParam("id") Integer id
+    ) {
+        final var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         final var todoId = new TodoId(id, jwt.getClaim("upn"));
         final var query = new GetTodoQuery(todoId);
 
@@ -135,7 +147,7 @@ public class TodosResource {
                 .map(result -> switch (result) {
                     case Ok(Todo todo) -> {
                         // todo: consider using 'item' fragment from todos template?
-                        var html = TodoTemplates.todo(todo).render();
+                        var html = TodoTemplates.todo(todo, zoneId).render();
 
                         yield Response.ok(html)
                                 .build();
@@ -162,10 +174,11 @@ public class TodosResource {
     public Uni<Response> create(@BeanParam final TodoCreateRequest request) {
         final String username = jwt.getClaim("upn");
         final var zone = URLDecoder.decode(request.zone(), StandardCharsets.UTF_8);
+        final var zoneId = ZoneId.of(zone);
         final var title = request.title();
         final var description = request.getDescription();
-        final var start = request.getStart().map(dt -> dt.atZone(ZoneId.of(zone)));
-        final var end = request.getEnd().map(dt -> dt.atZone(ZoneId.of(zone)));
+        final var start = request.getStart().map(s -> s.atZone(ZoneId.of(zone)));
+        final var end = request.getEnd().map(e -> e.atZone(ZoneId.of(zone)));
         final var command = new CreateTodo(
                 username,
                 title,
@@ -183,7 +196,7 @@ public class TodosResource {
                     case Ok(Todo todo) -> {
                         var id = todo.getId().getId();
                         var location = URI.create("/todos/%s".formatted(id));
-                        var html = TodoTemplates.todo(todo).render();
+                        var html = TodoTemplates.todo(todo, zoneId).render();
 
                         yield Response.created(location)
                                 .entity(html)

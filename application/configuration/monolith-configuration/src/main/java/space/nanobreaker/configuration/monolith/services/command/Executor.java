@@ -21,6 +21,7 @@ import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.option.Some;
 import space.nanobreaker.library.result.Result;
 
+import java.time.ZoneId;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,13 +34,18 @@ public class Executor {
     @Inject
     SecurityIdentity securityIdentity;
 
-    public Uni<Result<Todo, Error>> createTodo(final CreateTodoCommand cmd) {
+    public Uni<Result<Todo, Error>> createTodo(
+            final CreateTodoCommand cmd,
+            final ZoneId zoneId
+    ) {
+        final var start = cmd.start().map(s -> s.atZone(zoneId));
+        final var end = cmd.end().map(e -> e.atZone(zoneId));
         final CreateTodo command = new CreateTodo(
                 securityIdentity.getPrincipal().getName(),
                 cmd.title(),
                 cmd.description(),
-                cmd.start(),
-                cmd.end()
+                start,
+                end
         );
 
         return eventBus
@@ -47,7 +53,10 @@ public class Executor {
                 .map(Message::body);
     }
 
-    public Uni<Result<Void, Error>> updateTodo(final UpdateTodoCommand cmd) {
+    public Uni<Result<Void, Error>> updateTodo(
+            final UpdateTodoCommand cmd,
+            final ZoneId zoneId
+    ) {
         final String username = securityIdentity.getPrincipal().getName();
         final Option<Set<TodoId>> idsOption = cmd
                 .ids()
@@ -57,16 +66,18 @@ public class Executor {
                         .collect(Collectors.toSet())
                 );
         final Either<String, Set<TodoId>> usernameOrIds = switch (idsOption) {
-            case Some(final Set<TodoId> ids) -> new Right<>(ids);
-            case None<Set<TodoId>> ignored -> new Left<>(username);
+            case Some(Set<TodoId> ids) -> new Right<>(ids);
+            case None() -> new Left<>(username);
         };
+        final var start = cmd.start().map(s -> s.atZone(zoneId));
+        final var end = cmd.end().map(e -> e.atZone(zoneId));
         final UpdateTodo updateTodo = new UpdateTodo(
                 usernameOrIds,
                 cmd.filters(),
                 cmd.title(),
                 cmd.description(),
-                cmd.start(),
-                cmd.end()
+                start,
+                end
         );
 
         return eventBus
@@ -77,12 +88,12 @@ public class Executor {
     public Uni<Result<Set<Todo>, Error>> listTodo(final ListTodoCommand cmd) {
         final String username = securityIdentity.getPrincipal().getName();
         final Either<Set<TodoId>, String> usernameOrIds = switch (cmd.ids()) {
-            case Some(final Set<Integer> ids) -> new Left<>(ids
+            case Some(Set<Integer> ids) -> new Left<>(ids
                     .stream()
                     .map(id -> new TodoId(id, username))
                     .collect(Collectors.toUnmodifiableSet())
             );
-            case None<Set<Integer>> ignored -> new Right<>(username);
+            case None() -> new Right<>(username);
         };
         final GetTodosQuery todoListCommand = new GetTodosQuery(usernameOrIds);
 

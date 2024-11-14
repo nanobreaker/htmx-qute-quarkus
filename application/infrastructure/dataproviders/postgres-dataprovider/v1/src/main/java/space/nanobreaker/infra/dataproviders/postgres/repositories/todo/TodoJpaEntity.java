@@ -3,9 +3,9 @@ package space.nanobreaker.infra.dataproviders.postgres.repositories.todo;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Version;
-import space.nanobreaker.core.domain.v1.todo.TodoState;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -16,24 +16,23 @@ public class TodoJpaEntity {
 
     private String title;
     private String description;
-    private TodoState state;
-    private ZonedDateTime startDateTime;
-    private ZonedDateTime endDateTime;
+    private Instant startDateTime;
+    private Instant endDateTime;
+    private String timeZone;
 
     public TodoJpaEntity(
             final TodoJpaId id,
             final String title,
             final String description,
-            final TodoState state,
             final ZonedDateTime startDateTime,
             final ZonedDateTime endDateTime
     ) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.state = state;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
+        this.startDateTime = startDateTime.toInstant();
+        this.endDateTime = endDateTime.toInstant();
+        this.timeZone = startDateTime.getZone().getId();
     }
 
     public TodoJpaEntity() {
@@ -52,16 +51,12 @@ public class TodoJpaEntity {
         return description;
     }
 
-    public TodoState getState() {
-        return state;
-    }
-
     public ZonedDateTime getStartDateTime() {
-        return startDateTime;
+        return ZonedDateTime.ofInstant(startDateTime, ZoneId.of(timeZone));
     }
 
     public ZonedDateTime getEndDateTime() {
-        return endDateTime;
+        return ZonedDateTime.ofInstant(endDateTime, ZoneId.of(timeZone));
     }
 
     public int getVersion() {

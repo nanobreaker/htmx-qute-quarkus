@@ -7,8 +7,7 @@ import space.nanobreaker.configuration.monolith.services.command.CreateTodoComma
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.result.Result;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,8 +31,8 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "getDescription",
-                ZonedDateTime.of(2024, 6, 27, 12, 30, 0, 0, ZoneId.of("UTC")),
-                ZonedDateTime.of(2024, 6, 27, 13, 30, 0, 0, ZoneId.of("UTC"))
+                LocalDateTime.of(2024, 6, 27, 12, 30),
+                LocalDateTime.of(2024, 6, 27, 13, 30)
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -57,8 +56,8 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "getDescription",
-                ZonedDateTime.of(this.year, this.month, this.day, 12, 30, 0, 0, ZoneId.of("UTC")),
-                ZonedDateTime.of(this.year, this.month, this.day, 13, 30, 0, 0, ZoneId.of("UTC"))
+                LocalDateTime.of(this.year, this.month, this.day, 12, 30),
+                LocalDateTime.of(this.year, this.month, this.day, 13, 30)
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -82,8 +81,8 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "getDescription",
-                ZonedDateTime.of(2024, 6, 27, 0, 0, 0, 0, ZoneId.of("UTC")),
-                ZonedDateTime.of(2024, 6, 27, 0, 0, 0, 0, ZoneId.of("UTC"))
+                LocalDateTime.of(2024, 6, 27, 0, 0),
+                LocalDateTime.of(2024, 6, 27, 0, 0)
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -107,8 +106,8 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "getDescription",
-                ZonedDateTime.of(this.year, this.month, 27, 0, 0, 0, 0, ZoneId.of("UTC")),
-                ZonedDateTime.of(this.year, this.month, 28, 0, 0, 0, 0, ZoneId.of("UTC"))
+                LocalDateTime.of(this.year, this.month, 27, 0, 0),
+                LocalDateTime.of(this.year, this.month, 28, 0, 0)
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -132,8 +131,8 @@ public class ParserTodoCreateTest extends ParserTestBase {
         final Command expectedCommand = new CreateTodoCommand(
                 "test",
                 "getDescription",
-                ZonedDateTime.of(this.year, 6, 27, 0, 0, 0, 0, ZoneId.of("UTC")),
-                ZonedDateTime.of(this.year, 6, 28, 0, 0, 0, 0, ZoneId.of("UTC"))
+                LocalDateTime.of(this.year, 6, 27, 0, 0),
+                LocalDateTime.of(this.year, 6, 28, 0, 0)
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);

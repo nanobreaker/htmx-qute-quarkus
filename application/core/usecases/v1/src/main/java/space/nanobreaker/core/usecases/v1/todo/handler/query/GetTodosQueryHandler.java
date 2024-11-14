@@ -33,11 +33,11 @@ public class GetTodosQueryHandler
     @WithSpan("handleTodosGetCommand")
     @Override
     public Uni<Result<Set<Todo>, Error>> execute(final GetTodosQuery query) {
-        final Either<Set<TodoId>, String> usernameOrIds = query.idsOrUsername();
+        final Either<Set<TodoId>, String> idsOrUsername = query.idsOrUsername();
 
-        return switch (usernameOrIds) {
-            case Left(final Set<TodoId> ids) -> todoRepository.list(ids);
-            case Right(final String username) -> todoRepository.list(username);
+        return switch (idsOrUsername) {
+            case Left(var ids) -> todoRepository.list(ids);
+            case Right(var username) -> todoRepository.list(username);
         };
     }
 }

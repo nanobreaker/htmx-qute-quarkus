@@ -27,14 +27,6 @@ public interface TodoRepository extends Repository {
     );
 
     Uni<Result<Void, Error>> update(
-            Todo todo,
-            Option<String> someTitle,
-            Option<String> someDescription,
-            Option<ZonedDateTime> someStart,
-            Option<ZonedDateTime> someEnd
-    );
-
-    Uni<Result<Void, Error>> update(
             Set<Todo> todos,
             Option<String> someTitle,
             Option<String> someDescription,

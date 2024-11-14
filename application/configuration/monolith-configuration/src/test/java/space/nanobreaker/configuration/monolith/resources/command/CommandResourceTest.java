@@ -7,10 +7,8 @@ import space.nanobreaker.configuration.monolith.resources.TestBase;
 import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
-import space.nanobreaker.core.domain.v1.todo.TodoState;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -37,7 +35,7 @@ public class CommandResourceTest extends TestBase {
                     .auth().oauth2(ACCESS_TOKEN)
                     .header("X-CSRF-TOKEN", CSRF_TOKEN)
                     .cookie("csrf-token", CSRF_TOKEN)
-                    .cookie("time-zone", TIME_ZONE)
+                    .cookie("time-zone", USER_TIME_ZONE)
                     .contentType(ContentType.URLENC)
                     .formParams(Map.of("command", query))
                 .when()
@@ -53,11 +51,10 @@ public class CommandResourceTest extends TestBase {
                 expectedTodoId,
                 title,
                 description,
-                start.atZone(ZoneId.of("UTC")),
-                end.atZone(ZoneId.of("UTC")),
-                TodoState.ACTIVE
+                start.atZone(USER_TIME_ZONE_ID),
+                end.atZone(USER_TIME_ZONE_ID)
         );
-        var expectedHtml = TodoTemplates.todo(expectedTodo).render();
+        var expectedHtml = TodoTemplates.todo(expectedTodo, USER_TIME_ZONE_ID).render();
         var actualHtml = postResponse.extract().body().asString();
 
         assertThat(actualHtml).isEqualTo(expectedHtml);

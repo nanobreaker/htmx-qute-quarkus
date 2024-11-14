@@ -12,22 +12,19 @@ public class Todo extends AggregateRoot<TodoId> {
     private final String description;
     private final ZonedDateTime start;
     private final ZonedDateTime end;
-    private final TodoState state;
 
     public Todo(
             final TodoId todoId,
             final String title,
             final String description,
             final ZonedDateTime start,
-            final ZonedDateTime end,
-            final TodoState state
+            final ZonedDateTime end
     ) {
         super(todoId);
         this.title = Objects.requireNonNull(title);
         this.description = description;
         this.start = start;
         this.end = end;
-        this.state = state;
         // todo: consider moving to the CreateTodoHandler?
         this.registerEvent(new TodoEvent.Created(todoId));
     }
@@ -48,10 +45,6 @@ public class Todo extends AggregateRoot<TodoId> {
         return Option.of(end);
     }
 
-    public TodoState getState() {
-        return state;
-    }
-
     public static final class Builder {
 
         private final TodoId id;
@@ -59,7 +52,6 @@ public class Todo extends AggregateRoot<TodoId> {
         private ZonedDateTime start;
         private ZonedDateTime end;
         private String description;
-        private TodoState state;
 
         public Builder(
                 TodoId id,
@@ -67,11 +59,6 @@ public class Todo extends AggregateRoot<TodoId> {
         ) {
             this.id = id;
             this.title = title;
-        }
-
-        public Builder withState(TodoState state) {
-            this.state = state;
-            return this;
         }
 
         public Builder withEnd(ZonedDateTime end) {
@@ -90,7 +77,7 @@ public class Todo extends AggregateRoot<TodoId> {
         }
 
         public Todo build() {
-            return new Todo(id, title, description, start, end, state);
+            return new Todo(id, title, description, start, end);
         }
     }
 }

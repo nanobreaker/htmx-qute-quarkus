@@ -6,8 +6,6 @@ import space.nanobreaker.library.either.Either;
 
 import java.util.Set;
 
-public record GetTodosQuery(
-        Either<Set<TodoId>, String> idsOrUsername
-) implements Query {
+public record GetTodosQuery(Either<Set<TodoId>, String> idsOrUsername) implements Query {
 
 }

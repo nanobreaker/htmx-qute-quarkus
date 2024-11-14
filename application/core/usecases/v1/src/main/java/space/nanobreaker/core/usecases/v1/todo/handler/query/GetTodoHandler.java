@@ -20,7 +20,7 @@ public class GetTodoHandler implements QueryHandler<GetTodoQuery, Todo> {
 
     private final TodoRepository todoRepository;
 
-    public GetTodoHandler(TodoRepository todoRepository) {
+    public GetTodoHandler(final TodoRepository todoRepository) {
         this.todoRepository = todoRepository;
     }
 

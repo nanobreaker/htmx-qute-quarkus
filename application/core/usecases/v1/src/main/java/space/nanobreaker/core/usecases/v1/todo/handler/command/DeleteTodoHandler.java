@@ -24,8 +24,8 @@ public class DeleteTodoHandler
     private final TodoRepository todoRepository;
 
     public DeleteTodoHandler(
-            EventDispatcher eventDispatcher,
-            TodoRepository todoRepository
+            final EventDispatcher eventDispatcher,
+            final TodoRepository todoRepository
     ) {
         this.eventDispatcher = eventDispatcher;
         this.todoRepository = todoRepository;

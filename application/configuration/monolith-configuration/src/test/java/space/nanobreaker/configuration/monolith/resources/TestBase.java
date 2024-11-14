@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.DecoderConfig.decoderConfig;
@@ -26,31 +27,17 @@ public class TestBase {
                         decoderConfig().defaultContentCharset("UTF-8")
                 )
                 .sessionConfig(
-                        sessionConfig()
-                                .sessionIdName("q_session")
+                        sessionConfig().sessionIdName("q_session")
                 );
     }
 
     protected final KeycloakTestClient keycloakClient = new KeycloakTestClient();
-    protected String USERNAME = "alice";
+    protected final String USERNAME = "alice";
+    protected final String USER_TIME_ZONE = URLEncoder.encode("Europe/Chisinau", StandardCharsets.UTF_8);
+    protected final ZoneId USER_TIME_ZONE_ID = ZoneId.of("Europe/Chisinau");
+    protected final ZoneId UTC_TIME_ZONE = ZoneId.of("UTC");
     protected String ACCESS_TOKEN = null;
     protected String CSRF_TOKEN = null;
-    protected String TIME_ZONE = URLEncoder.encode("Etc/UTC", StandardCharsets.UTF_8);
-
-    protected String access_token() {
-        return keycloakClient.getAccessToken("alice");
-    }
-
-    // @formatter:off
-    protected String csrf_token() {
-        return
-            given()
-            .when()
-                .get("/")
-            .then()
-                .extract().cookie("csrf-token");
-    }
-    // @formatter:on
 
     @BeforeEach
     protected void setUp() {

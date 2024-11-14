@@ -1,3 +1,6 @@
+{@space.nanobreaker.core.domain.v1.todo.Todo todo}
+{@java.time.ZoneId zoneId}
+
 <form id="todo-{todo.id.id}"
       class="todo crowded fade-me-out slide-it"
       hx-get="/todo/{todo.id.id}"
@@ -14,32 +17,32 @@
 
     <div class="title padding">{todo.title}</div>
 
-    {#if todo.start.isSome() && todo.start.isTimePresent() }
+    {#if todo.start.isSome() && todo.start.isTimePresent(zoneId) }
         <div class="start-label">=>></div>
         <div class="start-date-time">
-            <div class="start-date padding">{todo.start.formatDate}</div>
-            <div class="start-time padding">{todo.start.formatTime}</div>
+            <div class="start-date padding">{todo.start.formatDate(zoneId)}</div>
+            <div class="start-time padding">{todo.start.formatTime(zoneId)}</div>
         </div>
     {#else if todo.start.isSome() }
         <div class="start-label">=>></div>
-        <div class="start-date-single padding">{todo.start.formatDate}</div>
-    {#else if todo.start.isTimePresent() }
+        <div class="start-date-single padding">{todo.start.formatDate(zoneId)}</div>
+    {#else if todo.start.isTimePresent(zoneId) }
         <div class="start-label">=>></div>
-        <div class="start-time-single padding">{todo.start.formatTime}</div>
+        <div class="start-time-single padding">{todo.start.formatTime(zoneId)}</div>
     {/if}
 
-    {#if todo.end.isSome() && todo.end.isTimePresent() }
+    {#if todo.end.isSome() && todo.end.isTimePresent(zoneId) }
         <div class="end-label"><<=</div>
         <div class="end-date-time">
-            <div class="end-date padding">{todo.end.formatDate}</div>
-            <div class="end-time padding">{todo.end.formatTime}</div>
+            <div class="end-date padding">{todo.end.formatDate(zoneId)}</div>
+            <div class="end-time padding">{todo.end.formatTime(zoneId)}</div>
         </div>
     {#else if todo.end.isSome() }
         <div class="end-label"><<=</div>
-        <div class="end-date-single padding">{todo.end.formatDate}</div>
-    {#else if todo.end.isTimePresent() }
+        <div class="end-date-single padding">{todo.end.formatDate(zoneId)}</div>
+    {#else if todo.end.isTimePresent(zoneId) }
         <div class="end-label"><<=</div>
-        <div class="end-time-single padding">{todo.end.formatTime}</div>
+        <div class="end-time-single padding">{todo.end.formatTime(zoneId)}</div>
     {/if}
 
     {#if todo.description.isSome()}

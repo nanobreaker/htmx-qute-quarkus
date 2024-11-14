@@ -4,7 +4,7 @@ import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.result.Result;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -13,8 +13,8 @@ public record UpdateTodoCommand(
         Option<List<String>> filters,
         Option<String> title,
         Option<String> description,
-        Option<ZonedDateTime> start,
-        Option<ZonedDateTime> end
+        Option<LocalDateTime> start,
+        Option<LocalDateTime> end
 ) implements TodoCommand {
 
     public UpdateTodoCommand {
@@ -27,8 +27,8 @@ public record UpdateTodoCommand(
             List<String> filters,
             String title,
             String description,
-            ZonedDateTime start,
-            ZonedDateTime end
+            LocalDateTime start,
+            LocalDateTime end
     ) {
         this(
                 Option.of(ids),
@@ -45,8 +45,8 @@ public record UpdateTodoCommand(
             Option<List<String>> filters,
             Option<String> title,
             Option<String> description,
-            Option<ZonedDateTime> start,
-            Option<ZonedDateTime> end
+            Option<LocalDateTime> start,
+            Option<LocalDateTime> end
     ) {
         try {
             return Result.ok(
@@ -69,8 +69,8 @@ public record UpdateTodoCommand(
             final List<String> titleFilters,
             final String title,
             final String description,
-            final ZonedDateTime start,
-            final ZonedDateTime end
+            final LocalDateTime start,
+            final LocalDateTime end
     ) {
         try {
             return Result.ok(

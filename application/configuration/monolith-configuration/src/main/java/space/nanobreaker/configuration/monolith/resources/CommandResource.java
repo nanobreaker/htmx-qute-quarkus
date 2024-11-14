@@ -40,6 +40,9 @@ import space.nanobreaker.library.result.Ok;
 import space.nanobreaker.library.result.Result;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,6 +64,7 @@ public class CommandResource {
             @CookieParam("time-zone") final String zone,
             @FormParam("command") final String input
     ) {
+        final var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         final String upn = jwt.getClaim("upn");
         final String sid = jwt.getClaim("sid");
 
@@ -70,14 +74,14 @@ public class CommandResource {
             case Ok(Command c) -> switch (c) {
                 case TodoCommand tc -> switch (tc) {
                     case CreateTodoCommand command -> executor
-                            .createTodo(command)
+                            .createTodo(command, zoneId)
                             .map(result -> switch (result) {
                                 case Ok(Todo todo) -> {
                                     var location = "/todos/%d".formatted(todo.getId().getId());
                                     var uri = URI.create(location);
                                     // todo: consider using 'item' fragment from todos template?
-                                    var html = TodoTemplates.todo(todo);
-                                    var event = new SseEvent.TodoCreated(upn, sid, html.render());
+                                    var html = TodoTemplates.todo(todo, zoneId).render();
+                                    var event = new SseEvent.TodoCreated(upn, sid, html);
                                     eventBus.publish("sse.todo.created", event);
 
                                     yield Response.created(uri)
@@ -96,7 +100,7 @@ public class CommandResource {
                             .listTodo(listTodoCommand)
                             .map(result -> switch (result) {
                                 case Ok(Set<Todo> todos) -> {
-                                    var html = TodoTemplates.todos(todos)
+                                    var html = TodoTemplates.todos(todos, zoneId)
                                             .getFragment("items")
                                             .instance()
                                             .data("todos", todos)
@@ -114,7 +118,7 @@ public class CommandResource {
                                 }
                             });
                     case UpdateTodoCommand updateTodoCommand -> executor
-                            .updateTodo(updateTodoCommand)
+                            .updateTodo(updateTodoCommand, zoneId)
                             .map(result -> switch (result) {
                                 case Ok(Void _) -> switch (updateTodoCommand.ids()) {
                                     case Some(Set<Integer> ids) -> {
