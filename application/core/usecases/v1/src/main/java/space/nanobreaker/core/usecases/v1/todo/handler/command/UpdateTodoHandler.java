@@ -15,9 +15,9 @@ import space.nanobreaker.ddd.EventDispatcher;
 import space.nanobreaker.library.either.Either;
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
-import space.nanobreaker.library.result.Err;
-import space.nanobreaker.library.result.Ok;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Err;
+import io.github.dcadea.jresult.Ok;
+import io.github.dcadea.jresult.Result;
 
 import java.util.List;
 import java.util.Set;

@@ -1,5 +1,6 @@
 package space.nanobreaker.infra.dataproviders.postgres.repositories.todo;
 
+import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
@@ -18,7 +19,6 @@ import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.error.None;
 import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.option.Some;
-import space.nanobreaker.library.result.Result;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -199,7 +199,7 @@ public class TodoJpaPostgresRepository
         return Panache.withTransaction(
                         () -> this.update(query, parameters)
                                 .chain(this::flush)
-                                .replaceWith(Result.<Error>okVoid())
+                                .replaceWith(Result.<Void, Error>empty())
                 )
                 .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
     }
@@ -213,7 +213,7 @@ public class TodoJpaPostgresRepository
                     if (!result) {
                         return Result.<Void, Error>err(new None());
                     } else {
-                        return Result.<Error>okVoid();
+                        return Result.<Void, Error>empty();
                     }
                 })
                 .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
@@ -232,7 +232,7 @@ public class TodoJpaPostgresRepository
                     if (count != ids.size()) {
                         return Result.<Void, Error>err(new None());
                     } else {
-                        return Result.<Error>okVoid();
+                        return Result.<Void, Error>empty();
                     }
                 })
                 .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
@@ -247,12 +247,17 @@ public class TodoJpaPostgresRepository
 
     private TodoJpaEntity mapToJpaEntity(final Todo todo) {
         final TodoJpaId id = mapToJpaId(todo.getId());
+        // TODO: Probably keep timezone on domain object as well
+        final var zoneFromStart = todo.getStart().map(d -> d.getZone().getId());
+        final var zoneFromEnd = todo.getEnd().map(d -> d.getZone().getId()).orElse("UTC");
+        final var timeZone = zoneFromStart.orElseGet(() -> zoneFromEnd);
         return new TodoJpaEntity(
                 id,
                 todo.getTitle(),
                 todo.getDescription().orElse(null),
-                todo.getStart().orElse(null),
-                todo.getEnd().orElse(null)
+                todo.getStart().map(ZonedDateTime::toInstant).orElse(null),
+                todo.getEnd().map(ZonedDateTime::toInstant).orElse(null),
+                timeZone
         );
     }
 

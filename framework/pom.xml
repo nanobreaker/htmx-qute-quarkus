@@ -23,6 +23,11 @@
             <artifactId>library</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.github.dcadea</groupId>
+            <artifactId>jresult</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-mutiny</artifactId>
         </dependency>

@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.services.analyzer;
 
+import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,7 +20,6 @@ import space.nanobreaker.configuration.monolith.services.tokenizer.token.Cmd;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.Prog;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.Token;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
 
 import java.util.SequencedCollection;
 
@@ -34,7 +34,7 @@ public class Analyzer {
         final Result<SequencedCollection<Token>, Error> tokenizerResult = tokenizer.tokenize(input);
 
         if (tokenizerResult.isErr())
-            return Result.err(tokenizerResult.error());
+            return Result.err(tokenizerResult.unwrapErr());
 
         final SequencedCollection<Token> tokens = tokenizerResult.unwrap();
 

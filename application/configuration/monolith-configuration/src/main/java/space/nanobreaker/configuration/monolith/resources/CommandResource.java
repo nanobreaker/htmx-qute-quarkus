@@ -1,5 +1,8 @@
 package space.nanobreaker.configuration.monolith.resources;
 
+import io.github.dcadea.jresult.Err;
+import io.github.dcadea.jresult.Ok;
+import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
@@ -35,9 +38,6 @@ import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.None;
 import space.nanobreaker.library.option.Some;
-import space.nanobreaker.library.result.Err;
-import space.nanobreaker.library.result.Ok;
-import space.nanobreaker.library.result.Result;
 
 import java.net.URI;
 import java.net.URLDecoder;
@@ -104,6 +104,7 @@ public class CommandResource {
                                             .getFragment("items")
                                             .instance()
                                             .data("todos", todos)
+                                            .data("zoneId", zoneId)
                                             .render();
 
                                     yield Response.ok()

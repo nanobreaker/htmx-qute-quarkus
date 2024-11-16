@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.services.command;
 
+import io.github.dcadea.jresult.Result;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
@@ -19,7 +20,6 @@ import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.None;
 import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.option.Some;
-import space.nanobreaker.library.result.Result;
 
 import java.time.ZoneId;
 import java.util.Set;
@@ -119,12 +119,12 @@ public class Executor {
     public Uni<Result<Void, Error>> showCalendar(final ShowCalendarCommand ignored) {
         // TODO: Implement show calendar command
         return Uni.createFrom()
-                .item(Result.okVoid());
+                .item(Result.empty());
     }
 
     public Uni<Result<Void, Error>> showUser(final ShowUserCommand ignored) {
         // TODO: Implement show user command
         return Uni.createFrom()
-                .item(Result.okVoid());
+                .item(Result.empty());
     }
 }

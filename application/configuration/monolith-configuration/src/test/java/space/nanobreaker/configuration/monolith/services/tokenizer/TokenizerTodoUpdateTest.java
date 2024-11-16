@@ -5,7 +5,7 @@ import space.nanobreaker.configuration.monolith.services.tokenizer.token.Cmd;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.Prog;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.Token;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 import java.util.SequencedCollection;
 

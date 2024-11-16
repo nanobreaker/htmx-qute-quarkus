@@ -1,12 +1,12 @@
 package space.nanobreaker.ddd;
 
+import io.github.dcadea.jresult.Err;
+import io.github.dcadea.jresult.Ok;
+import io.github.dcadea.jresult.Result;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.eventbus.EventBus;
 import jakarta.enterprise.context.ApplicationScoped;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Err;
-import space.nanobreaker.library.result.Ok;
-import space.nanobreaker.library.result.Result;
 
 import java.util.SequencedCollection;
 import java.util.function.Supplier;

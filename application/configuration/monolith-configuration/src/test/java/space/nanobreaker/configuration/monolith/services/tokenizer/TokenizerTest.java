@@ -3,7 +3,7 @@ package space.nanobreaker.configuration.monolith.services.tokenizer;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 import java.util.SequencedCollection;
 

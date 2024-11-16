@@ -36,6 +36,10 @@
             <artifactId>framework</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.github.dcadea</groupId>
+            <artifactId>jresult</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-reactive-panache</artifactId>
         </dependency>

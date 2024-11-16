@@ -13,7 +13,7 @@ import space.nanobreaker.core.usecases.v1.todo.query.GetTodoQuery;
 import space.nanobreaker.cqrs.QueryHandler;
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.error.None;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 @ApplicationScoped
 public class GetTodoHandler implements QueryHandler<GetTodoQuery, Todo> {

@@ -5,7 +5,7 @@ import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
 import space.nanobreaker.configuration.monolith.services.command.UpdateTodoCommand;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 import java.time.LocalDateTime;
 import java.util.List;

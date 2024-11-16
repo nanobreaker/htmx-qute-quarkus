@@ -7,14 +7,22 @@ import space.nanobreaker.library.option.Option;
 
 import java.time.LocalDateTime;
 
-public record TodoUpdateRequest(
-        @CookieParam("time-zone") String zone,
-        @PathParam("id") Integer id,
-        @FormParam("title") String title,
-        @FormParam("description") String description,
-        @FormParam("start") LocalDateTime start,
-        @FormParam("end") LocalDateTime end
-) {
+public final class TodoUpdateRequest {
+
+    @CookieParam("time-zone") private String zone;
+    @PathParam("id") private Integer id;
+    @FormParam("title") private String title;
+    @FormParam("description") private String description;
+    @FormParam("start") private LocalDateTime start;
+    @FormParam("end") private LocalDateTime end;
+
+    public String zone() {
+        return zone;
+    }
+
+    public Integer id() {
+        return id;
+    }
 
     public Option<String> getTitle() {
         return Option.of(title);

@@ -14,7 +14,7 @@ import space.nanobreaker.library.either.Either;
 import space.nanobreaker.library.either.Left;
 import space.nanobreaker.library.either.Right;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 import java.util.Set;
 

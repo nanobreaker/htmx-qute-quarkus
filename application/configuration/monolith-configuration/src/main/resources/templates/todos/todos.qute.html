@@ -1,4 +1,5 @@
-{@space.nanobreaker.core.domain.v1.todo.Todo todo}
+{@java.util.List<space.nanobreaker.core.domain.v1.todo.Todo> todos}
+{@space.nanobreaker.configuration.monolith.resources.todo.TodoTemplate todo}
 {@java.time.ZoneId zoneId}
 
 {#include base}
@@ -26,7 +27,7 @@
                 {#fragment id = items}
                     {#for todo in todos}
                         {#fragment id = item}
-                            <div id="todo-{todo.id.id}"
+                            <div id="todo-{todo}"
                                  hx-get="/todo/{todo.id.id}"
                                  hx-trigger="sse:todo.updated.{todo.id.id}"
                                  hx-swap="outerHTML"

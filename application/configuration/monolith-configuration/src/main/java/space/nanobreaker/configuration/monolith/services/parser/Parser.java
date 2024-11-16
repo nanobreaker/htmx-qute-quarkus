@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.services.parser;
 
+import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,7 +19,6 @@ import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.None;
 import space.nanobreaker.library.option.Option;
 import space.nanobreaker.library.option.Some;
-import space.nanobreaker.library.result.Result;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -66,7 +66,7 @@ public class Parser {
         final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         if (result.isErr())
-            return Result.err(result.error());
+            return Result.err(result.unwrapErr());
 
         final SequencedCollection<Token> tokens = result.unwrap();
         final Token programToken = tokens.removeFirst();
@@ -106,9 +106,9 @@ public class Parser {
         final Option<String> descriptionOption = descriptionToken
                 .map(Opt.Description::value);
         final Option<LocalDateTime> start = startToken
-                .flatMap(t -> this.parseDateTime(t.value()).ok());
+                .flatMap(t -> Option.of(this.parseDateTime(t.value()).ok()));
         final Option<LocalDateTime> end = endToken
-                .flatMap(t -> this.parseDateTime(t.value()).ok());
+                .flatMap(t -> Option.of(this.parseDateTime(t.value()).ok()));
 
         return CreateTodoCommand.of(
                 title,
@@ -152,9 +152,9 @@ public class Parser {
         final Option<String> description = descriptionToken
                 .map(Opt.Description::value);
         final Option<LocalDateTime> start = startToken
-                .flatMap(t -> this.parseDateTime(t.value()).ok());
+                .flatMap(t -> Option.of(this.parseDateTime(t.value()).ok()));
         final Option<LocalDateTime> end = endToken
-                .flatMap(t -> this.parseDateTime(t.value()).ok());
+                .flatMap(t -> Option.of(this.parseDateTime(t.value()).ok()));
 
         return UpdateTodoCommand.of(
                 ids,
@@ -170,7 +170,7 @@ public class Parser {
         final Result<Set<Arg>, Error> argumentResult = getArguments(tokens, Arg.class);
 
         if (argumentResult.isErr())
-            return Result.err(argumentResult.error());
+            return Result.err(argumentResult.unwrapErr());
 
         final Set<Arg> args = argumentResult.unwrap();
 

@@ -4,7 +4,7 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;

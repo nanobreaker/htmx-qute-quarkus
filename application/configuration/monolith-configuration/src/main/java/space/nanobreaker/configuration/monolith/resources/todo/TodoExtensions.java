@@ -1,4 +1,4 @@
-package space.nanobreaker.configuration.monolith.extensions;
+package space.nanobreaker.configuration.monolith.resources.todo;
 
 import io.quarkus.qute.TemplateExtension;
 import space.nanobreaker.library.option.Option;

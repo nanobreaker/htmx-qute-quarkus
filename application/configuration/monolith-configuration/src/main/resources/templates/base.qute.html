@@ -27,7 +27,10 @@
     <link rel="icon" type="image/png" href="/static/favicon/favicon.png">
 </head>
 <body hx-ext="response-targets"
-      _="on keyup[key is ':']
+      _="init
+            set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+            set cookies['time-zone'] to { value: zone, maxAge: 600 }
+         on keyup[key is ':']
             navigation.focusById('command')
          end">
 {#insert}{/}

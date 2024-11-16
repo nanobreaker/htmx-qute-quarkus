@@ -2,7 +2,7 @@ package space.nanobreaker.cqrs;
 
 import io.smallrye.mutiny.Uni;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 public interface QueryHandler<Q extends Query, R> {
 

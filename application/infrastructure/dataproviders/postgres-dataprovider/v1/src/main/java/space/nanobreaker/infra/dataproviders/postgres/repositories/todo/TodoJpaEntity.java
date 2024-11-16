@@ -24,15 +24,16 @@ public class TodoJpaEntity {
             final TodoJpaId id,
             final String title,
             final String description,
-            final ZonedDateTime startDateTime,
-            final ZonedDateTime endDateTime
+            final Instant startDateTime,
+            final Instant endDateTime,
+            final String timeZone
     ) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.startDateTime = startDateTime.toInstant();
-        this.endDateTime = endDateTime.toInstant();
-        this.timeZone = startDateTime.getZone().getId();
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.timeZone = timeZone;
     }
 
     public TodoJpaEntity() {
@@ -52,10 +53,16 @@ public class TodoJpaEntity {
     }
 
     public ZonedDateTime getStartDateTime() {
+        if (startDateTime == null) {
+            return null;
+        }
         return ZonedDateTime.ofInstant(startDateTime, ZoneId.of(timeZone));
     }
 
     public ZonedDateTime getEndDateTime() {
+        if (endDateTime == null) {
+            return null;
+        }
         return ZonedDateTime.ofInstant(endDateTime, ZoneId.of(timeZone));
     }
 

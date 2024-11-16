@@ -1,5 +1,8 @@
-package space.nanobreaker.configuration.monolith.resources;
+package space.nanobreaker.configuration.monolith.resources.todo;
 
+import io.github.dcadea.jresult.Err;
+import io.github.dcadea.jresult.Ok;
+import io.github.dcadea.jresult.Result;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -36,9 +39,6 @@ import space.nanobreaker.library.either.Left;
 import space.nanobreaker.library.either.Right;
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
-import space.nanobreaker.library.result.Err;
-import space.nanobreaker.library.result.Ok;
-import space.nanobreaker.library.result.Result;
 
 import java.net.URI;
 import java.net.URLDecoder;
@@ -55,9 +55,7 @@ public class TodosResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Uni<Response> todos(
-            @CookieParam("time-zone") String zone
-    ) {
+    public Uni<Response> todos(@CookieParam("time-zone") String zone) {
         final var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         final String username = jwt.getClaim("upn");
         final Either<Set<TodoId>, String> usernameOrIds = new Right<>(username);
@@ -109,10 +107,12 @@ public class TodosResource {
         return resultUni
                 .map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
+                        // TODO: access fragment directly
                         var html = TodoTemplates.todos(todos, zoneId)
                                 .getFragment("items")
                                 .instance()
                                 .data("todos", todos)
+                                .data("zoneId", zoneId)
                                 .render();
 
                         yield Response.ok(html)

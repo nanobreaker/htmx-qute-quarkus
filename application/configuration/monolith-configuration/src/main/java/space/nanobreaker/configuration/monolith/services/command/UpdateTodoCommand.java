@@ -2,7 +2,7 @@ package space.nanobreaker.configuration.monolith.services.command;
 
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 import java.time.LocalDateTime;
 import java.util.List;

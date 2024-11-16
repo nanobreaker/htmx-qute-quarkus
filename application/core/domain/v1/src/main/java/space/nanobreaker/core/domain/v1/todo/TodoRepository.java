@@ -1,11 +1,11 @@
 package space.nanobreaker.core.domain.v1.todo;
 
+import io.github.dcadea.jresult.Result;
 import io.smallrye.mutiny.Uni;
 import space.nanobreaker.jpa.Repository;
 import space.nanobreaker.library.either.Either;
 import space.nanobreaker.library.error.Error;
 import space.nanobreaker.library.option.Option;
-import space.nanobreaker.library.result.Result;
 
 import java.time.ZonedDateTime;
 import java.util.List;

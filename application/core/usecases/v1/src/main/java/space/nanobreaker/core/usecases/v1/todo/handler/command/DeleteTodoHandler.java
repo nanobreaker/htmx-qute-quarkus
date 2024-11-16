@@ -12,7 +12,7 @@ import space.nanobreaker.core.usecases.v1.todo.command.DeleteTodo;
 import space.nanobreaker.cqrs.CommandHandler;
 import space.nanobreaker.ddd.EventDispatcher;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Result;
+import io.github.dcadea.jresult.Result;
 
 import java.util.Set;
 

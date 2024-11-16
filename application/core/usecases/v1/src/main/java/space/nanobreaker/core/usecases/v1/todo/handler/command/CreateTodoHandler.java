@@ -1,5 +1,8 @@
 package space.nanobreaker.core.usecases.v1.todo.handler.command;
 
+import io.github.dcadea.jresult.Err;
+import io.github.dcadea.jresult.Ok;
+import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.vertx.ConsumeEvent;
@@ -13,9 +16,6 @@ import space.nanobreaker.core.usecases.v1.todo.command.CreateTodo;
 import space.nanobreaker.cqrs.CommandHandler;
 import space.nanobreaker.ddd.EventDispatcher;
 import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.result.Err;
-import space.nanobreaker.library.result.Ok;
-import space.nanobreaker.library.result.Result;
 
 @ApplicationScoped
 public class CreateTodoHandler implements CommandHandler<CreateTodo, Result<Todo, Error>> {
