@@ -1,13 +1,10 @@
 {@java.util.List<space.nanobreaker.core.domain.v1.todo.Todo> todos}
-{@space.nanobreaker.configuration.monolith.resources.todo.TodoTemplate todo}
+{@space.nanobreaker.core.domain.v1.todo.Todo todo}
 {@java.time.ZoneId zoneId}
 
 {#include base}
     <div id="dashboard"
-         class="fullscreen bg"
-         _="init
-                set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
-                set cookies['time-zone'] to { value: zone, maxAge: 600 }">
+         class="fullscreen bg">
 
         <div id="top-bar"
              hx-get="/topbar"
@@ -25,9 +22,9 @@
 
             <div id="todo-grid" class="todo-grid">
                 {#fragment id = items}
-                    {#for todo in todos}
+                    {#each todos}
                         {#fragment id = item}
-                            <div id="todo-{todo}"
+                            <div id="todo-{todo.id.id}"
                                  hx-get="/todo/{todo.id.id}"
                                  hx-trigger="sse:todo.updated.{todo.id.id}"
                                  hx-swap="outerHTML"
@@ -38,46 +35,40 @@
                                      hx-trigger="sse:todo.to.delete.{todo.id.id}"
                                      hx-target="#todo-{todo.id.id}"
                                      hx-swap="outerHTML swap:1s">
-                                    {todo.id.id.formatId}
+                                    {id:format(todo.id.id)}
                                 </div>
 
                                 <div class="title padding">{todo.title}</div>
 
-                                {#if todo.start.isSome() && todo.start.isTimePresent(zoneId) }
+                                {#if date:isDateTimePresent(todo.start) }
                                     <div class="start-label">=>></div>
                                     <div class="start-date-time">
-                                        <div class="start-date padding">{todo.start.formatDate(zoneId)}</div>
-                                        <div class="start-time padding">{todo.start.formatTime(zoneId)}</div>
+                                        <div class="start-date padding">{date:formatDate(todo.start, zoneId)}</div>
+                                        <div class="start-time padding">{date:formatTime(todo.start, zoneId)}</div>
                                     </div>
-                                {#else if todo.start.isSome() }
+                                {#else if date:isDatePresent(todo.start) }
                                     <div class="start-label">=>></div>
-                                    <div class="start-date-single padding">{todo.start.formatDate(zoneId)}</div>
-                                {#else if todo.start.isTimePresent(zoneId) }
-                                    <div class="start-label">=>></div>
-                                    <div class="start-time-single padding">{todo.start.formatTime(zoneId)}</div>
+                                    <div class="start-date-single padding">{date:formatDate(todo.start, zoneId)}</div>
                                 {/if}
 
-                                {#if todo.end.isSome() && todo.end.isTimePresent(zoneId) }
+                                {#if date:isDateTimePresent(todo.end) }
                                     <div class="end-label"><<=</div>
                                     <div class="end-date-time">
-                                        <div class="end-date padding">{todo.end.formatDate(zoneId)}</div>
-                                        <div class="end-time padding">{todo.end.formatTime(zoneId)}</div>
+                                        <div class="end-date padding">{date:formatDate(todo.end, zoneId)}</div>
+                                        <div class="end-time padding">{date:formatTime(todo.end, zoneId)}</div>
                                     </div>
-                                {#else if todo.end.isSome() }
+                                {#else if date:isDatePresent(todo.end) }
                                     <div class="end-label"><<=</div>
-                                    <div class="end-date-single padding">{todo.end.formatDate(zoneId)}</div>
-                                {#else if todo.end.isTimePresent(zoneId) }
-                                    <div class="end-label"><<=</div>
-                                    <div class="end-time-single padding">{todo.end.formatTime(zoneId)}</div>
+                                    <div class="end-date-single padding">{date:formatDate(todo.end, zoneId)}</div>
                                 {/if}
 
-                                {#if todo.description.isSome()}
+                                {#if todo.getDescription().isSome()}
                                     <div class="description-label">*</div>
-                                    <div class="description padding">{todo.description.value()}</div>
+                                    <div class="description padding">{todo.getDescription().value()}</div>
                                 {/if}
                             </div>
                         {/fragment}
-                    {/for}
+                    {/each}
                 {/fragment}
             </div>
         </div>

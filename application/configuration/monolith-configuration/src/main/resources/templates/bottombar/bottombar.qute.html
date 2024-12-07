@@ -42,11 +42,6 @@
                class="command-input"
                name="command"
                type="search"
-               hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
-               hx-post="/commands/validate"
-               hx-trigger="change, keyup delay:200ms changed"
-               hx-target="#feedback"
-               hx-swap="innerHTML"
                _="on command.empty from:document
                   set my value to ''">
         <input type="submit"

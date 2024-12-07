@@ -7,6 +7,7 @@ public sealed interface CommandError extends Error {
     // @formatter:off
     record CreationFailed(String description)   implements CommandError { }
     record DeletionFailed(String description)   implements CommandError { }
+    record NotSupported()  implements CommandError { }
     // @formatter:on
 
     @Override
@@ -14,6 +15,7 @@ public sealed interface CommandError extends Error {
         return switch (this) {
             case CreationFailed e -> "failed to create todo: %s".formatted(e.description());
             case DeletionFailed e -> "failed to delete todo: %s".formatted(e.description());
+            case NotSupported ignored -> "not supported command by command executor";
         };
     }
 }

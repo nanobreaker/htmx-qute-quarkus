@@ -1,21 +1,21 @@
 package space.nanobreaker.configuration.monolith.services.parser;
 
+import io.github.dcadea.jresult.Result;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.CreateTodoCommand;
 import space.nanobreaker.library.error.Error;
-import io.github.dcadea.jresult.Result;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static space.nanobreaker.library.option.Option.some;
 
 public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmd() {
-        final String input = new InputBuilder("todo")
+        String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
                 .append("-d\"getDescription\"")
@@ -23,16 +23,16 @@ public class ParserTodoCreateTest extends ParserTestBase {
                 .append("-e\"27/06/2024 13:30\"")
                 .build();
 
-        final Result<Command, Error> result = parser.parse(input);
+        Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
 
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCommand(
+        Command actualCommand = result.unwrap();
+        Command expectedCommand = new Command.Todo.Create.Default(
                 "test",
-                "getDescription",
-                LocalDateTime.of(2024, 6, 27, 12, 30),
-                LocalDateTime.of(2024, 6, 27, 13, 30)
+                some("getDescription"),
+                some(LocalDateTime.of(2024, 6, 27, 12, 30)),
+                some(LocalDateTime.of(2024, 6, 27, 13, 30))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -40,7 +40,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmdWhenStartAndEndOptionsAreTimes() {
-        final String input = new InputBuilder("todo")
+        String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
                 .append("-d\"getDescription\"")
@@ -48,16 +48,16 @@ public class ParserTodoCreateTest extends ParserTestBase {
                 .append("-e\"13:30\"")
                 .build();
 
-        final Result<Command, Error> result = parser.parse(input);
+        Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
 
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCommand(
+        Command actualCommand = result.unwrap();
+        Command expectedCommand = new Command.Todo.Create.Default(
                 "test",
-                "getDescription",
-                LocalDateTime.of(this.year, this.month, this.day, 12, 30),
-                LocalDateTime.of(this.year, this.month, this.day, 13, 30)
+                some("getDescription"),
+                some(LocalDateTime.of(this.year, this.month, this.day, 12, 30)),
+                some(LocalDateTime.of(this.year, this.month, this.day, 13, 30))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -65,7 +65,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmdWhenStartAndEndOptionsAreFullDates() {
-        final String input = new InputBuilder("todo")
+        String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
                 .append("-d\"getDescription\"")
@@ -73,16 +73,16 @@ public class ParserTodoCreateTest extends ParserTestBase {
                 .append("-e\"27.06.24\"")
                 .build();
 
-        final Result<Command, Error> result = parser.parse(input);
+        Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
 
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCommand(
+        Command actualCommand = result.unwrap();
+        Command expectedCommand = new Command.Todo.Create.Default(
                 "test",
-                "getDescription",
-                LocalDateTime.of(2024, 6, 27, 0, 0),
-                LocalDateTime.of(2024, 6, 27, 0, 0)
+                some("getDescription"),
+                some(LocalDateTime.of(2024, 6, 27, 0, 0)),
+                some(LocalDateTime.of(2024, 6, 27, 0, 0))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -90,7 +90,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmdWhenStartAndEndOptionsAreJustDayOfTheMonth() {
-        final String input = new InputBuilder("todo")
+        String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
                 .append("-d\"getDescription\"")
@@ -98,16 +98,16 @@ public class ParserTodoCreateTest extends ParserTestBase {
                 .append("-e\"28\"")
                 .build();
 
-        final Result<Command, Error> result = parser.parse(input);
+        Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
 
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCommand(
+        Command actualCommand = result.unwrap();
+        Command expectedCommand = new Command.Todo.Create.Default(
                 "test",
-                "getDescription",
-                LocalDateTime.of(this.year, this.month, 27, 0, 0),
-                LocalDateTime.of(this.year, this.month, 28, 0, 0)
+                some("getDescription"),
+                some(LocalDateTime.of(this.year, this.month, 27, 0, 0)),
+                some(LocalDateTime.of(this.year, this.month, 28, 0, 0))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);
@@ -115,7 +115,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void shouldCreateCmdWhenStartAndEndOptionsAreDayOfTheMonthAndMonth() {
-        final String input = new InputBuilder("todo")
+        String input = new InputBuilder("todo")
                 .append("create")
                 .append("\"test\"")
                 .append("-d\"getDescription\"")
@@ -123,16 +123,16 @@ public class ParserTodoCreateTest extends ParserTestBase {
                 .append("-e\"28.06\"")
                 .build();
 
-        final Result<Command, Error> result = parser.parse(input);
+        Result<Command, Error> result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
 
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new CreateTodoCommand(
+        Command actualCommand = result.unwrap();
+        Command expectedCommand = new Command.Todo.Create.Default(
                 "test",
-                "getDescription",
-                LocalDateTime.of(this.year, 6, 27, 0, 0),
-                LocalDateTime.of(this.year, 6, 28, 0, 0)
+                some("getDescription"),
+                some(LocalDateTime.of(this.year, 6, 27, 0, 0)),
+                some(LocalDateTime.of(this.year, 6, 28, 0, 0))
         );
 
         assertThat(actualCommand).isEqualTo(expectedCommand);

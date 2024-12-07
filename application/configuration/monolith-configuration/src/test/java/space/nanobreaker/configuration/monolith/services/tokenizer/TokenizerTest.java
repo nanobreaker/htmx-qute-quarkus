@@ -1,9 +1,8 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
-import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
-import space.nanobreaker.library.error.Error;
 import io.github.dcadea.jresult.Result;
+import org.junit.jupiter.api.Test;
+import space.nanobreaker.library.error.Error;
 
 import java.util.SequencedCollection;
 
@@ -13,15 +12,15 @@ class TokenizerTest extends TokenizerTestBase {
 
     @Test
     void shouldReturnProgramToken() {
-        final String input = "todo";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+        String input = "todo";
+        Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
 
         assertThat(result.isOk()).isTrue();
 
-        final SequencedCollection<Token> tokens = result.unwrap();
+        SequencedCollection<Token> tokens = result.unwrap();
 
         assertThat(tokens.size()).isEqualTo(1);
-        assertThat(tokens).contains(new Prog.Todo());
+        assertThat(tokens).contains(new Token.Prog.Todo());
     }
 
     @Test
@@ -34,7 +33,7 @@ class TokenizerTest extends TokenizerTestBase {
         final SequencedCollection<Token> tokens = result.unwrap();
 
         assertThat(tokens.size()).isEqualTo(1);
-        assertThat(tokens).contains(new Unk("tod"));
+        assertThat(tokens).contains(new Token.Unk("tod"));
     }
 
     @Test
@@ -48,8 +47,8 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Unk("crea")
+                new Token.Prog.Todo(),
+                new Token.Unk("crea")
         );
     }
 
@@ -64,8 +63,8 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Unk("tod"),
-                new Unk("crea")
+                new Token.Unk("tod"),
+                new Token.Unk("crea")
         );
     }
 
@@ -80,9 +79,9 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(3);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Unk("yog")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Unk("yog")
         );
     }
 
@@ -97,10 +96,10 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Unk("not compl")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Arg("yoga"),
+                new Token.Unk("not compl")
         );
     }
 
@@ -115,8 +114,8 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create()
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create()
         );
     }
 
@@ -131,10 +130,10 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Unk("wtf")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Arg("yoga"),
+                new Token.Unk("wtf")
         );
     }
 
@@ -149,14 +148,14 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(8);
         assertThat(tokens).containsExactly(
-                new Unk("some"),
-                new Unk("crazy"),
-                new Unk("shit"),
-                new Unk("bla"),
-                new Unk("bla"),
-                new Unk(""),
-                new Unk("243989fdfljsdlfkfdlk"),
-                new Arg(" ")
+                new Token.Unk("some"),
+                new Token.Unk("crazy"),
+                new Token.Unk("shit"),
+                new Token.Unk("bla"),
+                new Token.Unk("bla"),
+                new Token.Unk(""),
+                new Token.Unk("243989fdfljsdlfkfdlk"),
+                new Token.Arg(" ")
         );
     }
 
@@ -171,14 +170,14 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(8);
         assertThat(tokens).containsExactly(
-                new Unk("hey"),
-                new Unk("yo"),
-                new Unk("what"),
-                new Unk("the"),
-                new Unk("fuck"),
-                new Unk("are"),
-                new Unk("you"),
-                new Unk("failing")
+                new Token.Unk("hey"),
+                new Token.Unk("yo"),
+                new Token.Unk("what"),
+                new Token.Unk("the"),
+                new Token.Unk("fuck"),
+                new Token.Unk("are"),
+                new Token.Unk("you"),
+                new Token.Unk("failing")
         );
     }
 
@@ -193,11 +192,11 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("test"),
-                new Unk("22"),
-                new Unk("24")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Arg("test"),
+                new Token.Unk("22"),
+                new Token.Unk("24")
         );
     }
 

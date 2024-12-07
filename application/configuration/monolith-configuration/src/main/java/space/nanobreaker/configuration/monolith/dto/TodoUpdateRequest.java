@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.PathParam;
@@ -9,12 +10,24 @@ import java.time.LocalDateTime;
 
 public final class TodoUpdateRequest {
 
-    @CookieParam("time-zone") private String zone;
-    @PathParam("id") private Integer id;
-    @FormParam("title") private String title;
-    @FormParam("description") private String description;
-    @FormParam("start") private LocalDateTime start;
-    @FormParam("end") private LocalDateTime end;
+    @CookieParam("time-zone")
+    @NotBlank
+    private String zone;
+
+    @PathParam("id")
+    private Integer id;
+
+    @FormParam("title")
+    private String title;
+
+    @FormParam("description")
+    private String description;
+
+    @FormParam("start")
+    private LocalDateTime start;
+
+    @FormParam("end")
+    private LocalDateTime end;
 
     public String zone() {
         return zone;
@@ -25,18 +38,18 @@ public final class TodoUpdateRequest {
     }
 
     public Option<String> getTitle() {
-        return Option.of(title);
+        return Option.some(title);
     }
 
     public Option<String> getDescription() {
-        return Option.of(description);
+        return Option.some(description);
     }
 
     public Option<LocalDateTime> getStart() {
-        return Option.of(start);
+        return Option.some(start);
     }
 
     public Option<LocalDateTime> getEnd() {
-        return Option.of(end);
+        return Option.some(end);
     }
 }

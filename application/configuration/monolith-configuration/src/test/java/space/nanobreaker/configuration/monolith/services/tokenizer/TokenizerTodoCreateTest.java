@@ -1,9 +1,8 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
-import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
-import space.nanobreaker.library.error.Error;
 import io.github.dcadea.jresult.Result;
+import org.junit.jupiter.api.Test;
+import space.nanobreaker.library.error.Error;
 
 import java.util.SequencedCollection;
 
@@ -22,8 +21,8 @@ class TokenizerTodoCreateTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create()
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create()
         );
     }
 
@@ -38,9 +37,9 @@ class TokenizerTodoCreateTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(3);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Arg("yoga")
         );
     }
 
@@ -55,10 +54,10 @@ class TokenizerTodoCreateTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Opt.Description("Igor the best yogin in Moldova gives yoga lesson")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Arg("yoga"),
+                new Token.Opt.Description("Igor the best yogin in Moldova gives yoga lesson")
         );
     }
 
@@ -73,11 +72,11 @@ class TokenizerTodoCreateTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Opt.Description("Igor the best yogin in Moldova gives yoga lesson"),
-                new Opt.Start("27/06/2024")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Arg("yoga"),
+                new Token.Opt.Description("Igor the best yogin in Moldova gives yoga lesson"),
+                new Token.Opt.Start("27/06/2024")
         );
     }
 
@@ -92,11 +91,11 @@ class TokenizerTodoCreateTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("t"),
-                new Opt.Start("12:00"),
-                new Opt.End("13:00")
+                new Token.Prog.Todo(),
+                new Token.Cmd.Create(),
+                new Token.Arg("t"),
+                new Token.Opt.Start("12:00"),
+                new Token.Opt.End("13:00")
         );
     }
 }

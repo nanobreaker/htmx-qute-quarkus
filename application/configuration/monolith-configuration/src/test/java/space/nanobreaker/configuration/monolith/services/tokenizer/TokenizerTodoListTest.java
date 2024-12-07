@@ -1,12 +1,8 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
-import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Arg;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Cmd;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Prog;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Token;
-import space.nanobreaker.library.error.Error;
 import io.github.dcadea.jresult.Result;
+import org.junit.jupiter.api.Test;
+import space.nanobreaker.library.error.Error;
 
 import java.util.SequencedCollection;
 
@@ -25,8 +21,8 @@ class TokenizerTodoListTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.List()
+                new Token.Prog.Todo(),
+                new Token.Cmd.List()
         );
     }
 
@@ -41,11 +37,11 @@ class TokenizerTodoListTest extends TokenizerTestBase {
 
         assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.List(),
-                new Arg("id_one"),
-                new Arg("id_two"),
-                new Arg("id_three")
+                new Token.Prog.Todo(),
+                new Token.Cmd.List(),
+                new Token.Arg("id_one"),
+                new Token.Arg("id_two"),
+                new Token.Arg("id_three")
         );
     }
 }
