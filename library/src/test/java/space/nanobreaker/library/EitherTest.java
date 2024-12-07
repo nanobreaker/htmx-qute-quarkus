@@ -31,7 +31,7 @@ public class EitherTest {
     @Test
     void shouldConvertLeftSideOfEitherToOption() {
         final Either<Integer, Integer> left = new Left<>(42);
-        assertThat(left.left()).isEqualTo(Option.of(42));
+        assertThat(left.left()).isEqualTo(Option.some(42));
 
         final Either<Integer, Integer> right = new Right<>(666);
         assertThat(right.left()).isEqualTo(Option.none());
@@ -40,7 +40,7 @@ public class EitherTest {
     @Test
     void shouldConvertRightSideOfEitherToOption() {
         final Either<Integer, Integer> right = new Right<>(42);
-        assertThat(right.right()).isEqualTo(Option.of(42));
+        assertThat(right.right()).isEqualTo(Option.some(42));
 
         final Either<Integer, Integer> left = new Left<>(666);
         assertThat(left.right()).isEqualTo(Option.none());

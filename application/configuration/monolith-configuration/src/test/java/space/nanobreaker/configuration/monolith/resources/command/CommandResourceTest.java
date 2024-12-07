@@ -1,10 +1,11 @@
 package space.nanobreaker.configuration.monolith.resources.command;
 
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.resources.TestBase;
-import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 
@@ -19,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CommandResourceTest extends TestBase {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+    @Location("todos/todos.qute.html") Template todosTemplate;
 
     @Test
     public void post() {
@@ -54,7 +57,11 @@ public class CommandResourceTest extends TestBase {
                 start.atZone(USER_TIME_ZONE_ID),
                 end.atZone(USER_TIME_ZONE_ID)
         );
-        var expectedHtml = TodoTemplates.todo(expectedTodo, USER_TIME_ZONE_ID).render();
+        var expectedHtml = this.todosTemplate
+                .getFragment("item")
+                .data("todo", expectedTodo)
+                .data("zoneId", USER_TIME_ZONE_ID)
+                .render();
         var actualHtml = postResponse.extract().body().asString();
 
         assertThat(actualHtml).isEqualTo(expectedHtml);

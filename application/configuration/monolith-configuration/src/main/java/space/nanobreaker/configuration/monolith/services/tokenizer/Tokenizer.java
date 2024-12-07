@@ -1,16 +1,14 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
+import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
 import space.nanobreaker.library.error.Error;
-import io.github.dcadea.jresult.Result;
 
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.LinkedList;
 import java.util.SequencedCollection;
-
 
 @ApplicationScoped
 public class Tokenizer {
@@ -80,21 +78,22 @@ public class Tokenizer {
                     }
                 }
 
-                case State.StringLiteral _-> {
+                case State.StringLiteral _ -> {
                     if (Character.isLetterOrDigit(character)) {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else if (Character.isWhitespace(character) || character == CharacterIterator.DONE) {
                         currentToken = switch (currentTokenString.toString()) {
-                            case "todo" -> new Prog.Todo();
-                            case "user" -> new Prog.User();
-                            case "calendar" -> new Prog.Calendar();
-                            case "update" -> new Cmd.Update();
-                            case "create" -> new Cmd.Create();
-                            case "list" -> new Cmd.List();
-                            case "delete" -> new Cmd.Delete();
-                            case "show" -> new Cmd.Show();
-                            default -> new Unk(currentTokenString.toString());
+                            case "todo" -> new Token.Prog.Todo();
+                            case "user" -> new Token.Prog.User();
+                            case "calendar" -> new Token.Prog.Calendar();
+                            case "update" -> new Token.Cmd.Update();
+                            case "create" -> new Token.Cmd.Create();
+                            case "list" -> new Token.Cmd.List();
+                            case "delete" -> new Token.Cmd.Delete();
+                            case "show" -> new Token.Cmd.Show();
+                            case "all" -> new Token.SubCmd.All();
+                            default -> new Token.Unk(currentTokenString.toString());
                         };
 
                         stateNext = new State.FinalizeToken();
@@ -105,13 +104,13 @@ public class Tokenizer {
 
                 case State.ArgumentValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Arg(currentTokenString.toString());
+                        currentToken = new Token.Arg(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
@@ -220,49 +219,49 @@ public class Tokenizer {
 
                 case State.FilterOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Opt.Filters(currentTokenString.toString());
+                        currentToken = new Token.Opt.Filters(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
 
                 case State.TitleOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Opt.Title(currentTokenString.toString());
+                        currentToken = new Token.Opt.Title(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
 
                 case State.DescriptionOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Opt.Description(currentTokenString.toString());
+                        currentToken = new Token.Opt.Description(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
 
                 case State.StartOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character == '"') {
-                        currentToken = new Opt.Start(currentTokenString.toString());
+                        currentToken = new Token.Opt.Start(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else {
                         currentTokenString.append(character);
@@ -272,10 +271,10 @@ public class Tokenizer {
 
                 case State.EndOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character == '"') {
-                        currentToken = new Opt.End(currentTokenString.toString());
+                        currentToken = new Token.Opt.End(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else {
                         currentTokenString.append(character);
@@ -285,13 +284,13 @@ public class Tokenizer {
 
                 case State.UnknownOptionValue _ -> {
                     if (character == CharacterIterator.DONE) {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     } else if (character != '"') {
                         currentTokenString.append(character);
                         character = iterator.next();
                     } else {
-                        currentToken = new Unk(currentTokenString.toString());
+                        currentToken = new Token.Unk(currentTokenString.toString());
                         stateNext = new State.FinalizeToken();
                     }
                 }
@@ -310,5 +309,4 @@ public class Tokenizer {
 
         return Result.ok(tokens);
     }
-
 }

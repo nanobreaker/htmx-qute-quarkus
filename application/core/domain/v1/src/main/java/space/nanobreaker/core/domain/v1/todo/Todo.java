@@ -25,24 +25,22 @@ public class Todo extends AggregateRoot<TodoId> {
         this.description = description;
         this.start = start;
         this.end = end;
-        // todo: consider moving to the CreateTodoHandler?
-        this.registerEvent(new TodoEvent.Created(todoId));
     }
 
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     public Option<String> getDescription() {
-        return Option.of(description);
+        return Option.some(this.description);
     }
 
     public Option<ZonedDateTime> getStart() {
-        return Option.of(start);
+        return Option.some(this.start);
     }
 
     public Option<ZonedDateTime> getEnd() {
-        return Option.of(end);
+        return Option.some(this.end);
     }
 
     public static final class Builder {

@@ -1,10 +1,11 @@
 package space.nanobreaker.configuration.monolith.resources.todo;
 
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import space.nanobreaker.configuration.monolith.resources.TestBase;
-import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 
@@ -16,6 +17,8 @@ import static org.hamcrest.Matchers.matchesPattern;
 
 @QuarkusTest
 public class TodosResourceTest extends TestBase {
+
+    @Location("todos/todos.qute.html") Template todosTemplate;
 
     @Test
     public void post() {
@@ -172,7 +175,11 @@ public class TodosResourceTest extends TestBase {
                 updated_start.atZone(USER_TIME_ZONE_ID),
                 updated_end.atZone(USER_TIME_ZONE_ID)
         );
-        var expectedHtml = TodoTemplates.todo(expectedTodo, USER_TIME_ZONE_ID).render();
+        var expectedHtml = this.todosTemplate
+                .getFragment("item")
+                .data("todo", expectedTodo)
+                .data("zoneId", USER_TIME_ZONE_ID)
+                .render();
         var actualHtml = getResponse.extract().body().asString();
 
         assertThat(actualHtml).isEqualTo(expectedHtml);

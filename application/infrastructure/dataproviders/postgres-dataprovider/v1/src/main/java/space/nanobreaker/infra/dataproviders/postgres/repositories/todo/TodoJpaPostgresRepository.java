@@ -7,6 +7,7 @@ import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
+import space.nanobreaker.core.domain.v1.Command;
 import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
@@ -44,7 +45,7 @@ public class TodoJpaPostgresRepository
 
     @WithSpan("findByTodoId")
     @Override
-    public Uni<Result<Todo, Error>> find(final TodoId id) {
+    public Uni<Result<Todo, Error>> get(final TodoId id) {
         final TodoJpaId jpaId = mapToJpaId(id);
 
         return this.getSession()
@@ -74,6 +75,11 @@ public class TodoJpaPostgresRepository
                 )
                 .map(Result::<Set<Todo>, Error>ok)
                 .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+    }
+
+    @Override
+    public Uni<Result<Set<Todo>, Error>> list(String username, Set<String> filters) {
+        return null;
     }
 
     @WithSpan("listTodosByUsernameAndFilters")
@@ -119,6 +125,16 @@ public class TodoJpaPostgresRepository
                 .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
     }
 
+    @Override
+    public Uni<Result<Set<Todo>, Error>> list(Set<TodoId> ids, Set<String> filters) {
+        return null;
+    }
+
+    @Override
+    public Uni<Result<Void, Error>> update(Set<Todo> todos, Command.Todo.Update.Payload payload) {
+        return null;
+    }
+
     @WithSpan("listTodosByIdsAndFilter")
     public Uni<Result<Set<Todo>, Error>> list(
             final Set<TodoId> ids,
@@ -147,7 +163,6 @@ public class TodoJpaPostgresRepository
     }
 
     @WithSpan("listTodosByEitherUsernameOrIdsAndFilters")
-    @Override
     public Uni<Result<Set<Todo>, Error>> list(
             final Either<String, Set<TodoId>> usernameOrIds,
             final Option<List<String>> filtersOption
@@ -158,7 +173,6 @@ public class TodoJpaPostgresRepository
         };
     }
 
-    @Override
     @WithSpan("updateTodos")
     public Uni<Result<Void, Error>> update(
             final Set<Todo> todos,
@@ -238,6 +252,11 @@ public class TodoJpaPostgresRepository
                 .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
     }
 
+    @Override
+    public Uni<Result<Void, Error>> deleteAll(String username) {
+        return null;
+    }
+
     private TodoJpaId mapToJpaId(final TodoId id) {
         final TodoJpaId todoJpaId = new TodoJpaId();
         todoJpaId.setId(id.getId());
@@ -247,10 +266,10 @@ public class TodoJpaPostgresRepository
 
     private TodoJpaEntity mapToJpaEntity(final Todo todo) {
         final TodoJpaId id = mapToJpaId(todo.getId());
-        // TODO: Probably keep timezone on domain object as well
         final var zoneFromStart = todo.getStart().map(d -> d.getZone().getId());
         final var zoneFromEnd = todo.getEnd().map(d -> d.getZone().getId()).orElse("UTC");
         final var timeZone = zoneFromStart.orElseGet(() -> zoneFromEnd);
+
         return new TodoJpaEntity(
                 id,
                 todo.getTitle(),
@@ -267,6 +286,7 @@ public class TodoJpaPostgresRepository
 
     private Todo mapToDomainEntity(final TodoJpaEntity jpaEntity) {
         final TodoId id = this.mapToDomainId(jpaEntity.getId());
+
         return new Todo(
                 id,
                 jpaEntity.getTitle(),
