@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           java-version: '24'
-          distribution: 'graalvm'
+          distribution: 'zulu'
           cache: maven
       - name: mvn clean install
         run: ./mvnw clean install -Pmonolith -Dquarkus.profile=test
