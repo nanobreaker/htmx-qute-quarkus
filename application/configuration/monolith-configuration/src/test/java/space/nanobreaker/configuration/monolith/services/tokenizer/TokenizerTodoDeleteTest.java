@@ -1,64 +1,57 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
-import io.github.dcadea.jresult.Result;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.library.error.Error;
-
-import java.util.SequencedCollection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TokenizerTodoDeleteTest extends TokenizerTestBase {
 
     @Test
-    void shouldReturnProgTodoAndCmdDelete() {
-        final String input = "todo delete";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_delete() {
+        var input = "todo delete";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Token.Prog.Todo(),
-                new Token.Cmd.Delete()
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.DELETE)
         );
     }
 
     @Test
-    void shouldReturnProgTodoAndCmdDeleteAndArgs() {
-        final String input = "todo delete \"1\" \"2\" \"3\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_delete_help() {
+        var input = "todo delete help";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Token.Prog.Todo(),
-                new Token.Cmd.Delete(),
-                new Token.Arg("1"),
-                new Token.Arg("2"),
-                new Token.Arg("3")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.DELETE),
+                new Token.Keyword(KEYWORD.HELP)
         );
     }
 
     @Test
-    void shouldReturnProgTodoAndCmdDeleteAndSubCmdAll() {
-        final String input = "todo delete all";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_delete_all() {
+        var input = "todo delete all";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(3);
         assertThat(tokens).containsExactly(
-                new Token.Prog.Todo(),
-                new Token.Cmd.Delete(),
-                new Token.SubCmd.All()
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.DELETE),
+                new Token.Keyword(KEYWORD.ALL)
+        );
+    }
+
+    @Test
+    void tokenize_todo_delete_arg_arg_arg() {
+        var input = "todo delete \"1\" \"2\" \"3\"";
+        var tokens = tokenizer.tokenize(input);
+
+        assertThat(tokens).containsExactly(
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.DELETE),
+                new Token.Text("1"),
+                new Token.Text("2"),
+                new Token.Text("3")
         );
     }
 }

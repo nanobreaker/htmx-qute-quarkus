@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.github.dcadea.jresult.Result.err;
+
 public class TodoJpaPostgresRepository
         implements TodoRepository, PanacheRepositoryBase<TodoJpaEntity, TodoJpaId> {
 
@@ -40,7 +42,7 @@ public class TodoJpaPostgresRepository
                 .persistAndFlush(jpaEntity)
                 .map(this::mapToDomainEntity)
                 .map(Result::<Todo, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("findByTodoId")
@@ -58,7 +60,7 @@ public class TodoJpaPostgresRepository
                         return Result.<Todo, Error>ok(todo);
                     }
                 })
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("listTodosByUsername")
@@ -74,7 +76,7 @@ public class TodoJpaPostgresRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @Override
@@ -105,7 +107,7 @@ public class TodoJpaPostgresRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("listTodosByIds")
@@ -122,7 +124,7 @@ public class TodoJpaPostgresRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @Override
@@ -159,7 +161,7 @@ public class TodoJpaPostgresRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("listTodosByEitherUsernameOrIdsAndFilters")
@@ -215,7 +217,7 @@ public class TodoJpaPostgresRepository
                                 .chain(this::flush)
                                 .replaceWith(Result.<Void, Error>empty())
                 )
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @Override
@@ -230,7 +232,7 @@ public class TodoJpaPostgresRepository
                         return Result.<Void, Error>empty();
                     }
                 })
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @Override
@@ -249,7 +251,7 @@ public class TodoJpaPostgresRepository
                         return Result.<Void, Error>empty();
                     }
                 })
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @Override

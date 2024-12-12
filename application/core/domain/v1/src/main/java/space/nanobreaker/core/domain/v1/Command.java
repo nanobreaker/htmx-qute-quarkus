@@ -1,13 +1,14 @@
 package space.nanobreaker.core.domain.v1;
 
 import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.cqrs.CQRSEvent;
 import space.nanobreaker.library.option.Option;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
 
 // @formatter:off
-public sealed interface Command {
+public sealed interface Command extends CQRSEvent {
 
     sealed interface Todo extends Command {
        record Create(

@@ -35,14 +35,14 @@ public class CreateTodoHandler implements CommandHandler<Command.Todo.Create, Re
         this.eventDispatcher = eventDispatcher;
     }
 
+    @Override
     @ConsumeEvent(value = "command.todo.create")
     @WithSpan("handleTodoCreateCommand")
     @WithTransaction
-    @Override
     public Uni<Result<Todo, Error>> handle(final Command.Todo.Create command) {
-        final var username = command.username();
-        final Uni<TodoId> id = idSeq.next(username);
-        final Uni<Result<Todo, Error>> createdTodo = id
+        var username = command.username();
+        Uni<TodoId> id = idSeq.next(username);
+        Uni<Result<Todo, Error>> createdTodo = id
                 .map(todoId -> {
                     var title = command.title();
                     var builder = new Todo.Builder(todoId, title);

@@ -21,7 +21,7 @@ public class EventDispatcher {
 
     public <R> Uni<Result<R, Error>> on(
             final Supplier<Uni<Result<R, Error>>> operation,
-            final Event event
+            final DomainEvent event
     ) {
         final Uni<Result<R, Error>> resultUni = operation.get();
 

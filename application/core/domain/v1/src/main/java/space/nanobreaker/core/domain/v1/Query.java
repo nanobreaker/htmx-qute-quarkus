@@ -1,11 +1,12 @@
 package space.nanobreaker.core.domain.v1;
 
 import space.nanobreaker.core.domain.v1.todo.TodoId;
+import space.nanobreaker.cqrs.CQRSEvent;
 
 import java.util.Set;
 
 // @formatter:off
-public sealed interface Query {
+public sealed interface Query extends CQRSEvent {
 
     sealed interface Todo extends Query {
         sealed interface Get extends Todo {

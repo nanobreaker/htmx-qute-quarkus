@@ -8,7 +8,6 @@ import io.quarkus.qute.Template;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
@@ -50,7 +49,6 @@ public class TodosResource {
     private final JsonWebToken jwt;
     private final Template todosTemplate;
 
-    @Inject
     public TodosResource(
             final EventBus eventBus,
             final JsonWebToken jwt,

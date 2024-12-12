@@ -24,10 +24,10 @@ public class ListTodoHandler implements QueryHandler<List, Set<Todo>> {
         this.todoRepository = todoRepository;
     }
 
-    @WithSpan("handleTodoGetCommand")
-    @ConsumeEvent(value = "query.todo.list")
-    @WithSession
     @Override
+    @ConsumeEvent(value = "query.todo.list")
+    @WithSpan("handleTodoGetCommand")
+    @WithSession
     public Uni<Result<Set<Todo>, Error>> execute(final List query) {
         return switch (query) {
             case List.All(var username) -> todoRepository.list(username);

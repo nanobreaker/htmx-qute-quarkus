@@ -33,10 +33,10 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
         this.todoRepository = todoRepository;
     }
 
+    @Override
     @ConsumeEvent(value = "command.todo.update")
     @WithSpan("handleTodoUpdateCommand")
     @WithSession
-    @Override
     public Uni<Result<Void, Error>> handle(final Update command) {
         return switch (command) {
             case Update.ByIds(var ids, var payload) -> {

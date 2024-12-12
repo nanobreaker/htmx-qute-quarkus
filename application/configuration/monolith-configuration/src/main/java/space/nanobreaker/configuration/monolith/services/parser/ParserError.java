@@ -16,6 +16,7 @@ public sealed interface ParserError extends Error {
     record EmptyDateTime()                              implements ParserError { }
     record EmptyDate()                                  implements ParserError { }
     record EmptyTime()                                  implements ParserError { }
+    record Empty()                                      implements ParserError { }
     // @formatter:on
 
     @Override
@@ -27,13 +28,12 @@ public sealed interface ParserError extends Error {
             case UnknownProgram _ -> "parser error: unknown program";
             case DateTimeParseError e ->
                     "parser error: string \"%s\" is not a valid date time".formatted(e.description());
-            case DateParseError e ->
-                    "parser error: string \"%s\" is not a valid date".formatted(e.description());
-            case TimeParseError e ->
-                    "parser error: string \"%s\" is not a valid date".formatted(e.description());
+            case DateParseError e -> "parser error: string \"%s\" is not a valid date".formatted(e.description());
+            case TimeParseError e -> "parser error: string \"%s\" is not a valid date".formatted(e.description());
             case DateTimeParseException e ->
                     "parser error: string \"%s\" is not a valid date".formatted(e.exception().getMessage());
-            case EmptyDateTime _,
+            case Empty _,
+                 EmptyDateTime _,
                  EmptyDate _,
                  EmptyTime _ -> "<ignored>";
         };

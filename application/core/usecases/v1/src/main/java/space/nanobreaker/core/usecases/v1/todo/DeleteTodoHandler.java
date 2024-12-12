@@ -30,10 +30,10 @@ public class DeleteTodoHandler
         this.todoRepository = todoRepository;
     }
 
-    @ConsumeEvent(value = "command.todo.delete")
-    @WithTransaction
-    @WithSpan("handleTodoDeleteCommand")
     @Override
+    @ConsumeEvent(value = "command.todo.delete")
+    @WithSpan("handleTodoDeleteCommand")
+    @WithTransaction
     public Uni<Result<Void, Error>> handle(final Delete command) {
         return switch (command) {
             case Delete.All(var username) -> {

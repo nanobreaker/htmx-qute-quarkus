@@ -22,15 +22,13 @@ public class GetTodoHandler implements QueryHandler<Get, Todo> {
         this.todoRepository = todoRepository;
     }
 
-    @ConsumeEvent(value = "query.todo.get")
-    @WithSession
-    @WithSpan("handleTodoGetCommand")
     @Override
+    @ConsumeEvent(value = "query.todo.get")
+    @WithSpan("handleTodoGetCommand")
+    @WithSession
     public Uni<Result<Todo, Error>> execute(final Get query) {
         return switch (query) {
-            case Get.ById(var id) -> {
-                yield todoRepository.get(id);
-            }
+            case Get.ById(var id) -> todoRepository.get(id);
         };
     }
 }

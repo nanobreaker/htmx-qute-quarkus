@@ -1,9 +1,8 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
-import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
-import space.nanobreaker.library.error.Error;
+import jakarta.validation.constraints.NotNull;
 
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -15,298 +14,131 @@ public class Tokenizer {
 
     // @formatter:off
     sealed interface State {
-        record New() implements State { }
-        record StringLiteral() implements State { }
-        record OptionStart() implements State { }
-        record ArgumentValue() implements State { }
-        record FilterOption() implements State { }
-        record FilterOptionValue() implements State { }
-        record TitleOption() implements State { }
-        record TitleOptionValue() implements State { }
-        record DescriptionOption() implements State { }
-        record DescriptionOptionValue() implements State { }
-        record StartOption() implements State { }
-        record StartOptionValue() implements State { }
-        record EndOption() implements State { }
-        record EndOptionValue() implements State { }
-        record UnknownOption() implements State { }
-        record UnknownOptionValue() implements State { }
-        record FinalizeToken() implements State { }
-        record Exit() implements State { }
+        State BEGIN_TOKEN = new State.BeginToken();
+        State KEYWORD = new State.Keyword();
+        State OPTION = new State.Option();
+        State TEXT = new State.Text();
+        State EXIT = new State.Exit();
+
+        record BeginToken()             implements State { }
+        record EndToken(Token token)    implements State { }
+        record Keyword()                implements State { }
+        record Option()                 implements State { }
+        record Text()                   implements State { }
+        record Exit()                   implements State { }
+    }
+
+    enum CharCode {
+        LETTER_OR_DIGIT,
+        WHITESPACE,
+        QUOTATION_MARK,
+        DASH,
+        EMPTY,
+        NOT_SUPPORTED;
+
+        public static CharCode from(final Character character){
+            if (Character.isLetterOrDigit(character)) {
+                return LETTER_OR_DIGIT;
+            } else if (Character.isWhitespace(character)) {
+                return WHITESPACE;
+            } else if (character == '"') {
+                return QUOTATION_MARK;
+            } else if (character == '-') {
+                return DASH;
+            } else if (character == CharacterIterator.DONE) {
+                return EMPTY;
+            } else {
+                return NOT_SUPPORTED;
+            }
+        }
     }
     // @formatter:on
 
     @WithSpan("tokenizeInputString")
-    public Result<SequencedCollection<Token>, Error> tokenize(final String input) {
-        if (input == null || input.isEmpty()) {
-            return Result.err(new TokenizerError.EmptyInput());
+    public SequencedCollection<Token> tokenize(@NotNull final String source) {
+        SequencedCollection<Token> tokens = new LinkedList<>();
+        var chat_iter = new StringCharacterIterator(source);
+        var char_buff = new StringBuffer();
+        var character = chat_iter.first();
+        var state = (State) new State.BeginToken();
+        var stop = false;
+
+        while (!stop) {
+            state = switch (state) {
+                case State.BeginToken _ -> switch (CharCode.from(character)) {
+                    case CharCode.LETTER_OR_DIGIT -> {
+                        char_buff.append(character);
+                        character = chat_iter.next();
+                        yield State.KEYWORD;
+                    }
+                    case CharCode.WHITESPACE -> {
+                        character = chat_iter.next();
+                        yield State.BEGIN_TOKEN;
+                    }
+                    case CharCode.QUOTATION_MARK -> {
+                        character = chat_iter.next();
+                        yield State.TEXT;
+                    }
+                    case CharCode.DASH -> {
+                        character = chat_iter.next();
+                        yield State.OPTION;
+                    }
+                    default -> State.EXIT;
+                };
+                case State.Keyword _ -> switch (CharCode.from(character)) {
+                    case CharCode.LETTER_OR_DIGIT -> {
+                        char_buff.append(character);
+                        character = chat_iter.next();
+                        yield State.KEYWORD;
+                    }
+                    default -> {
+                        var keyword = KEYWORD.from(char_buff.toString());
+                        yield new State.EndToken(new Token.Keyword(keyword));
+                    }
+                };
+                case State.Text _ -> switch (CharCode.from(character)) {
+                    case CharCode.QUOTATION_MARK -> {
+                        character = chat_iter.next();
+                        var text = char_buff.toString();
+                        yield new State.EndToken(new Token.Text(text));
+                    }
+                    case CharCode.EMPTY -> {
+                        var text = char_buff.toString();
+                        yield new State.EndToken(new Token.Unknown(text));
+                    }
+                    default -> {
+                        char_buff.append(character);
+                        character = chat_iter.next();
+                        yield State.TEXT;
+                    }
+                };
+                case State.Option _ -> switch (CharCode.from(character)) {
+                    case CharCode.QUOTATION_MARK, CharCode.EMPTY -> {
+                        var option = OPTION.from(char_buff.toString());
+                        yield new State.EndToken(new Token.Option(option));
+                    }
+                    case CharCode.WHITESPACE -> {
+                        character = chat_iter.next();
+                        yield State.OPTION;
+                    }
+                    default -> {
+                        char_buff.append(character);
+                        character = chat_iter.next();
+                        yield State.OPTION;
+                    }
+                };
+                case State.EndToken(var token) -> {
+                    tokens.add(token);
+                    char_buff.delete(0, char_buff.length());
+                    yield State.BEGIN_TOKEN;
+                }
+                case State.Exit _ -> {
+                    stop = true;
+                    yield State.EXIT;
+                }
+            };
         }
 
-        final SequencedCollection<Token> tokens = new LinkedList<>();
-
-        State stateNow = new State.New();
-        State stateNext = new State.New();
-
-        StringBuffer currentTokenString = new StringBuffer();
-        Token currentToken = null;
-        boolean done = false;
-
-        final StringCharacterIterator iterator = new StringCharacterIterator(input);
-        char character = iterator.first();
-
-        while (done == false) {
-            switch (stateNow) {
-
-                case State.New _ -> {
-                    currentTokenString = new StringBuffer();
-                    if (Character.isLetterOrDigit(character)) {
-                        currentTokenString.append(character);
-                        stateNext = new State.StringLiteral();
-                        character = iterator.next();
-                    } else if (Character.isWhitespace(character)) {
-                        character = iterator.next();
-                    } else if (character == '-') {
-                        stateNext = new State.OptionStart();
-                        character = iterator.next();
-                    } else if (character == '"') {
-                        stateNext = new State.ArgumentValue();
-                        character = iterator.next();
-                    } else if (character == CharacterIterator.DONE) {
-                        stateNext = new State.Exit();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.StringLiteral _ -> {
-                    if (Character.isLetterOrDigit(character)) {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    } else if (Character.isWhitespace(character) || character == CharacterIterator.DONE) {
-                        currentToken = switch (currentTokenString.toString()) {
-                            case "todo" -> new Token.Prog.Todo();
-                            case "user" -> new Token.Prog.User();
-                            case "calendar" -> new Token.Prog.Calendar();
-                            case "update" -> new Token.Cmd.Update();
-                            case "create" -> new Token.Cmd.Create();
-                            case "list" -> new Token.Cmd.List();
-                            case "delete" -> new Token.Cmd.Delete();
-                            case "show" -> new Token.Cmd.Show();
-                            case "all" -> new Token.SubCmd.All();
-                            default -> new Token.Unk(currentTokenString.toString());
-                        };
-
-                        stateNext = new State.FinalizeToken();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.ArgumentValue _ -> {
-                    if (character == CharacterIterator.DONE) {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else if (character != '"') {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    } else {
-                        currentToken = new Token.Arg(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    }
-                }
-
-                case State.OptionStart _ -> {
-                    if (Character.isAlphabetic(character)) {
-                        switch (character) {
-                            case 'f' -> {
-                                stateNext = new State.FilterOption();
-                                character = iterator.next();
-                            }
-                            case 't' -> {
-                                stateNext = new State.TitleOption();
-                                character = iterator.next();
-                            }
-                            case 'd' -> {
-                                stateNext = new State.DescriptionOption();
-                                character = iterator.next();
-                            }
-                            case 's' -> {
-                                stateNext = new State.StartOption();
-                                character = iterator.next();
-                            }
-                            case 'e' -> {
-                                stateNext = new State.EndOption();
-                                character = iterator.next();
-                            }
-                            default -> {
-                                stateNext = new State.UnknownOption();
-                                character = iterator.next();
-                            }
-                        }
-                    } else if (character == ' ') {
-                        character = iterator.next();
-                    } else if (character == '"') {
-                        stateNext = new State.UnknownOptionValue();
-                        character = iterator.next();
-                    }
-                }
-
-                case State.FilterOption _ -> {
-                    if (character == '"') {
-                        character = iterator.next();
-                        stateNext = new State.FilterOptionValue();
-                    } else if (character == CharacterIterator.DONE) {
-                        stateNext = new State.Exit();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.TitleOption _ -> {
-                    if (character == '"') {
-                        character = iterator.next();
-                        stateNext = new State.TitleOptionValue();
-                    } else if (character == CharacterIterator.DONE) {
-                        stateNext = new State.Exit();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.DescriptionOption _ -> {
-                    if (character == '"') {
-                        character = iterator.next();
-                        stateNext = new State.DescriptionOptionValue();
-                    } else if (character == CharacterIterator.DONE) {
-                        stateNext = new State.Exit();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.StartOption _ -> {
-                    if (character == '"') {
-                        character = iterator.next();
-                        stateNext = new State.StartOptionValue();
-                    } else if (character == CharacterIterator.DONE) {
-                        stateNext = new State.Exit();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.EndOption _ -> {
-                    if (character == '"') {
-                        character = iterator.next();
-                        stateNext = new State.EndOptionValue();
-                    } else if (character == CharacterIterator.DONE) {
-                        stateNext = new State.Exit();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.UnknownOption _ -> {
-                    if (character == '"') {
-                        character = iterator.next();
-                        stateNext = new State.UnknownOptionValue();
-                    } else if (character == CharacterIterator.DONE) {
-                        stateNext = new State.Exit();
-                    } else {
-                        character = iterator.next();
-                    }
-                }
-
-                case State.FilterOptionValue _ -> {
-                    if (character == CharacterIterator.DONE) {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else if (character != '"') {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    } else {
-                        currentToken = new Token.Opt.Filters(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    }
-                }
-
-                case State.TitleOptionValue _ -> {
-                    if (character == CharacterIterator.DONE) {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else if (character != '"') {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    } else {
-                        currentToken = new Token.Opt.Title(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    }
-                }
-
-                case State.DescriptionOptionValue _ -> {
-                    if (character == CharacterIterator.DONE) {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else if (character != '"') {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    } else {
-                        currentToken = new Token.Opt.Description(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    }
-                }
-
-                case State.StartOptionValue _ -> {
-                    if (character == CharacterIterator.DONE) {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else if (character == '"') {
-                        currentToken = new Token.Opt.Start(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    }
-                }
-
-                case State.EndOptionValue _ -> {
-                    if (character == CharacterIterator.DONE) {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else if (character == '"') {
-                        currentToken = new Token.Opt.End(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    }
-                }
-
-                case State.UnknownOptionValue _ -> {
-                    if (character == CharacterIterator.DONE) {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    } else if (character != '"') {
-                        currentTokenString.append(character);
-                        character = iterator.next();
-                    } else {
-                        currentToken = new Token.Unk(currentTokenString.toString());
-                        stateNext = new State.FinalizeToken();
-                    }
-                }
-
-                case State.FinalizeToken _ -> {
-                    tokens.add(currentToken);
-                    stateNext = new State.New();
-                    character = iterator.next();
-                }
-
-                case State.Exit _ -> done = true;
-            }
-
-            stateNow = stateNext;
-        }
-
-        return Result.ok(tokens);
+        return tokens;
     }
 }
