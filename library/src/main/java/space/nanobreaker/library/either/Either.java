@@ -6,6 +6,14 @@ import java.util.function.Function;
 
 public sealed interface Either<L, R> permits Left, Right {
 
+    static <L, R> Either LEFT(L left) {
+        return new Left<L, R>(left);
+    }
+
+    static <L, R> Either RIGHT(R right) {
+        return new Right<L, R>(right);
+    }
+
     default boolean isLeft() {
         return switch (this) {
             case Left(L ignored) -> true;
@@ -22,7 +30,7 @@ public sealed interface Either<L, R> permits Left, Right {
 
     default Option<L> left() {
         return switch (this) {
-            case Left(L left) -> Option.of(left);
+            case Left(L left) -> Option.some(left);
             case Right(R ignored) -> Option.none();
         };
     }
@@ -30,7 +38,7 @@ public sealed interface Either<L, R> permits Left, Right {
     default Option<R> right() {
         return switch (this) {
             case Left(L ignored) -> Option.none();
-            case Right(R right) -> Option.of(right);
+            case Right(R right) -> Option.some(right);
         };
     }
 

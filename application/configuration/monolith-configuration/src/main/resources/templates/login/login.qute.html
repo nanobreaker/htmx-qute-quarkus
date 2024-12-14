@@ -1,6 +1,8 @@
 {#include base}
     <main class="padding" style="display: grid;place-items: center;height: 80vh;"
-          xmlns="http://www.w3.org/1999/html">
+          xmlns="http://www.w3.org/1999/html"
+          _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+                  set cookies['time-zone'] to { value: zone }">
         <div id="login-content">
             <h1 id="login-title" class="title-font">
                 REACTIVE TODOS

@@ -21,7 +21,7 @@ public abstract class ParserTestBase {
         clock = Clock.systemUTC();
         parser = new Parser(clock, tokenizer);
 
-        final var now = clock.instant().atZone(ZoneId.of("UTC"));
+        var now = clock.instant().atZone(ZoneId.of("UTC"));
         year = now.getYear();
         month = now.getMonth().getValue();
         day = now.getDayOfMonth();

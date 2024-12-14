@@ -1,14 +1,14 @@
 package space.nanobreaker.core.domain.v1.todo;
 
-import space.nanobreaker.ddd.Event;
+import space.nanobreaker.ddd.DomainEvent;
 
 import java.util.Set;
 
-public sealed interface TodoEvent extends Event {
+public sealed interface TodoEvent extends DomainEvent {
 
     // @formatter:off
-    record Created(TodoId id)       implements TodoEvent { }
-    record Updated(Set<TodoId> id)  implements TodoEvent { }
+    record Created(Todo todo)       implements TodoEvent { }
+    record Updated(Set<Todo> todos) implements TodoEvent { }
     record Deleted(Set<TodoId> ids) implements TodoEvent { }
     // @formatter:on
 

@@ -1,102 +1,103 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
-import space.nanobreaker.library.error.Error;
-import io.github.dcadea.jresult.Result;
-
-import java.util.SequencedCollection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TokenizerTodoCreateTest extends TokenizerTestBase {
 
     @Test
-    void shouldReturnProgramCommandTokens() {
-        final String input = "todo create";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_create() {
+        var input = "todo create";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create()
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE)
         );
     }
 
     @Test
-    void shouldReturnProgramAndCommandAndTitleTokens() {
-        final String input = "todo create \"yoga\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_create_help() {
+        var input = "todo create help";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(3);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Keyword(KEYWORD.HELP)
         );
     }
 
     @Test
-    void shouldReturnProgramCommandTitleDescriptionTokens() {
-        final String input = "todo create \"yoga\" -d\"Igor the best yogin in Moldova gives yoga lesson\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_create_arg() {
+        var input = "todo create \"yoga\"";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Opt.Description("Igor the best yogin in Moldova gives yoga lesson")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Text("yoga")
         );
     }
 
     @Test
-    void shouldReturnProgramCommandTitleDescriptionStartTokens() {
-        final String input = "todo create \"yoga\" -d\"Igor the best yogin in Moldova gives yoga lesson\" -s\"27/06/2024\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_create_arg_description() {
+        var input = "todo create \"yoga\" -d\"Igor the best yogin in Moldova gives yoga lesson\"";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Opt.Description("Igor the best yogin in Moldova gives yoga lesson"),
-                new Opt.Start("27/06/2024")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Text("yoga"),
+                new Token.Option(OPTION.DESCRIPTION),
+                new Token.Text("Igor the best yogin in Moldova gives yoga lesson")
         );
     }
 
     @Test
-    void shouldReturnStartAndEndTokensWhenDatesAreDateTime() {
-        final String input = "todo create \"t\" -s\"12:00\" -e\"13:00\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_create_arg_start() {
+        var input = "todo create \"yoga\" -s\"27/06/2024\"";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("t"),
-                new Opt.Start("12:00"),
-                new Opt.End("13:00")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Text("yoga"),
+                new Token.Option(OPTION.START),
+                new Token.Text("27/06/2024")
+        );
+    }
+
+    @Test
+    void tokenize_todo_create_arg_end() {
+        var input = "todo create \"yoga\" -e\"13:00\"";
+        var tokens = tokenizer.tokenize(input);
+
+        assertThat(tokens).containsExactly(
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Text("yoga"),
+                new Token.Option(OPTION.END),
+                new Token.Text("13:00")
+        );
+    }
+
+    @Test
+    void tokenize_todo_create_arg_description_start_end() {
+        var input = "todo create \"yoga\" -d\"celentanos\" -s\"27/06/2024 15:00\" -e\"13:00\"";
+        var tokens = tokenizer.tokenize(input);
+
+        assertThat(tokens).containsExactly(
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Text("yoga"),
+                new Token.Option(OPTION.DESCRIPTION),
+                new Token.Text("celentanos"),
+                new Token.Option(OPTION.START),
+                new Token.Text("27/06/2024 15:00"),
+                new Token.Option(OPTION.END),
+                new Token.Text("13:00")
         );
     }
 }

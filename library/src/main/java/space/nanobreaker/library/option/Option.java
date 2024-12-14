@@ -5,21 +5,22 @@ import space.nanobreaker.library.error.Error;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public sealed interface Option<T> permits None, Some {
 
-    static <T> Option<T> of(final Optional<T> opt) {
+    static <T> Option<T> some(final Optional<T> opt) {
         return opt.<Option<T>>map(Some::new).orElse(new None<>());
     }
 
-    static <T> Option<T> of(final T value) {
-        return of(Optional.ofNullable(value));
+    static <T> Option<T> some(final T value) {
+        return some(Optional.ofNullable(value));
     }
 
     static <T> Option<T> none() {
-        return of(Optional.empty());
+        return some(Optional.empty());
     }
 
     default boolean isSome() {
@@ -43,9 +44,17 @@ public sealed interface Option<T> permits None, Some {
         };
     }
 
+    default void ifPresent(Consumer<? super T> action) {
+        switch (this) {
+            case Some(T v) -> action.accept(v);
+            case None() -> {
+            }
+        }
+    }
+
     default <NV> Option<NV> map(final Function<? super T, ? extends NV> valueMapper) {
         return switch (this) {
-            case Some(T v) -> Option.of(valueMapper.apply(v));
+            case Some(T v) -> Option.some(valueMapper.apply(v));
             case None() -> Option.none();
         };
     }

@@ -1,11 +1,7 @@
 package space.nanobreaker.configuration.monolith.services.parser;
 
-import io.github.dcadea.jresult.Result;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.DeleteTodoCommand;
-import space.nanobreaker.library.error.Error;
 
 import java.util.Set;
 
@@ -14,36 +10,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ParserTodoDeleteTest extends ParserTestBase {
 
     @Test
-    void shouldNotCreateDeleteCmd() {
-        final String input = new InputBuilder("todo")
-                .append("delete")
-                .build();
+    void parse_todo_delete_help_command() {
+        var input = "todo delete help";
+        var result = parser.parse(input);
 
-        final Result<Command, Error> result = parser.parse(input);
-
-        assertThat(result.isOk()).isFalse();
-
-        final Error error = result.unwrapErr();
-
-        assertThat(error).isInstanceOf(ParserError.ArgumentNotFound.class);
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.ok()).contains(new Command.Todo.Delete.Help());
     }
 
     @Test
-    void shouldCreateDeleteCmdWithArgs() {
-        final String input = new InputBuilder("todo")
-                .append("delete")
-                .append("\"1\"")
-                .append("\"2\"")
-                .append("\"3\"")
-                .build();
-
-        final Result<Command, Error> result = parser.parse(input);
+    void parse_todo_delete_all() {
+        var input = "todo delete all";
+        var result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
+        assertThat(result.ok()).contains(new Command.Todo.Delete.All());
+    }
 
-        final Command actualCommand = result.unwrap();
-        final Command expectedCommand = new DeleteTodoCommand(Set.of(1, 2, 3));
+    @Test
+    void parse_todo_delete_with_args() {
+        var input = "todo delete \"1\" \"2\"";
+        var result = parser.parse(input);
 
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.ok()).contains(new Command.Todo.Delete.ByIds(Set.of(1, 2)));
+    }
+
+    @Test
+    void return_error_when_arg_is_missing() {
+        var input = "todo delete";
+        var result = parser.parse(input);
+
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.err()).contains(new ParserError.Empty());
     }
 }

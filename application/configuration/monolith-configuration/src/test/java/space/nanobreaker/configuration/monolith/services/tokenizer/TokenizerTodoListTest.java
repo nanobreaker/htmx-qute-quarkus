@@ -1,51 +1,85 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Arg;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Cmd;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Prog;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.Token;
-import space.nanobreaker.library.error.Error;
-import io.github.dcadea.jresult.Result;
-
-import java.util.SequencedCollection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TokenizerTodoListTest extends TokenizerTestBase {
 
     @Test
-    void shouldReturnProgTodoAndCmdList() {
-        final String input = "todo list";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_list() {
+        var input = "todo list";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.List()
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.LIST)
         );
     }
 
     @Test
-    void shouldReturnProgTodoAndCmdListAndArgs() {
-        final String input = "todo list \"id_one\" \"id_two\" \"id_three\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_todo_list_help() {
+        var input = "todo list help";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(5);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.List(),
-                new Arg("id_one"),
-                new Arg("id_two"),
-                new Arg("id_three")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.LIST),
+                new Token.Keyword(KEYWORD.HELP)
+        );
+    }
+
+    @Test
+    void tokenize_todo_list_all() {
+        var input = "todo list all";
+        var tokens = tokenizer.tokenize(input);
+
+        assertThat(tokens).containsExactly(
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.LIST),
+                new Token.Keyword(KEYWORD.ALL)
+        );
+    }
+
+    @Test
+    void tokenize_todo_list_arg_arg_arg() {
+        var input = "todo list \"id_one\" \"id_two\" \"id_three\"";
+        var tokens = tokenizer.tokenize(input);
+
+        assertThat(tokens).containsExactly(
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.LIST),
+                new Token.Text("id_one"),
+                new Token.Text("id_two"),
+                new Token.Text("id_three")
+        );
+    }
+
+    @Test
+    void tokenize_todo_list_filter() {
+        var input = "todo list -f\"title_filter\"";
+        var tokens = tokenizer.tokenize(input);
+
+        assertThat(tokens).containsExactly(
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.LIST),
+                new Token.Option(OPTION.FILTER),
+                new Token.Text("title_filter")
+        );
+    }
+
+    @Test
+    void tokenize_todo_list_arg_arg_filter() {
+        var input = "todo list \"id_one\" \"id_two\" -f\"title_filter\"";
+        var tokens = tokenizer.tokenize(input);
+
+        assertThat(tokens).containsExactly(
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.LIST),
+                new Token.Text("id_one"),
+                new Token.Text("id_two"),
+                new Token.Option(OPTION.FILTER),
+                new Token.Text("title_filter")
         );
     }
 }

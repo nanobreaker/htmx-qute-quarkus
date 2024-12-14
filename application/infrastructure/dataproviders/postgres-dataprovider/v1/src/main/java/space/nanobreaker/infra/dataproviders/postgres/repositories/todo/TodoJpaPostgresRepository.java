@@ -7,7 +7,9 @@ import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
+import space.nanobreaker.core.domain.v1.Command;
 import space.nanobreaker.core.domain.v1.todo.Todo;
+import space.nanobreaker.core.domain.v1.todo.TodoError;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
 import space.nanobreaker.ddd.Entity;
@@ -24,8 +26,11 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static io.github.dcadea.jresult.Result.err;
 
 public class TodoJpaPostgresRepository
         implements TodoRepository, PanacheRepositoryBase<TodoJpaEntity, TodoJpaId> {
@@ -34,37 +39,34 @@ public class TodoJpaPostgresRepository
     @Override
     public Uni<Result<Todo, Error>> save(final Todo todo) {
         final TodoJpaEntity jpaEntity = mapToJpaEntity(todo);
-
         return PanacheRepositoryBase.super
                 .persistAndFlush(jpaEntity)
                 .map(this::mapToDomainEntity)
                 .map(Result::<Todo, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("findByTodoId")
     @Override
-    public Uni<Result<Todo, Error>> find(final TodoId id) {
+    public Uni<Result<Todo, Error>> get(final TodoId id) {
         final TodoJpaId jpaId = mapToJpaId(id);
-
         return this.getSession()
                 .flatMap(session -> session.find(TodoJpaEntity.class, jpaId))
                 .map(todoJpaEntity -> {
                     if (todoJpaEntity == null) {
-                        return Result.<Todo, Error>err(new None());
+                        return Result.<Todo, Error>err(new TodoError.NotFound());
                     } else {
                         var todo = this.mapToDomainEntity(todoJpaEntity);
                         return Result.<Todo, Error>ok(todo);
                     }
                 })
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("listTodosByUsername")
     @Override
-    public Uni<Result<Set<Todo>, Error>> list(final String username) {
+    public Uni<Result<SequencedSet<Todo>, Error>> list(final String username) {
         final var parameters = Parameters.with("username", username);
-
         return this.find("id.username = :username", Sort.ascending("id.id"), parameters)
                 .list()
                 .map(jpaEntities -> jpaEntities
@@ -72,8 +74,13 @@ public class TodoJpaPostgresRepository
                         .map(this::mapToDomainEntity)
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
-                .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .map(Result::<SequencedSet<Todo>, Error>ok)
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+    }
+
+    @Override
+    public Uni<Result<SequencedSet<Todo>, Error>> list(String username, Set<String> filters) {
+        return null;
     }
 
     @WithSpan("listTodosByUsernameAndFilters")
@@ -91,7 +98,6 @@ public class TodoJpaPostgresRepository
                 yield this.find("id.username = :username", parameters);
             }
         };
-
         return query.list()
                 .map(jpaEntities -> jpaEntities
                         .stream()
@@ -99,24 +105,65 @@ public class TodoJpaPostgresRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("listTodosByIds")
     @Override
-    public Uni<Result<Set<Todo>, Error>> list(final Set<TodoId> ids) {
-        final var jpaIds = ids.stream().map(this::mapToJpaId).toList();
-        final var params = Parameters.with("idsOrUsername", jpaIds);
+    public Uni<Result<SequencedSet<Todo>, Error>> list(final Set<TodoId> ids) {
+        var jpaIds = ids.stream().map(this::mapToJpaId).toArray();
 
-        return this.find("id in :idsOrUsername", Sort.by("id.id"), params)
+        return this.find("id in ?1", Sort.by("id.id"), jpaIds)
                 .list()
                 .map(jpaEntities -> jpaEntities
                         .stream()
                         .map(this::mapToDomainEntity)
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
-                .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .map(Result::<SequencedSet<Todo>, Error>ok)
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+    }
+
+    @Override
+    public Uni<Result<SequencedSet<Todo>, Error>> list(Set<TodoId> ids, Set<String> filters) {
+        return null;
+    }
+
+    @Override
+    public Uni<Result<Void, Error>> update(Set<Todo> todos, Command.Todo.Update.Payload payload) {
+        var jpaIds = todos.stream()
+                .map(Entity::getId)
+                .map(this::mapToJpaId)
+                .collect(Collectors.toUnmodifiableSet());
+        var parameters = Parameters.with("idsOrUsername", jpaIds);
+        List<String> fields = new ArrayList<>();
+
+        payload.title().ifPresent(title -> {
+            parameters.and("title", title);
+            fields.add("title = :title");
+        });
+        payload.description().ifPresent(description -> {
+            parameters.and("description", description);
+            fields.add("description = :description");
+        });
+        payload.start().ifPresent(start -> {
+            parameters.and("start", start.toInstant());
+            fields.add("startDateTime = :start");
+        });
+        payload.end().ifPresent(end -> {
+            parameters.and("end", end.toInstant());
+            fields.add("endDateTime = :end");
+        });
+
+        var fieldsJoined = String.join(",", fields);
+        var query = "%s where id in :idsOrUsername".formatted(fieldsJoined);
+
+        return Panache.withTransaction(
+                        () -> this.update(query, parameters)
+                                .chain(this::flush)
+                                .replaceWith(Result.<Void, Error>empty())
+                )
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("listTodosByIdsAndFilter")
@@ -135,7 +182,6 @@ public class TodoJpaPostgresRepository
                 yield this.find("id in :idsOrUsername", Sort.by("id.id"), params);
             }
         };
-
         return query.list()
                 .map(jpaEntities -> jpaEntities
                         .stream()
@@ -143,11 +189,10 @@ public class TodoJpaPostgresRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @WithSpan("listTodosByEitherUsernameOrIdsAndFilters")
-    @Override
     public Uni<Result<Set<Todo>, Error>> list(
             final Either<String, Set<TodoId>> usernameOrIds,
             final Option<List<String>> filtersOption
@@ -158,7 +203,6 @@ public class TodoJpaPostgresRepository
         };
     }
 
-    @Override
     @WithSpan("updateTodos")
     public Uni<Result<Void, Error>> update(
             final Set<Todo> todos,
@@ -172,10 +216,8 @@ public class TodoJpaPostgresRepository
                 .map(Entity::getId)
                 .map(this::mapToJpaId)
                 .collect(Collectors.toUnmodifiableSet());
-
         final Parameters parameters = Parameters.with("idsOrUsername", jpaIds);
         final List<String> fields = new ArrayList<>();
-
         if (someTitle instanceof Some(final String title)) {
             parameters.and("title", title);
             fields.add("title = :title");
@@ -192,22 +234,19 @@ public class TodoJpaPostgresRepository
             parameters.and("end", end.toInstant());
             fields.add("endDateTime = :end");
         }
-
         final String fieldsJoined = String.join(",", fields);
         final String query = "%s where id in :idsOrUsername".formatted(fieldsJoined);
-
         return Panache.withTransaction(
                         () -> this.update(query, parameters)
                                 .chain(this::flush)
                                 .replaceWith(Result.<Void, Error>empty())
                 )
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @Override
     public Uni<Result<Void, Error>> delete(final TodoId id) {
         final TodoJpaId jpaId = mapToJpaId(id);
-
         return this.deleteById(jpaId)
                 .map(result -> {
                     if (!result) {
@@ -216,7 +255,7 @@ public class TodoJpaPostgresRepository
                         return Result.<Void, Error>empty();
                     }
                 })
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
     }
 
     @Override
@@ -226,7 +265,6 @@ public class TodoJpaPostgresRepository
                 .map(this::mapToJpaId)
                 .collect(Collectors.toUnmodifiableSet());
         final Parameters parameters = Parameters.with("idsOrUsername", jpaIds);
-
         return this.delete("where id in :idsOrUsername", parameters)
                 .map(count -> {
                     if (count != ids.size()) {
@@ -235,7 +273,12 @@ public class TodoJpaPostgresRepository
                         return Result.<Void, Error>empty();
                     }
                 })
-                .onFailure().recoverWithItem(t -> Result.err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+    }
+
+    @Override
+    public Uni<Result<Void, Error>> deleteAll(String username) {
+        return null;
     }
 
     private TodoJpaId mapToJpaId(final TodoId id) {
@@ -247,7 +290,6 @@ public class TodoJpaPostgresRepository
 
     private TodoJpaEntity mapToJpaEntity(final Todo todo) {
         final TodoJpaId id = mapToJpaId(todo.getId());
-        // TODO: Probably keep timezone on domain object as well
         final var zoneFromStart = todo.getStart().map(d -> d.getZone().getId());
         final var zoneFromEnd = todo.getEnd().map(d -> d.getZone().getId()).orElse("UTC");
         final var timeZone = zoneFromStart.orElseGet(() -> zoneFromEnd);

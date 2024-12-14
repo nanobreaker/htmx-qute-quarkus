@@ -1,211 +1,104 @@
 package space.nanobreaker.configuration.monolith.services.tokenizer;
 
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.services.tokenizer.token.*;
-import space.nanobreaker.library.error.Error;
-import io.github.dcadea.jresult.Result;
-
-import java.util.SequencedCollection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TokenizerTest extends TokenizerTestBase {
 
     @Test
-    void shouldReturnProgramToken() {
-        final String input = "todo";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void no_tokens_when_input_is_empty() {
+        var input = "";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(1);
-        assertThat(tokens).contains(new Prog.Todo());
+        assertThat(tokens).isEmpty();
     }
 
     @Test
-    void shouldReturnUnknownTokenWhenProgramIsNotComplete() {
-        final String input = "tod";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_known_keyword() {
+        var input = "help";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(1);
-        assertThat(tokens).contains(new Unk("tod"));
+        assertThat(tokens).contains(new Token.Keyword(KEYWORD.HELP));
     }
 
     @Test
-    void shouldReturnUnknownTokenWhenCommandIsNotComplete() {
-        final String input = "todo crea";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_unknown_keyword() {
+        var input = "donthelp";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
+        assertThat(tokens).contains(new Token.Keyword(KEYWORD.UNKNOWN));
+    }
 
-        final SequencedCollection<Token> tokens = result.unwrap();
+    @Test
+    void tokenize_known_and_unknown_keywords() {
+        var input = "todo crea";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Unk("crea")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.UNKNOWN)
         );
     }
 
     @Test
-    void shouldReturnUnknownTokensWhenProgramAndCommandAreNotComplete() {
-        final String input = "tod crea";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_unknown_tokens() {
+        var input = "tod crea";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Unk("tod"),
-                new Unk("crea")
+                new Token.Keyword(KEYWORD.UNKNOWN),
+                new Token.Keyword(KEYWORD.UNKNOWN)
         );
     }
 
     @Test
-    void shouldReturnUnknownTokenWhenArgumentIsNotComplete() {
-        final String input = "todo create \"yog";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_incomplete_text_token_as_unknown() {
+        var input = "todo create \"yog";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(3);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Unk("yog")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Unknown("yog")
         );
     }
 
     @Test
-    void shouldReturnUnknownTokenWhenOptionIsNotComplete() {
-        final String input = "todo create \"yoga\" -d\"not compl";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_unknown_option() {
+        var input = "todo create \"yoga\" -x\"wtf\"";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Unk("not compl")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Text("yoga"),
+                new Token.Option(OPTION.UNKNOWN),
+                new Token.Text("wtf")
         );
     }
 
     @Test
-    void shouldReturnUnknownTokenWhenOptionIsNotSpecified() {
-        final String input = "todo create -d";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_empty_text() {
+        var input = "\"\" \" \"";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(2);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create()
+                new Token.Text(""),
+                new Token.Text(" ")
         );
     }
 
     @Test
-    void shouldReturnUnknownTokenWhenOptionIsNotKnown() {
-        final String input = "todo create \"yoga\" -x\"wtf\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
+    void tokenize_empty_option_as_unknown() {
+        var input = "todo create -\"22\"";
+        var tokens = tokenizer.tokenize(input);
 
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(4);
         assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("yoga"),
-                new Unk("wtf")
+                new Token.Keyword(KEYWORD.TODO),
+                new Token.Keyword(KEYWORD.CREATE),
+                new Token.Option(OPTION.UNKNOWN),
+                new Token.Text("22")
         );
-    }
-
-    @Test
-    void shouldReturnUnknowns() {
-        final String input = "some crazy shit bla bla -j\"\" 243989fdfljsdlfkfdlk \" \"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
-
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(8);
-        assertThat(tokens).containsExactly(
-                new Unk("some"),
-                new Unk("crazy"),
-                new Unk("shit"),
-                new Unk("bla"),
-                new Unk("bla"),
-                new Unk(""),
-                new Unk("243989fdfljsdlfkfdlk"),
-                new Arg(" ")
-        );
-    }
-
-    @Test
-    void shouldReturnUnknownsAndIgnoreSpecialSymbols() {
-        final String input = "hey yo, what the fuck, are you failing?!";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
-
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(8);
-        assertThat(tokens).containsExactly(
-                new Unk("hey"),
-                new Unk("yo"),
-                new Unk("what"),
-                new Unk("the"),
-                new Unk("fuck"),
-                new Unk("are"),
-                new Unk("you"),
-                new Unk("failing")
-        );
-    }
-
-    @Test
-    void shouldNotFailOnOptionWithoutKey() {
-        final String input = "todo create \"test\" -\"22\" -\"24\"";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
-
-        assertThat(result.isOk()).isTrue();
-
-        final SequencedCollection<Token> tokens = result.unwrap();
-
-        assertThat(tokens.size()).isEqualTo(5);
-        assertThat(tokens).containsExactly(
-                new Prog.Todo(),
-                new Cmd.Create(),
-                new Arg("test"),
-                new Unk("22"),
-                new Unk("24")
-        );
-    }
-
-    @Test
-    void shouldReturnErrorWhenInputIsEmptyOrNull() {
-        final String input = "";
-        final Result<SequencedCollection<Token>, Error> result = tokenizer.tokenize(input);
-
-        assertThat(result.isErr()).isTrue();
     }
 }
