@@ -59,7 +59,7 @@ public class CommandExecutor {
         return Uni.createFrom().item(response);
     }
 
-    public Uni<Response> createTodo(
+    public Uni<Response> todoCreate(
             final Command.Todo.Create cmd,
             final ZoneId zoneId
     ) {
@@ -122,7 +122,7 @@ public class CommandExecutor {
         };
     }
 
-    public Uni<Response> listTodo(
+    public Uni<Response> todoList(
             final Command.Todo.List cmd,
             final ZoneId zoneId
     ) {
@@ -269,7 +269,7 @@ public class CommandExecutor {
         };
     }
 
-    public Uni<Response> updateTodo(
+    public Uni<Response> todoUpdate(
             final Command.Todo.Update cmd,
             final ZoneId zoneId
     ) {
@@ -408,7 +408,7 @@ public class CommandExecutor {
         };
     }
 
-    public Uni<Response> deleteTodos(final Command.Todo.Delete cmd) {
+    public Uni<Response> todoDelete(final Command.Todo.Delete cmd) {
         return switch (cmd) {
             case Command.Todo.Delete.All _ -> {
                 var username = securityIdentity.getPrincipal().getName();
@@ -488,13 +488,13 @@ public class CommandExecutor {
         };
     }
 
-    public Uni<Response> showCalendar(final Command.Calendar ignored) {
+    public Uni<Response> calendarShow(final Command.Calendar ignored) {
         // todo: Implement show calendar command
         return Uni.createFrom()
                 .item(Response.serverError().build());
     }
 
-    public Uni<Response> showUser(final Command.User ignored) {
+    public Uni<Response> userShow(final Command.User ignored) {
         // todo: Implement show user command
         return Uni.createFrom()
                 .item(Response.serverError().build());

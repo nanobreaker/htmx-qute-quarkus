@@ -120,6 +120,7 @@ public class Parser {
             }
             case Token.Text(var title) -> {
                 var isSingleArg = findArgs(tokens).isEmpty();
+
                 if (!isSingleArg) {
                     yield err(new ParserError.RedundantArgs());
                 }
@@ -209,9 +210,9 @@ public class Parser {
             }
             default -> {
                 var args = findArgs(tokens);
-                var filterOption = some(findOption(tokens, OPTION.FILTER));
+                var filterOpt = some(findOption(tokens, OPTION.FILTER));
 
-                if (args.isEmpty() && filterOption.isNone()) {
+                if (args.isEmpty() && filterOpt.isNone()) {
                     yield err(new ParserError.ArgumentOrFilterNotFound());
                 }
 
@@ -236,7 +237,7 @@ public class Parser {
                     yield err(parseError);
                 }
 
-                yield switch (filterOption) {
+                yield switch (filterOpt) {
                     case Some(var filter) when args.isEmpty() -> {
                         var command = new Update.ByFilters(Set.of(filter), paylodBuilder.build());
                         yield ok(command);

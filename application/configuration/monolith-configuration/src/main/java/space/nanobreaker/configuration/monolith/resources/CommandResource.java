@@ -64,12 +64,12 @@ public class CommandResource {
                      Todo.Delete.Help       _,
                      User.Help              _,
                      Calendar.Help  _       -> executor.help(c);
-                case Todo.Create    create  -> executor.createTodo(create, zoneId);
-                case Todo.List      list    -> executor.listTodo(list, zoneId);
-                case Todo.Update    update  -> executor.updateTodo(update, zoneId);
-                case Todo.Delete    delete  -> executor.deleteTodos(delete);
-                case Calendar.Show  show    -> executor.showCalendar(show);
-                case User.Show      show    -> executor.showUser(show);
+                case Todo.Create    create  -> executor.todoCreate(create, zoneId);
+                case Todo.List      list    -> executor.todoList(list, zoneId);
+                case Todo.Update    update  -> executor.todoUpdate(update, zoneId);
+                case Todo.Delete    delete  -> executor.todoDelete(delete);
+                case Calendar.Show  show    -> executor.calendarShow(show);
+                case User.Show      show    -> executor.userShow(show);
             };
             // @formatter:on
             case Err(Error error) -> {
