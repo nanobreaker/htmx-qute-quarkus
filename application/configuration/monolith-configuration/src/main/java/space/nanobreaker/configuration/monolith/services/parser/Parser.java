@@ -24,7 +24,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
-import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.SequencedCollection;
@@ -37,6 +36,7 @@ import static io.github.dcadea.jresult.Result.ok;
 import static space.nanobreaker.configuration.monolith.services.command.Command.Todo.Delete;
 import static space.nanobreaker.configuration.monolith.services.command.Command.Todo.List;
 import static space.nanobreaker.configuration.monolith.services.command.Command.Todo.Update;
+import static space.nanobreaker.library.option.Option.none;
 import static space.nanobreaker.library.option.Option.some;
 
 @ApplicationScoped
@@ -73,6 +73,7 @@ public class Parser {
         try {
             var programToken = tokens.removeFirst();
             return switch (programToken) {
+                case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Help());
                 case Token.Keyword(var keyword) when keyword == KEYWORD.TODO -> parseTodoProgram(tokens);
                 case Token.Keyword(var keyword) when keyword == KEYWORD.CALENDAR -> parseCalendarProgram(tokens);
                 case Token.Keyword(var keyword) when keyword == KEYWORD.USER -> parseUserProgram(tokens);
@@ -87,6 +88,7 @@ public class Parser {
         var commandToken = tokens.removeFirst();
 
         return switch (commandToken) {
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Todo.Help());
             case Token.Keyword(var keyword) when keyword == KEYWORD.CREATE -> parseTodoCreateCommand(tokens);
             case Token.Keyword(var keyword) when keyword == KEYWORD.LIST -> parseTodoListCommand(tokens);
             case Token.Keyword(var keyword) when keyword == KEYWORD.UPDATE -> parseTodoUpdateCommand(tokens);
@@ -98,9 +100,9 @@ public class Parser {
     // @formatter:off
     private static class TodoCreateCommandBuilder {
         private final String title;
-        private Option<String> description;
-        private Option<LocalDateTime> start;
-        private Option<LocalDateTime> end;
+        private Option<String> description = none();
+        private Option<LocalDateTime> start = none();
+        private Option<LocalDateTime> end = none();
         TodoCreateCommandBuilder(String title) { this.title = title; }
         void withDescription(Option<String> description) { this.description = description; }
         void withStart(Option<LocalDateTime> start) { this.start = start; }
@@ -110,39 +112,52 @@ public class Parser {
     // @formatter:on
 
     private Result<Command, Error> parseTodoCreateCommand(final SequencedCollection<Token> tokens) {
-        var optionalArg = findArg(tokens);
-        if (optionalArg.isEmpty()) {
-            return err(new ParserError.ArgumentNotFound());
-        }
+        var subcommand = tokens.removeFirst();
 
-        var title = optionalArg.get();
-        var descriptionOption = some(findOption(tokens, OPTION.DESCRIPTION));
-        var startResult = some(findOption(tokens, OPTION.START).map(this::parseDateTime));
-        var endResult = some(findOption(tokens, OPTION.END).map(this::parseDateTime));
+        return switch (subcommand) {
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
+                yield ok(new Create.Help());
+            }
+            case Token.Text(var title) -> {
+                var isSingleArg = findArgs(tokens).isEmpty();
+                if (!isSingleArg) {
+                    yield err(new ParserError.RedundantArgs());
+                }
 
-        var builder = new TodoCreateCommandBuilder(title);
-        builder.withDescription(descriptionOption);
+                var descriptionOpt = some(findOption(tokens, OPTION.DESCRIPTION));
+                var startOptResult = some(findOption(tokens, OPTION.START).map(this::parseDateTime));
+                var endOptResult = some(findOption(tokens, OPTION.END).map(this::parseDateTime));
+                var builder = new TodoCreateCommandBuilder(title);
+                builder.withDescription(descriptionOpt);
 
-        if (startResult instanceof Some(Ok(LocalDateTime start))) {
-            builder.withStart(some(start));
-        } else if (startResult instanceof Some(Err(ParserError.DateParseError parseError))) {
-            return err(parseError);
-        }
+                if (startOptResult instanceof Some(Ok(var start))) {
+                    builder.withStart(some(start));
+                } else if (startOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                    yield err(parseError);
+                }
 
-        if (endResult instanceof Some(Ok(LocalDateTime end))) {
-            builder.withEnd(some(end));
-        } else if (endResult instanceof Some(Err(ParserError.DateParseError parseError))) {
-            return err(parseError);
-        }
+                if (endOptResult instanceof Some(Ok(var end))) {
+                    builder.withEnd(some(end));
+                } else if (endOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                    yield err(parseError);
+                }
 
-        var command = builder.build();
-        return ok(command);
+                var command = builder.build();
+                yield ok(command);
+            }
+            default -> {
+                yield err(new ParserError.ArgumentNotFound());
+            }
+        };
     }
 
     private Result<Command, Error> parseTodoListCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
 
         return switch (subcommand) {
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
+                yield ok(new List.Help());
+            }
             case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> {
                 yield ok(new List.All());
             }
@@ -172,10 +187,10 @@ public class Parser {
 
     // @formatter:off
     private static class TodoUpdateCommandPaylodBuilder {
-        private Option<String> title;
-        private Option<String> description;
-        private Option<LocalDateTime> start;
-        private Option<LocalDateTime> end;
+        private Option<String> title = none();
+        private Option<String> description = none();
+        private Option<LocalDateTime> start = none();
+        private Option<LocalDateTime> end = none();
         TodoUpdateCommandPaylodBuilder() { }
         void withTitle(Option<String> title) { this.title = title; }
         void withDescription(Option<String> description) { this.description = description; }
@@ -186,51 +201,60 @@ public class Parser {
     // @formatter:on
 
     private Result<Command, Error> parseTodoUpdateCommand(final SequencedCollection<Token> tokens) {
-        var args = findArgs(tokens);
-        var filterOption = some(findOption(tokens, OPTION.FILTER));
+        var subcommand = tokens.getFirst();
 
-        if (args.isEmpty()) {
-            return err(new ParserError.ArgumentNotFound());
-        }
-
-        var title = some(findOption(tokens, OPTION.TITLE));
-        var descriptionOption = some(findOption(tokens, OPTION.DESCRIPTION));
-        var startResult = some(findOption(tokens, OPTION.START).map(this::parseDateTime));
-        var endResult = some(findOption(tokens, OPTION.END).map(this::parseDateTime));
-
-        var paylodBuilder = new TodoUpdateCommandPaylodBuilder();
-        paylodBuilder.withTitle(title);
-        paylodBuilder.withDescription(descriptionOption);
-
-        if (startResult instanceof Some(Ok(LocalDateTime start))) {
-            paylodBuilder.withStart(some(start));
-        } else if (startResult instanceof Some(Err(ParserError.DateParseError parseError))) {
-            return err(parseError);
-        }
-
-        if (endResult instanceof Some(Ok(LocalDateTime end))) {
-            paylodBuilder.withEnd(some(end));
-        } else if (endResult instanceof Some(Err(ParserError.DateParseError parseError))) {
-            return err(parseError);
-        }
-
-        return switch (filterOption) {
-            case Some(var filter) when args.isEmpty() -> {
-                var command = new Update.ByFilters(Set.of(filter), paylodBuilder.build());
-                yield ok(command);
+        return switch (subcommand) {
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
+                yield ok(new Update.Help());
             }
-            case Some(var filter) -> {
-                var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                var command = new Update.ByIdsAndFilters(ids, Set.of(filter), paylodBuilder.build());
-                yield ok(command);
-            }
-            case None() when args.isEmpty() -> {
-                yield err(new ParserError.ArgumentNotFound());
-            }
-            case None() -> {
-                var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                var command = new Update.ByIds(ids, paylodBuilder.build());
-                yield ok(command);
+            default -> {
+                var args = findArgs(tokens);
+                var filterOption = some(findOption(tokens, OPTION.FILTER));
+
+                if (args.isEmpty() && filterOption.isNone()) {
+                    yield err(new ParserError.ArgumentOrFilterNotFound());
+                }
+
+                var titleOpt = some(findOption(tokens, OPTION.TITLE));
+                var descriptionOpt = some(findOption(tokens, OPTION.DESCRIPTION));
+                var startOptResult = some(findOption(tokens, OPTION.START).map(this::parseDateTime));
+                var endOptResult = some(findOption(tokens, OPTION.END).map(this::parseDateTime));
+
+                var paylodBuilder = new TodoUpdateCommandPaylodBuilder();
+                paylodBuilder.withTitle(titleOpt);
+                paylodBuilder.withDescription(descriptionOpt);
+
+                if (startOptResult instanceof Some(Ok(LocalDateTime start))) {
+                    paylodBuilder.withStart(some(start));
+                } else if (startOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                    yield err(parseError);
+                }
+
+                if (endOptResult instanceof Some(Ok(LocalDateTime end))) {
+                    paylodBuilder.withEnd(some(end));
+                } else if (endOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                    yield err(parseError);
+                }
+
+                yield switch (filterOption) {
+                    case Some(var filter) when args.isEmpty() -> {
+                        var command = new Update.ByFilters(Set.of(filter), paylodBuilder.build());
+                        yield ok(command);
+                    }
+                    case Some(var filter) -> {
+                        var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
+                        var command = new Update.ByIdsAndFilters(ids, Set.of(filter), paylodBuilder.build());
+                        yield ok(command);
+                    }
+                    case None() when args.isEmpty() -> {
+                        yield err(new ParserError.ArgumentNotFound());
+                    }
+                    case None() -> {
+                        var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
+                        var command = new Update.ByIds(ids, paylodBuilder.build());
+                        yield ok(command);
+                    }
+                };
             }
         };
     }
@@ -239,6 +263,9 @@ public class Parser {
         var subcommand = tokens.getFirst();
 
         return switch (subcommand) {
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
+                yield ok(new Delete.Help());
+            }
             case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> {
                 yield ok(new Delete.All());
             }
@@ -264,7 +291,7 @@ public class Parser {
     }
 
     private static Optional<String> findOption(
-            final Collection<? extends Token> tokens,
+            final SequencedCollection<? extends Token> tokens,
             final OPTION target
     ) {
         return tokens.stream()
@@ -281,25 +308,17 @@ public class Parser {
                 .findFirst();
     }
 
-    private static Optional<String> findArg(final Collection<? extends Token> tokens) {
+    private static Set<String> findArgs(final SequencedCollection<? extends Token> tokens) {
         return tokens.stream()
-                .filter(token -> token instanceof Token.Text)
-                .findFirst()
-                .map(token -> (Token.Text) token)
-                .map(Token.Text::text);
-    }
-
-    private static Set<String> findArgs(final Collection<? extends Token> tokens) {
-        return tokens.stream()
-                .filter(token -> token instanceof Token.Text)
+                .takeWhile(token -> token instanceof Token.Text)
                 .map(token -> (Token.Text) token)
                 .map(Token.Text::text)
                 .collect(Collectors.toSet());
     }
 
     public Result<LocalDateTime, Error> parseDateTime(final String string) {
-        final var current = clock.instant().atZone(ZoneId.of("UTC"));
-        final var formatter = new DateTimeFormatterBuilder()
+        var current = clock.instant().atZone(ZoneId.of("UTC"));
+        var formatter = new DateTimeFormatterBuilder()
                 .appendPattern(datePattern)
                 .parseDefaulting(ChronoField.YEAR, current.getYear())
                 .parseDefaulting(ChronoField.MONTH_OF_YEAR, current.getMonthValue())

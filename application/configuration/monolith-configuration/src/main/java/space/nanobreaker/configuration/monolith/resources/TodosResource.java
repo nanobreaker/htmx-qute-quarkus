@@ -67,7 +67,7 @@ public class TodosResource {
         var query = new Query.Todo.List.All(username);
 
         Uni<Result<Set<Todo>, Error>> resultUni = eventBus
-                .<Result<Set<Todo>, Error>>request("todos.get", query)
+                .<Result<Set<Todo>, Error>>request("query.todo.list", query)
                 .map(Message::body);
 
         return resultUni.map(result -> switch (result) {

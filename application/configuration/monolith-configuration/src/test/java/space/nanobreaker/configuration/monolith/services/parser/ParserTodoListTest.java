@@ -1,10 +1,7 @@
 package space.nanobreaker.configuration.monolith.services.parser;
 
-import io.github.dcadea.jresult.Result;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.library.error.Error;
 
 import java.util.Set;
 
@@ -13,38 +10,56 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ParserTodoListTest extends ParserTestBase {
 
     @Test
-    void shouldCreateListCmd() {
-        String input = new InputBuilder("todo")
-                .append("list")
-                .append("all")
-                .build();
-
-        Result<Command, Error> result = parser.parse(input);
+    void parse_todo_list_help_command() {
+        var input = "todo list help";
+        var result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
-
-        Command actualCommand = result.unwrap();
-        Command expectedCommand = new Command.Todo.List.All();
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.ok()).contains(new Command.Todo.List.Help());
     }
 
     @Test
-    void shouldCreateListCmdWithArgs() {
-        String input = new InputBuilder("todo")
-                .append("list")
-                .append("\"1\"")
-                .append("\"2\"")
-                .append("\"3\"")
-                .build();
-
-        Result<Command, Error> result = parser.parse(input);
+    void parse_todo_list_all() {
+        var input = "todo list all";
+        var result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
+        assertThat(result.ok()).contains(new Command.Todo.List.All());
+    }
 
-        Command actualCommand = result.unwrap();
-        Command expectedCommand = new Command.Todo.List.ByIds(Set.of(1, 2, 3));
+    @Test
+    void parse_todo_list_with_args() {
+        var input = "todo list \"1\" \"2\"";
+        var result = parser.parse(input);
 
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.ok()).contains(new Command.Todo.List.ByIds(Set.of(1, 2)));
+    }
+
+    @Test
+    void parse_todo_list_with_filter() {
+        var input = "todo list -f\"title\"";
+        var result = parser.parse(input);
+
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.ok()).contains(new Command.Todo.List.ByFilters(Set.of("title")));
+    }
+
+    @Test
+    void parse_todo_list_with_args_filter() {
+        var input = "todo list \"1\" \"2\" -f\"title\"";
+        var result = parser.parse(input);
+
+        assertThat(result.isOk()).isTrue();
+        assertThat(result.ok()).contains(new Command.Todo.List.ByIdsAndFilters(Set.of(1, 2), Set.of("title")));
+    }
+
+    @Test
+    void return_error_when_arg_is_missing() {
+        var input = "todo list";
+        var result = parser.parse(input);
+
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.err()).contains(new ParserError.Empty());
     }
 }

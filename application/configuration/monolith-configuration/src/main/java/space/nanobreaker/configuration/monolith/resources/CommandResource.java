@@ -2,7 +2,6 @@ package space.nanobreaker.configuration.monolith.resources;
 
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
-import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.Consumes;
@@ -14,7 +13,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.configuration.monolith.services.command.CommandController;
+import space.nanobreaker.configuration.monolith.services.command.CommandExecutor;
 import space.nanobreaker.configuration.monolith.services.parser.Parser;
 import space.nanobreaker.configuration.monolith.templates.ErrorTemplates;
 import space.nanobreaker.library.error.Error;
@@ -23,18 +22,23 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 
+import static space.nanobreaker.configuration.monolith.services.command.Command.Calendar;
+import static space.nanobreaker.configuration.monolith.services.command.Command.Help;
+import static space.nanobreaker.configuration.monolith.services.command.Command.Todo;
+import static space.nanobreaker.configuration.monolith.services.command.Command.User;
+
 @Path("commands")
 public class CommandResource {
 
     private final Parser parser;
-    private final CommandController controller;
+    private final CommandExecutor executor;
 
     public CommandResource(
             final Parser parser,
-            final CommandController controller
+            final CommandExecutor executor
     ) {
         this.parser = parser;
-        this.controller = controller;
+        this.executor = executor;
     }
 
     @POST
@@ -47,35 +51,30 @@ public class CommandResource {
             @FormParam("command") final String input
     ) {
         var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
-        Result<Command, Error> parserResult = parser.parse(input);
+        var parserResult = parser.parse(input);
 
         return switch (parserResult) {
+            // @formatter:off
             case Ok(Command c) -> switch (c) {
-                case Command.Help help -> controller.help(help);
-                case Command.Todo.Help help -> controller.help(help);
-                case Command.Todo.Create.Help help -> controller.help(help);
-                case Command.Todo.Create.Default def -> controller.createTodo(def, zoneId);
-                case Command.Todo.List.Help help -> controller.help(help);
-                case Command.Todo.List.All all -> controller.listTodo(all, zoneId);
-                case Command.Todo.List.ByIds ids -> controller.listTodo(ids, zoneId);
-                case Command.Todo.List.ByFilters filters -> controller.listTodo(filters, zoneId);
-                case Command.Todo.List.ByIdsAndFilters idsAndFilters -> controller.listTodo(idsAndFilters, zoneId);
-                case Command.Todo.Update.Help help -> controller.help(help);
-                case Command.Todo.Update.ByIds ids -> controller.updateTodo(ids, zoneId);
-                case Command.Todo.Update.ByFilters filters -> controller.updateTodo(filters, zoneId);
-                case Command.Todo.Update.ByIdsAndFilters idsAndFilters -> controller.updateTodo(idsAndFilters, zoneId);
-                case Command.Todo.Delete.Help help -> controller.help(help);
-                case Command.Todo.Delete.All all -> controller.deleteTodos(all);
-                case Command.Todo.Delete.ByIds ids -> controller.deleteTodos(ids);
-                case Command.Calendar.Help help -> controller.help(help);
-                case Command.Calendar.Show show -> controller.showCalendar(show);
-                case Command.User.Help help -> controller.help(help);
-                case Command.User.Show show -> controller.showUser(show);
+                case Help                   _,
+                     Todo.Help              _,
+                     Todo.Create.Help       _,
+                     Todo.List.Help         _,
+                     Todo.Update.Help       _,
+                     Todo.Delete.Help       _,
+                     User.Help              _,
+                     Calendar.Help  _       -> executor.help(c);
+                case Todo.Create    create  -> executor.createTodo(create, zoneId);
+                case Todo.List      list    -> executor.listTodo(list, zoneId);
+                case Todo.Update    update  -> executor.updateTodo(update, zoneId);
+                case Todo.Delete    delete  -> executor.deleteTodos(delete);
+                case Calendar.Show  show    -> executor.showCalendar(show);
+                case User.Show      show    -> executor.showUser(show);
             };
+            // @formatter:on
             case Err(Error error) -> {
                 var text = error.describe();
                 var html = ErrorTemplates.error(text);
-
                 var response = Response.serverError()
                         .entity(html)
                         .build();

@@ -19,7 +19,7 @@ public sealed interface Command
         record Help() implements Todo { }
 
         sealed interface Create extends Todo {
-            record Help()                   implements Create { }
+            record Help() implements Create { }
             record Default(
                     String title,
                     Option<String> description,

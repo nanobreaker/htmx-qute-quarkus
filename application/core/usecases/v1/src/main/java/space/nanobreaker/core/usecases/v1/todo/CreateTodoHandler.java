@@ -53,9 +53,9 @@ public class CreateTodoHandler implements CommandHandler<Command.Todo.Create, Re
 
                     return builder.build();
                 })
-                .flatMap(t -> eventDispatcher.on(
-                        () -> todoRepository.save(t),
-                        new TodoEvent.Created(t.getId())
+                .flatMap(todo -> eventDispatcher.on(
+                        () -> todoRepository.save(todo),
+                        new TodoEvent.Created(todo)
                 ));
 
         return createdTodo.flatMap(result -> switch (result) {

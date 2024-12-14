@@ -46,7 +46,7 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
                     case Ok(Set<Todo> todos) -> {
                         yield eventDispatcher.on(
                                 () -> todoRepository.update(todos, payload),
-                                new TodoEvent.Updated(ids)
+                                new TodoEvent.Updated(todos)
                         );
                     }
                     case Err(Error error) -> {
@@ -66,7 +66,7 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
 
                         yield eventDispatcher.on(
                                 () -> todoRepository.update(todos, payload),
-                                new TodoEvent.Updated(ids)
+                                new TodoEvent.Updated(todos)
                         );
                     }
                     case Err(Error error) -> {
@@ -82,7 +82,7 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
                     case Ok(Set<Todo> todos) -> {
                         yield eventDispatcher.on(
                                 () -> todoRepository.update(todos, payload),
-                                new TodoEvent.Updated(ids)
+                                new TodoEvent.Updated(todos)
                         );
                     }
                     case Err(Error error) -> {

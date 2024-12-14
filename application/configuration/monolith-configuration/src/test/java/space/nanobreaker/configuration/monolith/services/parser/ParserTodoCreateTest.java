@@ -1,10 +1,7 @@
 package space.nanobreaker.configuration.monolith.services.parser;
 
-import io.github.dcadea.jresult.Result;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.configuration.monolith.common.InputBuilder;
 import space.nanobreaker.configuration.monolith.services.command.Command;
-import space.nanobreaker.library.error.Error;
 
 import java.time.LocalDateTime;
 
@@ -14,127 +11,54 @@ import static space.nanobreaker.library.option.Option.some;
 public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
-    void shouldCreateCmd() {
-        String input = new InputBuilder("todo")
-                .append("create")
-                .append("\"test\"")
-                .append("-d\"getDescription\"")
-                .append("-s\"27.06.24 12:30\"")
-                .append("-e\"27/06/2024 13:30\"")
-                .build();
-
-        Result<Command, Error> result = parser.parse(input);
+    void parse_todo_create_help_command() {
+        var input = "todo create help";
+        var result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
-
-        Command actualCommand = result.unwrap();
-        Command expectedCommand = new Command.Todo.Create.Default(
-                "test",
-                some("getDescription"),
-                some(LocalDateTime.of(2024, 6, 27, 12, 30)),
-                some(LocalDateTime.of(2024, 6, 27, 13, 30))
-        );
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.ok()).contains(new Command.Todo.Create.Help());
     }
 
     @Test
-    void shouldCreateCmdWhenStartAndEndOptionsAreTimes() {
-        String input = new InputBuilder("todo")
-                .append("create")
-                .append("\"test\"")
-                .append("-d\"getDescription\"")
-                .append("-s\"12:30\"")
-                .append("-e\"13:30\"")
-                .build();
-
-        Result<Command, Error> result = parser.parse(input);
+    void parse_todo_create_command_with_title_description_start_end() {
+        var input = "todo create \"title\" -d\"description\" -s\"27.06.24 12:30\" -e\"13:30\"";
+        var result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
-
-        Command actualCommand = result.unwrap();
-        Command expectedCommand = new Command.Todo.Create.Default(
-                "test",
-                some("getDescription"),
-                some(LocalDateTime.of(this.year, this.month, this.day, 12, 30)),
-                some(LocalDateTime.of(this.year, this.month, this.day, 13, 30))
-        );
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.ok())
+                .contains(new Command.Todo.Create.Default(
+                        "title",
+                        some("description"),
+                        some(LocalDateTime.of(2024, 6, 27, 12, 30)),
+                        some(LocalDateTime.of(this.year, this.month, this.day, 13, 30))
+                ));
     }
 
     @Test
-    void shouldCreateCmdWhenStartAndEndOptionsAreFullDates() {
-        String input = new InputBuilder("todo")
-                .append("create")
-                .append("\"test\"")
-                .append("-d\"getDescription\"")
-                .append("-s\"27.06.24\"")
-                .append("-e\"27.06.24\"")
-                .build();
+    void return_error_when_arg_is_missing() {
+        var input = "todo create -d\"test\"";
+        var result = parser.parse(input);
 
-        Result<Command, Error> result = parser.parse(input);
-
-        assertThat(result.isOk()).isTrue();
-
-        Command actualCommand = result.unwrap();
-        Command expectedCommand = new Command.Todo.Create.Default(
-                "test",
-                some("getDescription"),
-                some(LocalDateTime.of(2024, 6, 27, 0, 0)),
-                some(LocalDateTime.of(2024, 6, 27, 0, 0))
-        );
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.err()).contains(new ParserError.ArgumentNotFound());
     }
 
     @Test
-    void shouldCreateCmdWhenStartAndEndOptionsAreJustDayOfTheMonth() {
-        String input = new InputBuilder("todo")
-                .append("create")
-                .append("\"test\"")
-                .append("-d\"getDescription\"")
-                .append("-s\"27\"")
-                .append("-e\"28\"")
-                .build();
+    void return_error_when_more_than_one_arg() {
+        var input = "todo create \"title1\" \"title2\"";
+        var result = parser.parse(input);
 
-        Result<Command, Error> result = parser.parse(input);
-
-        assertThat(result.isOk()).isTrue();
-
-        Command actualCommand = result.unwrap();
-        Command expectedCommand = new Command.Todo.Create.Default(
-                "test",
-                some("getDescription"),
-                some(LocalDateTime.of(this.year, this.month, 27, 0, 0)),
-                some(LocalDateTime.of(this.year, this.month, 28, 0, 0))
-        );
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.err()).contains(new ParserError.RedundantArgs());
     }
 
     @Test
-    void shouldCreateCmdWhenStartAndEndOptionsAreDayOfTheMonthAndMonth() {
-        String input = new InputBuilder("todo")
-                .append("create")
-                .append("\"test\"")
-                .append("-d\"getDescription\"")
-                .append("-s\"27.06\"")
-                .append("-e\"28.06\"")
-                .build();
+    void return_error_when_date_is_invalid() {
+        var input = "todo create \"title\" -s\"not a date\"";
+        var result = parser.parse(input);
 
-        Result<Command, Error> result = parser.parse(input);
-
-        assertThat(result.isOk()).isTrue();
-
-        Command actualCommand = result.unwrap();
-        Command expectedCommand = new Command.Todo.Create.Default(
-                "test",
-                some("getDescription"),
-                some(LocalDateTime.of(this.year, 6, 27, 0, 0)),
-                some(LocalDateTime.of(this.year, 6, 28, 0, 0))
-        );
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(result.isErr()).isTrue();
+        assertThat(result.err())
+                .contains(new ParserError.DateParseError("Text 'not a date' could not be parsed, unparsed text found at index 0"));
     }
 }
