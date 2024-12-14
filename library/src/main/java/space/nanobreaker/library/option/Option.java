@@ -5,6 +5,7 @@ import space.nanobreaker.library.error.Error;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -41,6 +42,14 @@ public sealed interface Option<T> permits None, Some {
             case Some(T v) -> Result.ok(v);
             case None() -> Result.err(error);
         };
+    }
+
+    default void ifPresent(Consumer<? super T> action) {
+        switch (this) {
+            case Some(T v) -> action.accept(v);
+            case None() -> {
+            }
+        }
     }
 
     default <NV> Option<NV> map(final Function<? super T, ? extends NV> valueMapper) {

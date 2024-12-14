@@ -6,6 +6,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
+import java.util.Objects;
+
 @Provider
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
@@ -13,9 +15,14 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
     Template error;
 
     @Override
-    public Response toResponse(Throwable exception) {
+    public Response toResponse(final Throwable exception) {
+        var exceptionMessage = exception.getMessage();
+        var message = Objects.isNull(exceptionMessage)
+                ? exception.toString()
+                : exceptionMessage;
+
         return Response.serverError()
-                .entity(error.data("message", exception.getMessage()))
+                .entity(error.data("message", message))
                 .build();
     }
 }

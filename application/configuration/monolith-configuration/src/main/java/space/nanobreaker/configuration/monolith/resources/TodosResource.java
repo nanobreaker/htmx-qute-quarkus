@@ -101,7 +101,7 @@ public class TodosResource {
         var query = new Query.Todo.List.ByIdsAndFilters(idz, filters);
 
         Uni<Result<Set<Todo>, Error>> resultUni = eventBus
-                .<Result<Set<Todo>, Error>>request("todos.get", query)
+                .<Result<Set<Todo>, Error>>request("query.todo.list", query)
                 .map(Message::body);
 
         return resultUni.map(result -> switch (result) {
@@ -135,10 +135,9 @@ public class TodosResource {
         var username = (String) jwt.getClaim("upn");
         var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         var todoId = new TodoId(id, username);
-        var query = new Query.Todo.List.ByIds(Set.of(todoId));
-
-        Uni<Result<Todo, Error>> resultUni = eventBus
-                .<Result<Todo, Error>>request("todo.get", query)
+        var query = new Query.Todo.Get.ById(todoId);
+        var resultUni = eventBus
+                .<Result<Todo, Error>>request("query.todo.get", query)
                 .map(Message::body);
 
         return resultUni.map(result -> switch (result) {
@@ -188,7 +187,7 @@ public class TodosResource {
         );
 
         Uni<Result<Todo, Error>> resultUni = eventBus
-                .<Result<Todo, Error>>request("todo.create", command)
+                .<Result<Todo, Error>>request("command.todo.create", command)
                 .map(Message::body);
 
         return resultUni.map(result -> switch (result) {
@@ -232,9 +231,8 @@ public class TodosResource {
                 end
         );
         var command = new Command.Todo.Update.ByIds(Set.of(id), payload);
-
-        Uni<Result<Void, Error>> resultUni = eventBus
-                .<Result<Void, Error>>request("todo.update", command)
+        var resultUni = eventBus
+                .<Result<Void, Error>>request("command.todo.update", command)
                 .map(Message::body);
 
         return resultUni.map(result -> switch (result) {
@@ -260,7 +258,7 @@ public class TodosResource {
         var command = new Command.Todo.Delete.ByIds(Set.of(todoId));
 
         Uni<Result<Void, Error>> resultUni = eventBus
-                .<Result<Void, Error>>request("todo.delete", command)
+                .<Result<Void, Error>>request("command.todo.delete", command)
                 .map(Message::body);
 
         return resultUni.map(result -> switch (result) {

@@ -17,7 +17,6 @@ import space.nanobreaker.ddd.EventDispatcher;
 import space.nanobreaker.library.error.Error;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Error>> {
@@ -60,10 +59,6 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
 
                 yield resultUni.flatMap(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var ids = todos.stream()
-                                .map(Todo::getId)
-                                .collect(Collectors.toSet());
-
                         yield eventDispatcher.on(
                                 () -> todoRepository.update(todos, payload),
                                 new TodoEvent.Updated(todos)

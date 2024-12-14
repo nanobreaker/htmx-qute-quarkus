@@ -6,6 +6,7 @@ import space.nanobreaker.core.domain.v1.Command.Todo.Update.Payload;
 import space.nanobreaker.jpa.Repository;
 import space.nanobreaker.library.error.Error;
 
+import java.util.SequencedSet;
 import java.util.Set;
 
 public interface TodoRepository extends Repository {
@@ -14,13 +15,13 @@ public interface TodoRepository extends Repository {
 
     Uni<Result<Todo, Error>> get(TodoId id);
 
-    Uni<Result<Set<Todo>, Error>> list(String username);
+    Uni<Result<SequencedSet<Todo>, Error>> list(String username);
 
-    Uni<Result<Set<Todo>, Error>> list(String username, Set<String> filters);
+    Uni<Result<SequencedSet<Todo>, Error>> list(String username, Set<String> filters);
 
-    Uni<Result<Set<Todo>, Error>> list(Set<TodoId> ids);
+    Uni<Result<SequencedSet<Todo>, Error>> list(Set<TodoId> ids);
 
-    Uni<Result<Set<Todo>, Error>> list(Set<TodoId> ids, Set<String> filters);
+    Uni<Result<SequencedSet<Todo>, Error>> list(Set<TodoId> ids, Set<String> filters);
 
     Uni<Result<Void, Error>> update(Set<Todo> todos, Payload payload);
 
