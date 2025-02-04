@@ -3,6 +3,7 @@ package space.nanobreaker.infra.dataproviders.postgres.repositories.todo;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Version;
+import space.nanobreaker.core.domain.v1.todo.Todo;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -68,5 +69,33 @@ public class TodoJpaEntity {
 
     public int getVersion() {
         return version;
+    }
+
+    public Todo into() {
+        var id = this.id.into();
+
+        return new Todo(
+                id,
+                this.getTitle(),
+                this.getDescription(),
+                this.getStartDateTime(),
+                this.getEndDateTime()
+        );
+    }
+
+    public static TodoJpaEntity from(Todo todo) {
+        var id = TodoJpaId.from(todo.getId());
+        var zoneFromStart = todo.getStart().map(d -> d.getZone().getId());
+        var zoneFromEnd = todo.getEnd().map(d -> d.getZone().getId());
+        var timeZone = zoneFromStart.orElseGet(() -> zoneFromEnd.orElse("UTC"));
+
+        return new TodoJpaEntity(
+                id,
+                todo.getTitle(),
+                todo.getDescription().orElse(null),
+                todo.getStart().map(ZonedDateTime::toInstant).orElse(null),
+                todo.getEnd().map(ZonedDateTime::toInstant).orElse(null),
+                timeZone
+        );
     }
 }

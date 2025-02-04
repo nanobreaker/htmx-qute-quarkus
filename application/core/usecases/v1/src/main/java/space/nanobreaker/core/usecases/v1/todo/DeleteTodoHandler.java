@@ -10,14 +10,15 @@ import space.nanobreaker.core.domain.v1.Command.Todo.Delete;
 import space.nanobreaker.core.domain.v1.todo.TodoEvent;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
 import space.nanobreaker.cqrs.CommandHandler;
+import space.nanobreaker.ddd.DomainEvent;
 import space.nanobreaker.ddd.EventDispatcher;
 import space.nanobreaker.library.error.Error;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class DeleteTodoHandler
-        implements CommandHandler<Delete, Result<Void, Error>> {
+public class DeleteTodoHandler implements CommandHandler<Delete, Result<Void, Error>> {
 
     private final EventDispatcher eventDispatcher;
     private final TodoRepository todoRepository;
@@ -32,21 +33,21 @@ public class DeleteTodoHandler
 
     @Override
     @ConsumeEvent(value = "command.todo.delete")
-    @WithSpan("handleTodoDeleteCommand")
+    @WithSpan
     @WithTransaction
     public Uni<Result<Void, Error>> handle(final Delete command) {
         return switch (command) {
             case Delete.All(var username) -> {
-                yield eventDispatcher.on(
-                        () -> todoRepository.deleteAll(username),
-                        new TodoEvent.Deleted(Set.of())
-                );
+                var domainEvents = Set.<DomainEvent>of(new TodoEvent.DeletedAll());
+
+                yield eventDispatcher.on(() -> todoRepository.deleteAll(username), domainEvents);
             }
             case Delete.ByIds(var ids) -> {
-                yield eventDispatcher.on(
-                        () -> todoRepository.delete(ids),
-                        new TodoEvent.Deleted(ids)
-                );
+                var domainEvents = ids.stream()
+                        .map(TodoEvent.Deleted::new)
+                        .collect(Collectors.<DomainEvent>toUnmodifiableList());
+
+                yield eventDispatcher.on(() -> todoRepository.delete(ids), domainEvents);
             }
         };
     }

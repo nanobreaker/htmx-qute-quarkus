@@ -27,8 +27,8 @@ public class CommandResourceTest extends TestBase {
     public void post() {
         var title = "title";
         var description = "description";
-        var start = LocalDateTime.of(2024, 11, 10, 0, 0);
-        var end = LocalDateTime.of(2024, 11, 11, 0, 0);
+        var start = LocalDateTime.of(2025, 11, 10, 0, 0);
+        var end = LocalDateTime.of(2025, 11, 11, 0, 0);
         var query = "todo create \"%s\" -d\"%s\" -s\"%s\" -e\"%s\""
                 .formatted(title, description, start.format(formatter), end.format(formatter));
 

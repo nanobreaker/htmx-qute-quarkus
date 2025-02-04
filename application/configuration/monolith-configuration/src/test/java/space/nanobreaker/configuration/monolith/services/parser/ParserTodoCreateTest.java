@@ -21,7 +21,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
 
     @Test
     void parse_todo_create_command_with_title_description_start_end() {
-        var input = "todo create \"title\" -d\"description\" -s\"27.06.24 12:30\" -e\"13:30\"";
+        var input = "todo create \"title\" -d\"description\" -s\"27.06.25 12:30\" -e\"13:30\"";
         var result = parser.parse(input);
 
         assertThat(result.isOk()).isTrue();
@@ -29,7 +29,7 @@ public class ParserTodoCreateTest extends ParserTestBase {
                 .contains(new Command.Todo.Create.Default(
                         "title",
                         some("description"),
-                        some(LocalDateTime.of(2024, 6, 27, 12, 30)),
+                        some(LocalDateTime.of(2025, 6, 27, 12, 30)),
                         some(LocalDateTime.of(this.year, this.month, this.day, 13, 30))
                 ));
     }

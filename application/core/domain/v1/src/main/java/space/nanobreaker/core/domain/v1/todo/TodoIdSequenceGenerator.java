@@ -4,12 +4,7 @@ import io.smallrye.mutiny.Uni;
 
 public interface TodoIdSequenceGenerator {
 
-    Uni<Void> increment(
-            final String username
-    );
+    Uni<Void> increment(String username);
 
-    Uni<TodoId> next(
-            final String username
-    );
-
+    Uni<TodoId> next(String username);
 }

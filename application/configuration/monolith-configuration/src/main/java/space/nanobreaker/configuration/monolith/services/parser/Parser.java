@@ -53,7 +53,6 @@ public class Parser {
             .append("[HH:mm]")
             .append("[dd]")
             .toString();
-
     private final Clock clock;
     private final Tokenizer tokenizer;
 
@@ -66,10 +65,9 @@ public class Parser {
         this.clock = clock;
     }
 
-    @WithSpan("parseInputString")
+    @WithSpan
     public Result<Command, Error> parse(final String input) {
         var tokens = tokenizer.tokenize(input);
-
         try {
             var programToken = tokens.removeFirst();
             return switch (programToken) {
@@ -86,7 +84,6 @@ public class Parser {
 
     private Result<Command, Error> parseTodoProgram(final SequencedCollection<Token> tokens) {
         var commandToken = tokens.removeFirst();
-
         return switch (commandToken) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Todo.Help());
             case Token.Keyword(var keyword) when keyword == KEYWORD.CREATE -> parseTodoCreateCommand(tokens);
@@ -113,36 +110,30 @@ public class Parser {
 
     private Result<Command, Error> parseTodoCreateCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.removeFirst();
-
         return switch (subcommand) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
                 yield ok(new Create.Help());
             }
             case Token.Text(var title) -> {
                 var isSingleArg = findArgs(tokens).isEmpty();
-
                 if (!isSingleArg) {
                     yield err(new ParserError.RedundantArgs());
                 }
-
                 var descriptionOpt = some(findOption(tokens, OPTION.DESCRIPTION));
                 var startOptResult = some(findOption(tokens, OPTION.START).map(this::parseDateTime));
                 var endOptResult = some(findOption(tokens, OPTION.END).map(this::parseDateTime));
                 var builder = new TodoCreateCommandBuilder(title);
                 builder.withDescription(descriptionOpt);
-
                 if (startOptResult instanceof Some(Ok(var start))) {
                     builder.withStart(some(start));
-                } else if (startOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                } else if (startOptResult instanceof Some(Err(var parseError))) {
                     yield err(parseError);
                 }
-
                 if (endOptResult instanceof Some(Ok(var end))) {
                     builder.withEnd(some(end));
-                } else if (endOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                } else if (endOptResult instanceof Some(Err(var parseError))) {
                     yield err(parseError);
                 }
-
                 var command = builder.build();
                 yield ok(command);
             }
@@ -154,7 +145,6 @@ public class Parser {
 
     private Result<Command, Error> parseTodoListCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
-
         return switch (subcommand) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
                 yield ok(new List.Help());
@@ -165,7 +155,6 @@ public class Parser {
             default -> {
                 var args = findArgs(tokens);
                 var option = some(findOption(tokens, OPTION.FILTER));
-
                 yield switch (option) {
                     case Some(var filter) when args.isEmpty() -> {
                         yield ok(new List.ByFilters(Set.of(filter)));
@@ -203,7 +192,6 @@ public class Parser {
 
     private Result<Command, Error> parseTodoUpdateCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
-
         return switch (subcommand) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
                 yield ok(new Update.Help());
@@ -211,32 +199,28 @@ public class Parser {
             default -> {
                 var args = findArgs(tokens);
                 var filterOpt = some(findOption(tokens, OPTION.FILTER));
-
                 if (args.isEmpty() && filterOpt.isNone()) {
                     yield err(new ParserError.ArgumentOrFilterNotFound());
                 }
-
                 var titleOpt = some(findOption(tokens, OPTION.TITLE));
                 var descriptionOpt = some(findOption(tokens, OPTION.DESCRIPTION));
                 var startOptResult = some(findOption(tokens, OPTION.START).map(this::parseDateTime));
                 var endOptResult = some(findOption(tokens, OPTION.END).map(this::parseDateTime));
-
                 var paylodBuilder = new TodoUpdateCommandPaylodBuilder();
+
                 paylodBuilder.withTitle(titleOpt);
                 paylodBuilder.withDescription(descriptionOpt);
 
                 if (startOptResult instanceof Some(Ok(LocalDateTime start))) {
                     paylodBuilder.withStart(some(start));
-                } else if (startOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                } else if (startOptResult instanceof Some(Err(var parseError))) {
                     yield err(parseError);
                 }
-
                 if (endOptResult instanceof Some(Ok(LocalDateTime end))) {
                     paylodBuilder.withEnd(some(end));
-                } else if (endOptResult instanceof Some(Err(ParserError.DateParseError parseError))) {
+                } else if (endOptResult instanceof Some(Err(var parseError))) {
                     yield err(parseError);
                 }
-
                 yield switch (filterOpt) {
                     case Some(var filter) when args.isEmpty() -> {
                         var command = new Update.ByFilters(Set.of(filter), paylodBuilder.build());
@@ -262,7 +246,6 @@ public class Parser {
 
     private Result<Command, Error> parseTodoDeleteCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
-
         return switch (subcommand) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
                 yield ok(new Delete.Help());
@@ -272,7 +255,6 @@ public class Parser {
             }
             default -> {
                 var args = findArgs(tokens);
-
                 if (args.isEmpty()) {
                     yield err(new ParserError.ArgumentNotFound());
                 } else {
@@ -291,17 +273,14 @@ public class Parser {
         return err(new ParserError.NotSupportedOperation());
     }
 
-    private static Optional<String> findOption(
-            final SequencedCollection<? extends Token> tokens,
-            final OPTION target
-    ) {
+    private static Optional<String> findOption(SequencedCollection<Token> tokens, OPTION target) {
         return tokens.stream()
                 .gather(Gatherers.windowSliding(2))
                 .gather(Gatherers.fold(
                         Option::<String>none,
-                        (text, window) -> switch (Pair.of(window.getFirst(), window.getLast())) {
-                            case Pair(Token.Option(var opt), Token.Text(var _text)) when opt == target -> some(_text);
-                            default -> text;
+                        (value, window) -> switch (Pair.of(window.getFirst(), window.getLast())) {
+                            case Pair(Token.Option(var opt), Token.Text(var text)) when opt == target -> some(text);
+                            default -> value;
                         }
                 ))
                 .filter(Option::isSome)
@@ -321,14 +300,13 @@ public class Parser {
         var current = clock.instant().atZone(ZoneId.of("UTC"));
         var formatter = new DateTimeFormatterBuilder()
                 .appendPattern(datePattern)
-                .parseDefaulting(ChronoField.YEAR, current.getYear())
+                .parseDefaulting(ChronoField.YEAR_OF_ERA, current.getYear())
                 .parseDefaulting(ChronoField.MONTH_OF_YEAR, current.getMonthValue())
                 .parseDefaulting(ChronoField.DAY_OF_MONTH, current.getDayOfMonth())
                 .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
                 .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
                 .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
                 .toFormatter();
-
         try {
             var local = LocalDateTime.parse(string, formatter);
             return ok(local);

@@ -7,10 +7,15 @@ import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import space.nanobreaker.core.domain.v1.todo.Todo;
+import space.nanobreaker.core.domain.v1.todo.TodoError;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
 import space.nanobreaker.cqrs.QueryHandler;
 import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.option.None;
+import space.nanobreaker.library.option.Some;
 
+import static io.github.dcadea.jresult.Result.err;
+import static io.github.dcadea.jresult.Result.ok;
 import static space.nanobreaker.core.domain.v1.Query.Todo.Get;
 
 @ApplicationScoped
@@ -24,11 +29,16 @@ public class GetTodoHandler implements QueryHandler<Get, Todo> {
 
     @Override
     @ConsumeEvent(value = "query.todo.get")
-    @WithSpan("handleTodoGetCommand")
+    @WithSpan
     @WithSession
     public Uni<Result<Todo, Error>> execute(final Get query) {
         return switch (query) {
-            case Get.ById(var id) -> todoRepository.get(id);
+            case Get.ById(var id) -> todoRepository
+                    .find(id)
+                    .map(result -> result.andThen(opt -> switch (opt) {
+                        case Some(var todo) -> ok(todo);
+                        case None() -> err(new TodoError.NotFound());
+                    }));
         };
     }
 }

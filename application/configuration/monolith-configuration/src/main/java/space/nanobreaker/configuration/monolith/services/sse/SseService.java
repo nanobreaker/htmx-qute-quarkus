@@ -9,7 +9,7 @@ import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
 import org.keycloak.common.util.ConcurrentMultivaluedHashMap;
 
-import java.util.function.Predicate;
+import static java.util.function.Predicate.not;
 
 @ApplicationScoped
 public class SseService {
@@ -27,7 +27,7 @@ public class SseService {
         this.connections = new ConcurrentMultivaluedHashMap<>();
     }
 
-    @WithSpan("SseService: register")
+    @WithSpan
     public void register(
             final String upn,
             final String sid,
@@ -36,7 +36,7 @@ public class SseService {
         connections.add(upn, new SidSinkPair(sid, sink));
     }
 
-    @WithSpan("SseService: publish")
+    @WithSpan
     public void publish(
             final String upn,
             final String sid,
@@ -44,13 +44,13 @@ public class SseService {
     ) {
         connections.getList(upn)
                 .stream()
-                .filter(Predicate.not(v -> v.sid().equals(sid)))
-                .filter(Predicate.not(v -> v.sink().isClosed()))
+                .filter(not(v -> v.sid().equals(sid)))
+                .filter(not(v -> v.sink().isClosed()))
                 .forEach(v -> v.sink().send(event));
     }
 
     @ConsumeEvent(value = "sse.todo.created")
-    @WithSpan("SseService: consumeTodoCreated")
+    @WithSpan
     public void consumeTodoCreated(SseEvent.TodoCreated event) {
         final var upn = event.upn();
         final var sid = event.sid();
@@ -61,7 +61,7 @@ public class SseService {
     }
 
     @ConsumeEvent(value = "sse.todo.updated")
-    @WithSpan("SseService: consumeTodoUpdated")
+    @WithSpan
     public void consumeTodoUpdated(final SseEvent.TodoUpdated event) {
         final var upn = event.upn();
         final var sid = event.sid();
@@ -73,7 +73,7 @@ public class SseService {
     }
 
     @ConsumeEvent(value = "sse.todo.deleted")
-    @WithSpan("SseService: consumeTodoDeleted")
+    @WithSpan
     public void consumeTodoDeleted(final SseEvent.TodoDeleted event) {
         final var upn = event.upn();
         final var sid = event.sid();

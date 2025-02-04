@@ -13,7 +13,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import space.nanobreaker.configuration.monolith.services.sse.SseEvent;
 import space.nanobreaker.configuration.monolith.templates.ErrorTemplates;
 import space.nanobreaker.configuration.monolith.templates.HelpTemplates;
 import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
@@ -80,8 +79,6 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Todo todo) -> {
-                        String upn = jwt.getClaim("upn");
-                        String sid = jwt.getClaim("sid");
                         var location = "/todos/%d".formatted(todo.getId().getId());
                         var uri = URI.create(location);
                         var html = this.todosTemplate
@@ -89,9 +86,6 @@ public class CommandExecutor {
                                 .data("todo", todo)
                                 .data("zoneId", zoneId)
                                 .render();
-
-                        var event = new SseEvent.TodoCreated(upn, sid, html);
-                        eventBus.publish("sse.todo.created", event);
 
                         yield Response.created(uri)
                                 .header("HX-Reswap", "beforeend")
@@ -290,15 +284,8 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Void _) -> {
-                        String upn = jwt.getClaim("upn");
-                        String sid = jwt.getClaim("sid");
                         var query = ids.stream().map("id=%d"::formatted).collect(Collectors.joining("&"));
                         var location = URI.create("/todos/search?%s".formatted(query));
-
-                        ids.forEach(id -> {
-                            final var event = new SseEvent.TodoUpdated(upn, sid, id);
-                            eventBus.publish("sse.todo.updated", event);
-                        });
 
                         yield Response.seeOther(location)
                                 .build();
@@ -329,16 +316,8 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Void _) -> {
-                        String upn = jwt.getClaim("upn");
-                        String sid = jwt.getClaim("sid");
                         var query = filters.stream().map("filters=%s"::formatted).collect(Collectors.joining("&"));
                         var location = URI.create("/todos/search?%s".formatted(query));
-
-                        // todo: figure out how to update todos using only filters
-                        // ids.forEach(id -> {
-                        //    final var event = new SseEvent.TodoUpdated(upn, sid, id);
-                        //    eventBus.publish("sse.todo.updated", event);
-                        // });
 
                         yield Response.seeOther(location)
                                 .build();
@@ -370,17 +349,9 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Void _) -> {
-                        String upn = jwt.getClaim("upn");
-                        String sid = jwt.getClaim("sid");
                         var idsQuery = ids.stream().map("id=%d"::formatted).collect(Collectors.joining("&"));
                         var filtersQuery = filters.stream().map("filters=%s"::formatted).collect(Collectors.joining("&"));
                         var location = URI.create("/todos/search?%s&%s".formatted(idsQuery, filtersQuery));
-
-                        // todo: figure out how to update todos using ids and filters
-                        // ids.forEach(id -> {
-                        //    final var event = new SseEvent.TodoUpdated(upn, sid, id);
-                        //    eventBus.publish("sse.todo.updated", event);
-                        // });
 
                         yield Response.seeOther(location)
                                 .build();
@@ -419,12 +390,9 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        String upn = jwt.getClaim("upn");
-                        String sid = jwt.getClaim("sid");
+                        var htmx = TodoTemplates.todosDeleteAll().render();
 
-                        // todo: delete all todos in grid
-
-                        yield Response.ok()
+                        yield Response.ok(htmx)
                                 .header("HX-Reswap", "none")
                                 .header("HX-Trigger", "command.empty")
                                 .build();
@@ -449,14 +417,6 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        String upn = jwt.getClaim("upn");
-                        String sid = jwt.getClaim("sid");
-
-                        ids.forEach(id -> {
-                            var event = new SseEvent.TodoDeleted(upn, sid, id);
-                            eventBus.publish("sse.todo.deleted", event);
-                        });
-
                         var html = TodoTemplates.todosDelete(ids)
                                 .render();
 

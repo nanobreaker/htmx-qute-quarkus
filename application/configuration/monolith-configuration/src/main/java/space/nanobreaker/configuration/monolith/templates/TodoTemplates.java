@@ -14,5 +14,7 @@ public class TodoTemplates {
 
     public static native TemplateInstance todos(Set<Todo> todos, ZoneId zoneId);
 
+    public static native TemplateInstance todosDeleteAll();
+
     public static native TemplateInstance todosDelete(Set<Integer> ids);
 }

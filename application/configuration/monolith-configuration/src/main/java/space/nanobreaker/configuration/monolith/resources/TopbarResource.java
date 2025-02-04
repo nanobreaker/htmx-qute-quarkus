@@ -1,6 +1,7 @@
 
 package space.nanobreaker.configuration.monolith.resources;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -20,6 +21,7 @@ public class TopbarResource {
     @ConfigProperty(name = "quarkus.application.version") String version;
 
     @GET
+    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> get() {

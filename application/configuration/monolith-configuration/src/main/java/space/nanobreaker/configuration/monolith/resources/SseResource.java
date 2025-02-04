@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.resources;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -19,6 +20,7 @@ public class SseResource {
     @Context Sse sse;
 
     @GET
+    @WithSpan
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void register(@Context final SseEventSink eventSink) {
         final String upn = jwt.getClaim("upn");

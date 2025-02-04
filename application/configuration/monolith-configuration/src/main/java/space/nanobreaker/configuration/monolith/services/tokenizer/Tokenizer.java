@@ -54,7 +54,7 @@ public class Tokenizer {
     }
     // @formatter:on
 
-    @WithSpan("tokenizeInputString")
+    @WithSpan
     public SequencedCollection<Token> tokenize(@NotNull final String source) {
         SequencedCollection<Token> tokens = new LinkedList<>();
         var chat_iter = new StringCharacterIterator(source);

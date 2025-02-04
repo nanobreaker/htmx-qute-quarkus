@@ -37,7 +37,7 @@ public class CreateTodoHandler implements CommandHandler<Command.Todo.Create, Re
 
     @Override
     @ConsumeEvent(value = "command.todo.create")
-    @WithSpan("handleTodoCreateCommand")
+    @WithSpan
     @WithTransaction
     public Uni<Result<Todo, Error>> handle(final Command.Todo.Create command) {
         var username = command.username();
@@ -53,10 +53,7 @@ public class CreateTodoHandler implements CommandHandler<Command.Todo.Create, Re
 
                     return builder.build();
                 })
-                .flatMap(todo -> eventDispatcher.on(
-                        () -> todoRepository.save(todo),
-                        new TodoEvent.Created(todo)
-                ));
+                .flatMap(todo -> eventDispatcher.on(() -> todoRepository.save(todo), new TodoEvent.Created(todo)));
 
         return createdTodo.flatMap(result -> switch (result) {
             case Ok(Todo todo) -> {

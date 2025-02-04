@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatterBuilder;
 public class DateTimeExtension {
 
     private static final DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder()
-            .appendPattern("dd LLL")
+            .appendPattern("dd LLL yyyy")
             .toFormatter();
 
     private static final DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()

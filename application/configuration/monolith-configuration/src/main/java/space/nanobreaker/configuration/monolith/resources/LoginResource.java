@@ -1,5 +1,6 @@
 package space.nanobreaker.configuration.monolith.resources;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.smallrye.mutiny.Uni;
@@ -17,6 +18,7 @@ public class LoginResource {
     Template template;
 
     @GET
+    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> login() {

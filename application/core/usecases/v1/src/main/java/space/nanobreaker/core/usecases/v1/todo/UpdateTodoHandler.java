@@ -13,10 +13,12 @@ import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoEvent;
 import space.nanobreaker.core.domain.v1.todo.TodoRepository;
 import space.nanobreaker.cqrs.CommandHandler;
+import space.nanobreaker.ddd.DomainEvent;
 import space.nanobreaker.ddd.EventDispatcher;
 import space.nanobreaker.library.error.Error;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Error>> {
@@ -34,7 +36,7 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
 
     @Override
     @ConsumeEvent(value = "command.todo.update")
-    @WithSpan("handleTodoUpdateCommand")
+    @WithSpan
     @WithSession
     public Uni<Result<Void, Error>> handle(final Update command) {
         return switch (command) {
@@ -43,10 +45,11 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
 
                 yield resultUni.flatMap(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        yield eventDispatcher.on(
-                                () -> todoRepository.update(todos, payload),
-                                new TodoEvent.Updated(todos)
-                        );
+                        var domainEvents = todos.stream()
+                                .map(TodoEvent.Updated::new)
+                                .collect(Collectors.<DomainEvent>toUnmodifiableList());
+
+                        yield eventDispatcher.on(() -> todoRepository.update(todos, payload), domainEvents);
                     }
                     case Err(Error error) -> {
                         yield Uni.createFrom()
@@ -59,10 +62,11 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
 
                 yield resultUni.flatMap(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        yield eventDispatcher.on(
-                                () -> todoRepository.update(todos, payload),
-                                new TodoEvent.Updated(todos)
-                        );
+                        var domainEvents = todos.stream()
+                                .map(TodoEvent.Updated::new)
+                                .collect(Collectors.<DomainEvent>toUnmodifiableList());
+
+                        yield eventDispatcher.on(() -> todoRepository.update(todos, payload), domainEvents);
                     }
                     case Err(Error error) -> {
                         yield Uni.createFrom()
@@ -75,10 +79,11 @@ public class UpdateTodoHandler implements CommandHandler<Update, Result<Void, Er
 
                 yield resultUni.flatMap(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        yield eventDispatcher.on(
-                                () -> todoRepository.update(todos, payload),
-                                new TodoEvent.Updated(todos)
-                        );
+                        var domainEvents = todos.stream()
+                                .map(TodoEvent.Updated::new)
+                                .collect(Collectors.<DomainEvent>toUnmodifiableList());
+
+                        yield eventDispatcher.on(() -> todoRepository.update(todos, payload), domainEvents);
                     }
                     case Err(Error error) -> {
                         yield Uni.createFrom()

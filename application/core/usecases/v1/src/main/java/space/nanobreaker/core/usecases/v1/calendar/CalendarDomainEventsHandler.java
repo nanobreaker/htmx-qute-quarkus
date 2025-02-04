@@ -11,7 +11,7 @@ import space.nanobreaker.core.domain.v1.todo.TodoEvent;
 public class CalendarDomainEventsHandler {
 
     @ConsumeEvent(value = "todo.created")
-    @WithSpan("handleTodoCreatedEvent")
+    @WithSpan
     @WithTransaction
     public Uni<Void> handle(final TodoEvent.Created todoCreatedEvent) {
         // todo: create calendar item based on event
@@ -19,15 +19,23 @@ public class CalendarDomainEventsHandler {
     }
 
     @ConsumeEvent(value = "todo.deleted")
-    @WithSpan("handleTodoCreatedEvent")
+    @WithSpan
     @WithTransaction
     public Uni<Void> handle(final TodoEvent.Deleted todoDeletedEvent) {
         // todo: delete calendar items based on event
         return Uni.createFrom().voidItem();
     }
 
+    @ConsumeEvent(value = "todo.deleted.all")
+    @WithSpan
+    @WithTransaction
+    public Uni<Void> handle(final TodoEvent.DeletedAll todoDeletedAllEvent) {
+        // todo: delete calendar items based on event
+        return Uni.createFrom().voidItem();
+    }
+
     @ConsumeEvent(value = "todo.updated")
-    @WithSpan("handleTodoCreatedEvent")
+    @WithSpan
     @WithTransaction
     public Uni<Void> handle(final TodoEvent.Updated todoUpdatedEvent) {
         // todo: update calendar items based on event

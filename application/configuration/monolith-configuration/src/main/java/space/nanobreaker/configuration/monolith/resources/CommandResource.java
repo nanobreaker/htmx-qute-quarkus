@@ -43,7 +43,7 @@ public class CommandResource {
 
     @POST
     @Path("submit")
-    @WithSpan("submit")
+    @WithSpan
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> execute(

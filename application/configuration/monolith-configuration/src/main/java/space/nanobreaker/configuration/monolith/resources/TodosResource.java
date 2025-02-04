@@ -3,6 +3,7 @@ package space.nanobreaker.configuration.monolith.resources;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.smallrye.mutiny.Uni;
@@ -34,6 +35,7 @@ import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoError;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.library.error.Error;
+import space.nanobreaker.library.tuple.Pair;
 
 import java.net.URI;
 import java.net.URLDecoder;
@@ -60,6 +62,7 @@ public class TodosResource {
     }
 
     @GET
+    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> todos(@CookieParam("time-zone") String zone) {
         var username = (String) jwt.getClaim("upn");
@@ -88,6 +91,7 @@ public class TodosResource {
     }
 
     @GET
+    @WithSpan
     @Path("search")
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> search(
@@ -98,7 +102,12 @@ public class TodosResource {
         var username = (String) jwt.getClaim("upn");
         var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
-        var query = new Query.Todo.List.ByIdsAndFilters(idz, filters);
+        var query = switch (Pair.of(idz, filters)) {
+            case Pair(var i, var f) when i.isEmpty() && f.isEmpty() -> new Query.Todo.List.All(username);
+            case Pair(var i, var f) when f.isEmpty() -> new Query.Todo.List.ByIds(i);
+            case Pair(var i, var f) when i.isEmpty() -> new Query.Todo.List.ByFilters(username, f);
+            case Pair(var _, var _) -> new Query.Todo.List.ByIdsAndFilters(idz, filters);
+        };
 
         Uni<Result<Set<Todo>, Error>> resultUni = eventBus
                 .<Result<Set<Todo>, Error>>request("query.todo.list", query)
@@ -126,6 +135,7 @@ public class TodosResource {
     }
 
     @GET
+    @WithSpan
     @Path("{id}")
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> get(
@@ -168,6 +178,7 @@ public class TodosResource {
     }
 
     @POST
+    @WithSpan
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> create(@Valid @BeanParam final TodoCreateRequest request) {
@@ -216,6 +227,7 @@ public class TodosResource {
 
     @PATCH
     @Path("{id}")
+    @WithSpan
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> patch(@BeanParam final TodoUpdateRequest request) {
@@ -251,6 +263,7 @@ public class TodosResource {
 
     @DELETE
     @Path("{id}")
+    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> delete(@PathParam("id") Integer id) {
         var username = (String) jwt.getClaim("upn");
@@ -279,6 +292,7 @@ public class TodosResource {
 
     @GET
     @Path("create")
+    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> getForm() {

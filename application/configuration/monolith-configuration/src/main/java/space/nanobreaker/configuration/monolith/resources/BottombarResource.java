@@ -1,6 +1,7 @@
 
 package space.nanobreaker.configuration.monolith.resources;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -13,6 +14,7 @@ import space.nanobreaker.configuration.monolith.templates.BottombarTemplates;
 public class BottombarResource {
 
     @GET
+    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> get() {
