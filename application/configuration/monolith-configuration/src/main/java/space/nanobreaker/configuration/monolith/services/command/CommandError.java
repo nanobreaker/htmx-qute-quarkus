@@ -7,7 +7,7 @@ public sealed interface CommandError extends Error {
     // @formatter:off
     record CreationFailed(String description)   implements CommandError { }
     record DeletionFailed(String description)   implements CommandError { }
-    record NotSupported()  implements CommandError { }
+    record NotSupported()                       implements CommandError { }
     // @formatter:on
 
     @Override

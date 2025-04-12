@@ -1,6 +1,5 @@
 {@java.util.List<space.nanobreaker.core.domain.v1.todo.Todo> todos}
 {@space.nanobreaker.core.domain.v1.todo.Todo todo}
-{@java.time.ZoneId zoneId}
 
 {#include base}
     <div id="dashboard"
@@ -40,31 +39,23 @@
 
                                 <div class="title padding">{todo.title}</div>
 
-                                {#if date:isDateTimePresent(todo.start) }
+                                {#if todo.start.isSome }
                                     <div class="start-label">=>></div>
                                     <div class="start-date-time">
-                                        <div class="start-date padding">{date:formatDate(todo.start, zoneId)}</div>
-                                        <div class="start-time padding">{date:formatTime(todo.start, zoneId)}</div>
+                                        <div class="start-date padding">{todo.start.value.toString}</div>
                                     </div>
-                                {#else if date:isDatePresent(todo.start) }
-                                    <div class="start-label">=>></div>
-                                    <div class="start-date-single padding">{date:formatDate(todo.start, zoneId)}</div>
                                 {/if}
 
-                                {#if date:isDateTimePresent(todo.end) }
+                                {#if todo.end.isSome }
                                     <div class="end-label"><<=</div>
                                     <div class="end-date-time">
-                                        <div class="end-date padding">{date:formatDate(todo.end, zoneId)}</div>
-                                        <div class="end-time padding">{date:formatTime(todo.end, zoneId)}</div>
+                                        <div class="end-date padding">{todo.end.value.toString}</div>
                                     </div>
-                                {#else if date:isDatePresent(todo.end) }
-                                    <div class="end-label"><<=</div>
-                                    <div class="end-date-single padding">{date:formatDate(todo.end, zoneId)}</div>
                                 {/if}
 
-                                {#if todo.getDescription().isSome()}
+                                {#if todo.description.isSome }
                                     <div class="description-label">*</div>
-                                    <div class="description padding">{todo.getDescription().value()}</div>
+                                    <div class="description padding">{todo.description.value}</div>
                                 {/if}
                             </div>
                         {/fragment}

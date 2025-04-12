@@ -16,9 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 
 @QuarkusTest
-public class TodosResourceTest extends TestBase {
+public class TodoResourceTest extends TestBase {
 
-    @Location("todos/todos.qute.html") Template todosTemplate;
+    @Location("todos/view-todos.html") Template todosTemplate;
 
     @Test
     public void post() {
@@ -38,7 +38,7 @@ public class TodosResourceTest extends TestBase {
                            .build()
             )
         .when()
-            .post("/todos")
+            .post("/todo")
         .then()
             .assertThat()
             .statusCode(201)
@@ -69,7 +69,7 @@ public class TodosResourceTest extends TestBase {
                             .build()
             )
         .when()
-            .post("/todos")
+            .post("/todo")
         .then()
             .assertThat()
             .statusCode(201)
@@ -119,7 +119,7 @@ public class TodosResourceTest extends TestBase {
                             .build()
             )
             .when()
-            .post("/todos")
+            .post("/todo")
             .then()
             .assertThat()
             .statusCode(201)
@@ -203,7 +203,7 @@ public class TodosResourceTest extends TestBase {
                             .build()
             )
         .when()
-            .post("/todos")
+            .post("/todo")
         .then()
             .assertThat()
             .statusCode(201)

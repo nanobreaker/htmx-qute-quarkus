@@ -42,25 +42,23 @@ import static space.nanobreaker.library.option.Option.some;
 @ApplicationScoped
 public class Parser {
 
-    private static final String datePattern = new StringBuilder()
-            .append("[[dd[/][.][-]MM[/][.][-]yyyy] [HH:mm]]")
-            .append("[dd[/][.][-]MM[/][.][-]yyyy]")
-            .append("[[dd[/][.][-]MM[/][.][-]yy] [HH:mm]]")
-            .append("[dd[/][.][-]MM[/][.][-]yy]")
-            .append("[[dd[/][.][-]MM] [HH:mm]]")
-            .append("[dd[/][.][-]MM]")
-            .append("[[dd] [HH:mm]]")
-            .append("[HH:mm]")
-            .append("[dd]")
-            .toString();
+    private static final String datePattern = """
+            [[dd[/][.][-]MM[/][.][-]yyyy] [HH:mm]]
+            [[dd[/][.][-]MM[/][.][-]yy] [HH:mm]]
+            [[dd[/][.][-]MM] [HH:mm]]
+            [dd[/][.][-]MM[/][.][-]yyyy]
+            [dd[/][.][-]MM[/][.][-]yy]
+            [dd[/][.][-]MM]
+            [[dd] [HH:mm]]
+            [HH:mm]
+            [dd]
+            """;
+
     private final Clock clock;
     private final Tokenizer tokenizer;
 
     @Inject
-    public Parser(
-            final Clock clock,
-            final Tokenizer tokenizer
-    ) {
+    public Parser(final Clock clock, final Tokenizer tokenizer) {
         this.tokenizer = tokenizer;
         this.clock = clock;
     }
@@ -206,29 +204,29 @@ public class Parser {
                 var descriptionOpt = some(findOption(tokens, OPTION.DESCRIPTION));
                 var startOptResult = some(findOption(tokens, OPTION.START).map(this::parseDateTime));
                 var endOptResult = some(findOption(tokens, OPTION.END).map(this::parseDateTime));
-                var paylodBuilder = new TodoUpdateCommandPaylodBuilder();
+                var payloadBuilder = new TodoUpdateCommandPaylodBuilder();
 
-                paylodBuilder.withTitle(titleOpt);
-                paylodBuilder.withDescription(descriptionOpt);
+                payloadBuilder.withTitle(titleOpt);
+                payloadBuilder.withDescription(descriptionOpt);
 
                 if (startOptResult instanceof Some(Ok(LocalDateTime start))) {
-                    paylodBuilder.withStart(some(start));
+                    payloadBuilder.withStart(some(start));
                 } else if (startOptResult instanceof Some(Err(var parseError))) {
                     yield err(parseError);
                 }
                 if (endOptResult instanceof Some(Ok(LocalDateTime end))) {
-                    paylodBuilder.withEnd(some(end));
+                    payloadBuilder.withEnd(some(end));
                 } else if (endOptResult instanceof Some(Err(var parseError))) {
                     yield err(parseError);
                 }
                 yield switch (filterOpt) {
                     case Some(var filter) when args.isEmpty() -> {
-                        var command = new Update.ByFilters(Set.of(filter), paylodBuilder.build());
+                        var command = new Update.ByFilters(Set.of(filter), payloadBuilder.build());
                         yield ok(command);
                     }
                     case Some(var filter) -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                        var command = new Update.ByIdsAndFilters(ids, Set.of(filter), paylodBuilder.build());
+                        var command = new Update.ByIdsAndFilters(ids, Set.of(filter), payloadBuilder.build());
                         yield ok(command);
                     }
                     case None() when args.isEmpty() -> {
@@ -236,7 +234,7 @@ public class Parser {
                     }
                     case None() -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                        var command = new Update.ByIds(ids, paylodBuilder.build());
+                        var command = new Update.ByIds(ids, payloadBuilder.build());
                         yield ok(command);
                     }
                 };
@@ -247,12 +245,8 @@ public class Parser {
     private Result<Command, Error> parseTodoDeleteCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
         return switch (subcommand) {
-            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
-                yield ok(new Delete.Help());
-            }
-            case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> {
-                yield ok(new Delete.All());
-            }
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Delete.Help());
+            case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> ok(new Delete.All());
             default -> {
                 var args = findArgs(tokens);
                 if (args.isEmpty()) {

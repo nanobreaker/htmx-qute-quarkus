@@ -71,20 +71,4 @@ public sealed interface Command
         record Show() implements User { }
     }
     // @formatter:on
-
-    static String help() {
-        return """
-                  \s
-                  usage
-                  \s
-                    <program> <command> "<args>" [options]
-                  \s
-                  programs
-                  \s
-                    todo          manage todos
-                    calendar      manage calendar
-                    user          manage user
-                  \s
-                """;
-    }
 }

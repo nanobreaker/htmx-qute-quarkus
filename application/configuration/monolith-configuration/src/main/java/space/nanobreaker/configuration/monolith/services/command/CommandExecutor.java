@@ -1,21 +1,21 @@
 package space.nanobreaker.configuration.monolith.services.command;
 
+import java.net.URI;
+import java.time.ZoneId;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
-import io.quarkus.qute.Location;
-import io.quarkus.qute.Template;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.jwt.JsonWebToken;
-import space.nanobreaker.configuration.monolith.templates.ErrorTemplates;
-import space.nanobreaker.configuration.monolith.templates.HelpTemplates;
-import space.nanobreaker.configuration.monolith.templates.TodoTemplates;
+import space.nanobreaker.configuration.monolith.resources.TodoResource;
+import space.nanobreaker.configuration.monolith.templates.GlobalTemplates;
 import space.nanobreaker.core.domain.v1.Command.Todo.Create;
 import space.nanobreaker.core.domain.v1.Command.Todo.Delete;
 import space.nanobreaker.core.domain.v1.Command.Todo.Update;
@@ -24,32 +24,27 @@ import space.nanobreaker.core.domain.v1.todo.Todo;
 import space.nanobreaker.core.domain.v1.todo.TodoId;
 import space.nanobreaker.library.error.Error;
 
-import java.net.URI;
-import java.time.ZoneId;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @ApplicationScoped
 public class CommandExecutor {
 
-    @Inject
-    EventBus eventBus;
+    private final EventBus eventBus;
+    private final CommandDescriber describer;
+    private final SecurityIdentity securityIdentity;
 
-    @Inject
-    CommandDescriber describer;
-
-    @Inject
-    SecurityIdentity securityIdentity;
-
-    @Location("todos/todos.qute.html")
-    Template todosTemplate;
-
-    @Inject
-    JsonWebToken jwt;
+    public CommandExecutor(
+            EventBus eventBus,
+            CommandDescriber describer,
+            SecurityIdentity securityIdentity
+    ) {
+        this.eventBus = eventBus;
+        this.describer = describer;
+        this.securityIdentity = securityIdentity;
+    }
 
     public Uni<Response> help(final Command cmd) {
         var text = describer.describe(cmd);
-        var html = HelpTemplates.help(text);
+        var template = new GlobalTemplates.help(text);
+        var html = template.render();
         var response = Response.ok()
                 .header("HX-Retarget", "#feedback")
                 .entity(html)
@@ -73,19 +68,15 @@ public class CommandExecutor {
                 var startZoned = start.map(s -> s.atZone(zoneId));
                 var endZoned = end.map(e -> e.atZone(zoneId));
                 var command = new Create(username, title, description, startZoned, endZoned);
-                var responseUni = eventBus
+                var reply = eventBus
                         .<Result<Todo, Error>>request("command.todo.create", command)
                         .map(Message::body);
 
-                yield responseUni.map(result -> switch (result) {
+                yield reply.map(result -> switch (result) {
                     case Ok(Todo todo) -> {
                         var location = "/todos/%d".formatted(todo.getId().getId());
                         var uri = URI.create(location);
-                        var html = this.todosTemplate
-                                .getFragment("item")
-                                .data("todo", todo)
-                                .data("zoneId", zoneId)
-                                .render();
+                        var html = new TodoResource.viewTodos$item(todo).render();
 
                         yield Response.created(uri)
                                 .header("HX-Reswap", "beforeend")
@@ -95,7 +86,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -105,7 +96,7 @@ public class CommandExecutor {
             }
             case Command.Todo.Create.Help help -> {
                 var text = describer.describe(help);
-                var html = HelpTemplates.help(text);
+                var html = new GlobalTemplates.help(text).render();
                 var response = Response.ok()
                         .header("HX-Retarget", "#feedback")
                         .entity(html)
@@ -130,12 +121,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos(todos, zoneId)
-                                .getFragment("items")
-                                .instance()
-                                .data("todos", todos)
-                                .data("zoneId", zoneId)
-                                .render();
+                        var html = new TodoResource.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -144,7 +130,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -163,12 +149,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos(todos, zoneId)
-                                .getFragment("items")
-                                .instance()
-                                .data("todos", todos)
-                                .data("zoneId", zoneId)
-                                .render();
+                        var html = new TodoResource.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -177,7 +158,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -195,12 +176,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos(todos, zoneId)
-                                .getFragment("items")
-                                .instance()
-                                .data("todos", todos)
-                                .data("zoneId", zoneId)
-                                .render();
+                        var html = new TodoResource.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -209,7 +185,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -228,12 +204,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos(todos, zoneId)
-                                .getFragment("items")
-                                .instance()
-                                .data("todos", todos)
-                                .data("zoneId", zoneId)
-                                .render();
+                        var html = new TodoResource.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -242,7 +213,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -252,7 +223,7 @@ public class CommandExecutor {
             }
             case Command.Todo.List.Help help -> {
                 var text = describer.describe(help);
-                var html = HelpTemplates.help(text);
+                var html = new GlobalTemplates.help(text).render();
                 var response = Response.ok()
                         .header("HX-Retarget", "#feedback")
                         .entity(html)
@@ -292,7 +263,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -324,7 +295,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -358,7 +329,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -368,7 +339,7 @@ public class CommandExecutor {
             }
             case Command.Todo.Update.Help help -> {
                 var text = describer.describe(help);
-                var html = HelpTemplates.help(text);
+                var html = new GlobalTemplates.help(text).render();
                 var response = Response.ok()
                         .header("HX-Retarget", "#feedback")
                         .entity(html)
@@ -390,16 +361,16 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        var htmx = TodoTemplates.todosDeleteAll().render();
+                        var html = new TodoResource.deleteAllTodos().render();
 
-                        yield Response.ok(htmx)
+                        yield Response.ok(html)
                                 .header("HX-Reswap", "none")
                                 .header("HX-Trigger", "command.empty")
                                 .build();
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -417,8 +388,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        var html = TodoTemplates.todosDelete(ids)
-                                .render();
+                        var html = new TodoResource.deleteTodos(ids).render();
 
                         yield Response.ok(html)
                                 .header("HX-Reswap", "none")
@@ -427,7 +397,7 @@ public class CommandExecutor {
                     }
                     case Err(Error err) -> {
                         var text = err.describe();
-                        var html = ErrorTemplates.error(text);
+                        var html = new GlobalTemplates.error(text).render();
 
                         yield Response.serverError()
                                 .entity(html)
@@ -437,7 +407,7 @@ public class CommandExecutor {
             }
             case Command.Todo.Delete.Help help -> {
                 var text = describer.describe(help);
-                var html = HelpTemplates.help(text);
+                var html = new GlobalTemplates.help(text).render();
                 var response = Response.ok()
                         .header("HX-Retarget", "#feedback")
                         .entity(html)

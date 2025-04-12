@@ -1,10 +1,10 @@
 package space.nanobreaker.core.domain.v1.todo;
 
-import space.nanobreaker.ddd.AggregateRoot;
-import space.nanobreaker.library.option.Option;
-
 import java.time.ZonedDateTime;
 import java.util.Objects;
+
+import space.nanobreaker.ddd.AggregateRoot;
+import space.nanobreaker.library.option.Option;
 
 public class Todo extends AggregateRoot<TodoId> {
 

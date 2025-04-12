@@ -21,7 +21,7 @@ public class CommandResourceTest extends TestBase {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    @Location("todos/todos.qute.html") Template todosTemplate;
+    @Location("todos/view-todos.html") Template todosTemplate;
 
     @Test
     public void post() {

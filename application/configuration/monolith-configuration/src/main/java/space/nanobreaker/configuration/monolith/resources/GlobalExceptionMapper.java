@@ -1,18 +1,14 @@
 package space.nanobreaker.configuration.monolith.resources;
 
-import io.quarkus.qute.Location;
-import io.quarkus.qute.Template;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import space.nanobreaker.configuration.monolith.templates.GlobalTemplates;
 
 import java.util.Objects;
 
 @Provider
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
-
-    @Location("error/error.qute.html")
-    Template error;
 
     @Override
     public Response toResponse(final Throwable exception) {
@@ -20,9 +16,11 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         var message = Objects.isNull(exceptionMessage)
                 ? exception.toString()
                 : exceptionMessage;
+        var template = new GlobalTemplates.error(message);
+        var html = template.render();
 
         return Response.serverError()
-                .entity(error.data("message", message))
+                .entity(html)
                 .build();
     }
 }

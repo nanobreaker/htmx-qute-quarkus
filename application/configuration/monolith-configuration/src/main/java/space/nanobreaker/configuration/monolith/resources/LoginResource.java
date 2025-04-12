@@ -1,8 +1,8 @@
 package space.nanobreaker.configuration.monolith.resources;
 
 import io.opentelemetry.instrumentation.annotations.WithSpan;
-import io.quarkus.qute.Location;
-import io.quarkus.qute.Template;
+import io.quarkus.qute.CheckedTemplate;
+import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -14,15 +14,16 @@ import org.jboss.resteasy.reactive.Cache;
 @Produces(MediaType.TEXT_HTML)
 public class LoginResource {
 
-    @Location("login/login.qute.html")
-    Template template;
+    @CheckedTemplate(basePath = "login", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
+    record login() implements TemplateInstance {}
 
     @GET
     @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> login() {
-        return template.instance()
-                .createUni();
+        var template = new login();
+
+        return template.createUni();
     }
 }
