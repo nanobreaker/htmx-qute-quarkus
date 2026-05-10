@@ -1,0 +1,81 @@
+package dev.thatwhichis.core.domain.todo;
+
+import dev.thatwhichis.framework.ddd.Entity;
+import dev.thatwhichis.library.option.Option;
+
+import java.time.ZonedDateTime;
+import java.util.Objects;
+
+public class Todo extends Entity<TodoId> {
+
+    private final String title;
+    private final String description;
+    private final ZonedDateTime start;
+    private final ZonedDateTime end;
+
+    public Todo(
+            final TodoId todoId,
+            final String title,
+            final String description,
+            final ZonedDateTime start,
+            final ZonedDateTime end
+    ) {
+        super(todoId);
+        this.title = Objects.requireNonNull(title);
+        this.description = description;
+        this.start = start;
+        this.end = end;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public Option<String> getDescription() {
+        return Option.some(this.description);
+    }
+
+    public Option<ZonedDateTime> getStart() {
+        return Option.some(this.start);
+    }
+
+    public Option<ZonedDateTime> getEnd() {
+        return Option.some(this.end);
+    }
+
+    public static final class Builder {
+
+        private final TodoId id;
+        private final String title;
+        private ZonedDateTime start;
+        private ZonedDateTime end;
+        private String description;
+
+        public Builder(
+                TodoId id,
+                String title
+        ) {
+            this.id = id;
+            this.title = title;
+        }
+
+        public Builder withEnd(ZonedDateTime end) {
+            this.end = end;
+            return this;
+        }
+
+        public Builder withStart(ZonedDateTime start) {
+            this.start = start;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Todo build() {
+            return new Todo(id, title, description, start, end);
+        }
+    }
+}

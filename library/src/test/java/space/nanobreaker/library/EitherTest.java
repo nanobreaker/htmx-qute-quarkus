@@ -1,10 +1,10 @@
 package space.nanobreaker.library;
 
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.library.either.Either;
-import space.nanobreaker.library.either.Left;
-import space.nanobreaker.library.either.Right;
-import space.nanobreaker.library.option.Option;
+import dev.thatwhichis.library.either.Either;
+import dev.thatwhichis.library.either.Left;
+import dev.thatwhichis.library.either.Right;
+import dev.thatwhichis.library.option.Option;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,11 +76,9 @@ public class EitherTest {
     @Test
     void shouldApplyFunctionsToBothSidesIfPresent() {
         final Either<String, String> left = new Left<>("TeSt");
-        assertThat(left.mapEither(String::toLowerCase, String::length))
-                .isEqualTo(new Left<>("test"));
+        assertThat(left.mapEither(String::toLowerCase, String::length)).isEqualTo(new Left<>("test"));
 
         final Either<String, String> right = new Right<>("TeSt");
-        assertThat(right.mapEither(String::toLowerCase, String::length))
-                .isEqualTo(new Right<>(4));
+        assertThat(right.mapEither(String::toLowerCase, String::length)).isEqualTo(new Right<>(4));
     }
 }
