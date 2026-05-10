@@ -1,4 +1,4 @@
-package java.dev.thatwhichis.rest.adapter.services.sse;
+package dev.thatwhichis.rest.adapter.services.sse;
 
 // @formatter:off
 public sealed interface SseEvent

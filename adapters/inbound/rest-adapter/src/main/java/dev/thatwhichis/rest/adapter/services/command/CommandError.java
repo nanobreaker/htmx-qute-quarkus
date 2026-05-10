@@ -1,6 +1,6 @@
-package java.dev.thatwhichis.rest.adapter.services.command;
+package dev.thatwhichis.rest.adapter.services.command;
 
-import space.nanobreaker.library.error.Error;
+import dev.thatwhichis.library.error.Error;
 
 public sealed interface CommandError extends Error {
 

@@ -1,7 +1,7 @@
-package java.dev.thatwhichis.rest.adapter.services.parser;
+package dev.thatwhichis.rest.adapter.services.parser;
 
+import dev.thatwhichis.rest.adapter.services.tokenizer.Tokenizer;
 import org.junit.jupiter.api.BeforeEach;
-import java.dev.thatwhichis.rest.adapter.services.tokenizer.Tokenizer;
 
 import java.time.Clock;
 import java.time.ZoneId;

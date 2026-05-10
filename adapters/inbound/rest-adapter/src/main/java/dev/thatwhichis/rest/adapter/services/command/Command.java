@@ -1,6 +1,6 @@
-package java.dev.thatwhichis.rest.adapter.services.command;
+package dev.thatwhichis.rest.adapter.services.command;
 
-import space.nanobreaker.library.option.Option;
+import dev.thatwhichis.library.option.Option;
 
 import java.time.LocalDateTime;
 import java.util.Set;

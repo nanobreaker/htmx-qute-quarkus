@@ -1,4 +1,4 @@
-package java.dev.thatwhichis.rest.adapter.extensions;
+package dev.thatwhichis.rest.adapter.extensions;
 
 import io.quarkus.qute.TemplateExtension;
 

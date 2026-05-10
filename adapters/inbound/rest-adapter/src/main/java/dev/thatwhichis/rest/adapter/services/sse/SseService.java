@@ -1,8 +1,8 @@
-package java.dev.thatwhichis.rest.adapter.services.sse;
+package dev.thatwhichis.rest.adapter.services.sse;
 
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.vertx.ConsumeEvent;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.sse.OutboundSseEvent;
 import jakarta.ws.rs.sse.Sse;
@@ -22,12 +22,12 @@ public class SseService {
     @Context
     private final Sse sse;
 
+    @Inject
     public SseService(Sse sse) {
         this.sse = sse;
         this.connections = new ConcurrentMultivaluedHashMap<>();
     }
 
-    @WithSpan
     public void register(
             final String upn,
             final String sid,
@@ -36,7 +36,6 @@ public class SseService {
         connections.add(upn, new SidSinkPair(sid, sink));
     }
 
-    @WithSpan
     public void publish(
             final String upn,
             final String sid,
@@ -50,7 +49,6 @@ public class SseService {
     }
 
     @ConsumeEvent(value = "sse.todo.created")
-    @WithSpan
     public void consumeTodoCreated(SseEvent.TodoCreated event) {
         final var upn = event.upn();
         final var sid = event.sid();
@@ -61,7 +59,6 @@ public class SseService {
     }
 
     @ConsumeEvent(value = "sse.todo.updated")
-    @WithSpan
     public void consumeTodoUpdated(final SseEvent.TodoUpdated event) {
         final var upn = event.upn();
         final var sid = event.sid();
@@ -73,7 +70,6 @@ public class SseService {
     }
 
     @ConsumeEvent(value = "sse.todo.deleted")
-    @WithSpan
     public void consumeTodoDeleted(final SseEvent.TodoDeleted event) {
         final var upn = event.upn();
         final var sid = event.sid();

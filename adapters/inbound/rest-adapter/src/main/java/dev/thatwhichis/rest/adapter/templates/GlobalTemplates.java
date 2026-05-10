@@ -1,4 +1,4 @@
-package java.dev.thatwhichis.rest.adapter.templates;
+package dev.thatwhichis.rest.adapter.templates;
 
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;

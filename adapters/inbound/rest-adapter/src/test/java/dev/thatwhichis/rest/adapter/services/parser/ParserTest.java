@@ -1,10 +1,10 @@
-package java.dev.thatwhichis.rest.adapter.services.parser;
+package dev.thatwhichis.rest.adapter.services.parser;
 
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ParserTest extends ParserTestBase {
+class ParserTest extends dev.thatwhichis.rest.adapter.services.parser.ParserTestBase {
 
     @Test
     void return_error_when_input_is_empty() {

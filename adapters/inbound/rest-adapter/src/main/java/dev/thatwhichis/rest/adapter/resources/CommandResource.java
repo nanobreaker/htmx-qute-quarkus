@@ -1,18 +1,14 @@
-package java.dev.thatwhichis.rest.adapter.resources;
+package dev.thatwhichis.rest.adapter.resources;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.time.ZoneId;
-
-import static java.dev.thatwhichis.rest.adapter.services.command.Command.Calendar;
-import static java.dev.thatwhichis.rest.adapter.services.command.Command.Help;
-import static java.dev.thatwhichis.rest.adapter.services.command.Command.Todo;
-import static java.dev.thatwhichis.rest.adapter.services.command.Command.User;
-
+import dev.thatwhichis.library.error.Error;
+import dev.thatwhichis.rest.adapter.services.command.Command;
+import dev.thatwhichis.rest.adapter.services.command.CommandExecutor;
+import dev.thatwhichis.rest.adapter.services.parser.Parser;
+import dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.FormParam;
@@ -22,11 +18,15 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.Claim;
-import java.dev.thatwhichis.rest.adapter.services.command.Command;
-import java.dev.thatwhichis.rest.adapter.services.command.CommandExecutor;
-import java.dev.thatwhichis.rest.adapter.services.parser.Parser;
-import java.dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
-import space.nanobreaker.library.error.Error;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
+
+import static dev.thatwhichis.rest.adapter.services.command.Command.Calendar;
+import static dev.thatwhichis.rest.adapter.services.command.Command.Help;
+import static dev.thatwhichis.rest.adapter.services.command.Command.Todo;
+import static dev.thatwhichis.rest.adapter.services.command.Command.User;
 
 @Path("commands")
 public class CommandResource {
@@ -34,6 +34,7 @@ public class CommandResource {
     private final Parser parser;
     private final CommandExecutor executor;
 
+    @Inject
     public CommandResource(
             final Parser parser,
             final CommandExecutor executor
@@ -44,7 +45,6 @@ public class CommandResource {
 
     @POST
     @Path("submit")
-    @WithSpan
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> execute(

@@ -1,6 +1,6 @@
-package java.dev.thatwhichis.rest.adapter.services.parser;
+package dev.thatwhichis.rest.adapter.services.parser;
 
-import space.nanobreaker.library.error.Error;
+import dev.thatwhichis.library.error.Error;
 
 public sealed interface ParserError extends Error {
 

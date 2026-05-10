@@ -1,7 +1,5 @@
+package dev.thatwhichis.rest.adapter.resources;
 
-package java.dev.thatwhichis.rest.adapter.resources;
-
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
@@ -15,10 +13,11 @@ import org.jboss.resteasy.reactive.Cache;
 public class BottombarResource {
 
     @CheckedTemplate(basePath = "bottombar")
-    record bottombar() implements TemplateInstance {}
+    record bottombar() implements TemplateInstance {
+
+    }
 
     @GET
-    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> get() {

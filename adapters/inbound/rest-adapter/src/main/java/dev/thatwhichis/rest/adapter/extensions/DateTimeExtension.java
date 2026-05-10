@@ -1,7 +1,7 @@
-package java.dev.thatwhichis.rest.adapter.extensions;
+package dev.thatwhichis.rest.adapter.extensions;
 
+import dev.thatwhichis.library.option.Option;
 import io.quarkus.qute.TemplateExtension;
-import space.nanobreaker.library.option.Option;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

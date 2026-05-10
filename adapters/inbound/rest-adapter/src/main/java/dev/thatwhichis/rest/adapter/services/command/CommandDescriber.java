@@ -1,4 +1,4 @@
-package java.dev.thatwhichis.rest.adapter.services.command;
+package dev.thatwhichis.rest.adapter.services.command;
 
 import jakarta.enterprise.context.ApplicationScoped;
 

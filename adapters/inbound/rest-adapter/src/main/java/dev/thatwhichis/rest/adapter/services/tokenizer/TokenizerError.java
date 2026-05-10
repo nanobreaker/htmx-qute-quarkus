@@ -1,6 +1,6 @@
-package java.dev.thatwhichis.rest.adapter.services.tokenizer;
+package dev.thatwhichis.rest.adapter.services.tokenizer;
 
-import space.nanobreaker.library.error.Error;
+import dev.thatwhichis.library.error.Error;
 
 public sealed interface TokenizerError extends Error {
 

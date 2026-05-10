@@ -1,10 +1,12 @@
-package java.dev.thatwhichis.rest.adapter.services.command;
+package dev.thatwhichis.rest.adapter.services.command;
 
-import java.net.URI;
-import java.time.ZoneId;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import dev.thatwhichis.core.domain.todo.Todo;
+import dev.thatwhichis.core.domain.todo.TodoId;
+import dev.thatwhichis.core.ports.inbound.TodoCommand;
+import dev.thatwhichis.core.ports.inbound.TodoQuery;
+import dev.thatwhichis.library.error.Error;
+import dev.thatwhichis.rest.adapter.resources.TodoResource;
+import dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
@@ -13,16 +15,13 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-import java.dev.thatwhichis.rest.adapter.resources.TodoResource;
-import java.dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
-import space.nanobreaker.core.domain.v1.Command.Todo.Create;
-import space.nanobreaker.core.domain.v1.Command.Todo.Delete;
-import space.nanobreaker.core.domain.v1.Command.Todo.Update;
-import space.nanobreaker.core.domain.v1.Query;
-import space.nanobreaker.core.domain.v1.todo.Todo;
-import space.nanobreaker.core.domain.v1.todo.TodoId;
-import space.nanobreaker.library.error.Error;
+
+import java.net.URI;
+import java.time.ZoneId;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CommandExecutor {
@@ -31,6 +30,7 @@ public class CommandExecutor {
     private final CommandDescriber describer;
     private final SecurityIdentity securityIdentity;
 
+    @Inject
     public CommandExecutor(
             EventBus eventBus,
             CommandDescriber describer,
@@ -67,7 +67,7 @@ public class CommandExecutor {
                 var username = securityIdentity.getPrincipal().getName();
                 var startZoned = start.map(s -> s.atZone(zoneId));
                 var endZoned = end.map(e -> e.atZone(zoneId));
-                var command = new Create(username, title, description, startZoned, endZoned);
+                var command = new TodoCommand.Create(username, title, description, startZoned, endZoned);
                 var reply = eventBus
                         .<Result<Todo, Error>>request("command.todo.create", command)
                         .map(Message::body);
@@ -114,7 +114,7 @@ public class CommandExecutor {
         return switch (cmd) {
             case Command.Todo.List.All _ -> {
                 var username = securityIdentity.getPrincipal().getName();
-                var query = new Query.Todo.List.All(username);
+                var query = new TodoQuery.List.All(username);
                 var responseUni = eventBus
                         .<Result<Set<Todo>, Error>>request("query.todo.list", query)
                         .map(Message::body);
@@ -141,7 +141,7 @@ public class CommandExecutor {
             case Command.Todo.List.ByIds(var ids) -> {
                 var username = securityIdentity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
-                var query = new Query.Todo.List.ByIds(idz);
+                var query = new TodoQuery.List.ByIds(idz);
 
                 var responseUni = eventBus
                         .<Result<Set<Todo>, Error>>request("query.todo.list", query)
@@ -168,7 +168,7 @@ public class CommandExecutor {
             }
             case Command.Todo.List.ByFilters(var filters) -> {
                 var username = securityIdentity.getPrincipal().getName();
-                var query = new Query.Todo.List.ByFilters(username, filters);
+                var query = new TodoQuery.List.ByFilters(username, filters);
 
                 var responseUni = eventBus
                         .<Result<Set<Todo>, Error>>request("query.todo.list", query)
@@ -196,7 +196,7 @@ public class CommandExecutor {
             case Command.Todo.List.ByIdsAndFilters(var ids, var filters) -> {
                 var username = securityIdentity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
-                var query = new Query.Todo.List.ByIdsAndFilters(idz, filters);
+                var query = new TodoQuery.List.ByIdsAndFilters(idz, filters);
 
                 var responseUni = eventBus
                         .<Result<Set<Todo>, Error>>request("query.todo.list", query)
@@ -242,13 +242,13 @@ public class CommandExecutor {
             case Command.Todo.Update.ByIds(var ids, var payload) -> {
                 var username = securityIdentity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
-                var payloadz = new Update.Payload(
+                var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
                         payload.description(),
                         payload.start().map(d -> d.atZone(zoneId)),
                         payload.end().map(d -> d.atZone(zoneId))
                 );
-                var command = new Update.ByIds(idz, payloadz);
+                var command = new TodoCommand.Update.ByIds(idz, payloadz);
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.update", command)
                         .map(Message::body);
@@ -273,13 +273,13 @@ public class CommandExecutor {
             }
             case Command.Todo.Update.ByFilters(var filters, var payload) -> {
                 var username = securityIdentity.getPrincipal().getName();
-                var payloadz = new Update.Payload(
+                var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
                         payload.description(),
                         payload.start().map(d -> d.atZone(zoneId)),
                         payload.end().map(d -> d.atZone(zoneId))
                 );
-                var command = new Update.ByFilters(username, filters, payloadz);
+                var command = new TodoCommand.Update.ByFilters(username, filters, payloadz);
 
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.update", command)
@@ -306,13 +306,13 @@ public class CommandExecutor {
             case Command.Todo.Update.ByIdsAndFilters(var ids, var filters, var payload) -> {
                 var username = securityIdentity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
-                var payloadz = new Update.Payload(
+                var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
                         payload.description(),
                         payload.start().map(d -> d.atZone(zoneId)),
                         payload.end().map(d -> d.atZone(zoneId))
                 );
-                var command = new Update.ByIdsAndFilters(idz, filters, payloadz);
+                var command = new TodoCommand.Update.ByIdsAndFilters(idz, filters, payloadz);
 
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.update", command)
@@ -354,7 +354,7 @@ public class CommandExecutor {
         return switch (cmd) {
             case Command.Todo.Delete.All _ -> {
                 var username = securityIdentity.getPrincipal().getName();
-                var command = new Delete.All(username);
+                var command = new TodoCommand.Delete.All(username);
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.delete", command)
                         .map(Message::body);
@@ -381,7 +381,7 @@ public class CommandExecutor {
             case Command.Todo.Delete.ByIds(var ids) -> {
                 var username = securityIdentity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
-                var command = new Delete.ByIds(idz);
+                var command = new TodoCommand.Delete.ByIds(idz);
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.delete", command)
                         .map(Message::body);

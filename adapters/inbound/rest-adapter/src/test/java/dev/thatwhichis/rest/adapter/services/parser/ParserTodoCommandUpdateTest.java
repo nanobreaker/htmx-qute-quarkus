@@ -1,13 +1,14 @@
-package java.dev.thatwhichis.rest.adapter.services.parser;
+package dev.thatwhichis.rest.adapter.services.parser;
 
+import dev.thatwhichis.rest.adapter.services.command.Command;
 import org.junit.jupiter.api.Test;
 
-import java.dev.thatwhichis.rest.adapter.services.command.Command;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static space.nanobreaker.library.option.Option.none;
-import static space.nanobreaker.library.option.Option.some;
+import static dev.thatwhichis.library.option.Option.none;
+import static dev.thatwhichis.library.option.Option.some;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ParserTodoCommandUpdateTest extends ParserTestBase {
 

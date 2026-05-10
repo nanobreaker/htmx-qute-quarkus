@@ -1,22 +1,23 @@
-package java.dev.thatwhichis.rest.adapter.resources;
+package dev.thatwhichis.rest.adapter.resources;
 
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import dev.thatwhichis.core.domain.todo.Todo;
+import dev.thatwhichis.core.domain.todo.TodoError;
+import dev.thatwhichis.core.domain.todo.TodoId;
+import dev.thatwhichis.core.ports.inbound.TodoCommand;
+import dev.thatwhichis.core.ports.inbound.TodoQuery;
+import dev.thatwhichis.library.error.Error;
+import dev.thatwhichis.library.option.Option;
+import dev.thatwhichis.library.tuple.Pair;
+import dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.BeanParam;
@@ -35,15 +36,14 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.Claim;
 import org.jboss.resteasy.reactive.Cache;
-import java.dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
-import space.nanobreaker.core.domain.v1.Command;
-import space.nanobreaker.core.domain.v1.Query;
-import space.nanobreaker.core.domain.v1.todo.Todo;
-import space.nanobreaker.core.domain.v1.todo.TodoError;
-import space.nanobreaker.core.domain.v1.todo.TodoId;
-import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.option.Option;
-import space.nanobreaker.library.tuple.Pair;
+
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("todo")
 public class TodoResource {
@@ -88,15 +88,15 @@ public class TodoResource {
     }
     //@formatter:on
 
+    @Inject
     public TodoResource(final EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
     @GET
-    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> todos(@Claim("upn") String username) {
-        var query = new Query.Todo.List.All(username);
+        var query = new TodoQuery.List.All(username);
 
         var reply = eventBus
                 .<Result<Set<Todo>, Error>>request("query.todo.list", query)
@@ -113,7 +113,6 @@ public class TodoResource {
     }
 
     @GET
-    @WithSpan
     @Path("search")
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> search(
@@ -123,10 +122,10 @@ public class TodoResource {
     ) {
         var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
         var query = switch (Pair.of(idz, filters)) {
-            case Pair(var i, var f) when i.isEmpty() && f.isEmpty() -> new Query.Todo.List.All(username);
-            case Pair(var i, var f) when f.isEmpty() -> new Query.Todo.List.ByIds(i);
-            case Pair(var i, var f) when i.isEmpty() -> new Query.Todo.List.ByFilters(username, f);
-            case Pair(var _, var _) -> new Query.Todo.List.ByIdsAndFilters(idz, filters);
+            case Pair(var i, var f) when i.isEmpty() && f.isEmpty() -> new TodoQuery.List.All(username);
+            case Pair(var i, var f) when f.isEmpty() -> new TodoQuery.List.ByIds(i);
+            case Pair(var i, var f) when i.isEmpty() -> new TodoQuery.List.ByFilters(username, f);
+            case Pair(var _, var _) -> new TodoQuery.List.ByIdsAndFilters(idz, filters);
         };
 
         var reply = eventBus
@@ -144,7 +143,6 @@ public class TodoResource {
     }
 
     @GET
-    @WithSpan
     @Path("{id}")
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> get(
@@ -152,7 +150,7 @@ public class TodoResource {
             @PathParam("id") Integer id
     ) {
         var todoId = new TodoId(id, username);
-        var query = new Query.Todo.Get.ById(todoId);
+        var query = new TodoQuery.Get.ById(todoId);
 
         var reply = eventBus
                 .<Result<Todo, Error>>request("query.todo.get", query)
@@ -172,7 +170,6 @@ public class TodoResource {
     }
 
     @POST
-    @WithSpan
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> create(
@@ -185,7 +182,7 @@ public class TodoResource {
         var description = request.getDescription();
         var start = request.getStart().map(s -> s.atZone(zoneId));
         var end = request.getEnd().map(e -> e.atZone(zoneId));
-        var command = new Command.Todo.Create(
+        var command = new TodoCommand.Create(
                 username,
                 title,
                 description,
@@ -214,7 +211,6 @@ public class TodoResource {
     }
 
     @PATCH
-    @WithSpan
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
@@ -228,13 +224,13 @@ public class TodoResource {
         var start = request.getStart().map(dt -> dt.atZone(zoneId));
         var end = request.getEnd().map(dt -> dt.atZone(zoneId));
         var id = new TodoId(pathId, username);
-        var payload = new Command.Todo.Update.Payload(
+        var payload = new TodoCommand.Update.Payload(
                 request.getTitle(),
                 request.getDescription(),
                 start,
                 end
         );
-        var command = new Command.Todo.Update.ByIds(Set.of(id), payload);
+        var command = new TodoCommand.Update.ByIds(Set.of(id), payload);
 
         var reply = eventBus
                 .<Result<Void, Error>>request("command.todo.update", command)
@@ -250,14 +246,13 @@ public class TodoResource {
 
     @DELETE
     @Path("{id}")
-    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> delete(
             @Claim("upn") String username,
             @PathParam("id") Integer id
     ) {
         var todoId = new TodoId(id, username);
-        var command = new Command.Todo.Delete.ByIds(Set.of(todoId));
+        var command = new TodoCommand.Delete.ByIds(Set.of(todoId));
 
         var reply = eventBus
                 .<Result<Void, Error>>request("command.todo.delete", command)
@@ -273,7 +268,6 @@ public class TodoResource {
 
     @GET
     @Path("create")
-    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> getForm() {

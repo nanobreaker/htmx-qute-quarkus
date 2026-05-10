@@ -1,6 +1,5 @@
-package java.dev.thatwhichis.rest.adapter.services.tokenizer;
+package dev.thatwhichis.rest.adapter.services.tokenizer;
 
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.constraints.NotNull;
 
@@ -54,7 +53,6 @@ public class Tokenizer {
     }
     // @formatter:on
 
-    @WithSpan
     public SequencedCollection<Token> tokenize(@NotNull final String source) {
         SequencedCollection<Token> tokens = new LinkedList<>();
         var chat_iter = new StringCharacterIterator(source);

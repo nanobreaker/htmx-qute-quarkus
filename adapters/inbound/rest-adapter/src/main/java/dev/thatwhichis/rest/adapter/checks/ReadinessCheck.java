@@ -1,4 +1,4 @@
-package java.dev.thatwhichis.rest.adapter.checks;
+package dev.thatwhichis.rest.adapter.checks;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.health.HealthCheck;

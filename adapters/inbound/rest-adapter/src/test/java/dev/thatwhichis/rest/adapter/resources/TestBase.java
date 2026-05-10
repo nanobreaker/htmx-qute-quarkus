@@ -1,4 +1,4 @@
-package java.dev.thatwhichis.rest.adapter.resources;
+package dev.thatwhichis.rest.adapter.resources;
 
 import io.quarkus.test.keycloak.client.KeycloakTestClient;
 import io.restassured.RestAssured;

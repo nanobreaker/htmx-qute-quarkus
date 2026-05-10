@@ -1,17 +1,18 @@
-package java.dev.thatwhichis.rest.adapter.resources.todo;
+package dev.thatwhichis.rest.adapter.resources.todo;
 
+import dev.thatwhichis.core.domain.todo.Todo;
+import dev.thatwhichis.core.domain.todo.TodoId;
+import dev.thatwhichis.rest.adapter.resources.TestBase;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.core.domain.v1.todo.Todo;
-import space.nanobreaker.core.domain.v1.todo.TodoId;
 
-import java.dev.thatwhichis.rest.adapter.resources.TestBase;
 import java.time.LocalDateTime;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 
 @QuarkusTest

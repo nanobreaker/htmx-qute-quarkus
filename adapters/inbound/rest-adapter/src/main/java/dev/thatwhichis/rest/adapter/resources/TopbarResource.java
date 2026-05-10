@@ -1,10 +1,9 @@
+package dev.thatwhichis.rest.adapter.resources;
 
-package java.dev.thatwhichis.rest.adapter.resources;
-
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -24,6 +23,7 @@ public class TopbarResource {
 
     }
 
+    @Inject
     public TopbarResource(
             @ConfigProperty(name = "quarkus.application.name") String applicationName,
             @ConfigProperty(name = "quarkus.application.version") String applicationVersion
@@ -33,7 +33,6 @@ public class TopbarResource {
     }
 
     @GET
-    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> get(@Claim("upn") String upn) {

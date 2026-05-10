@@ -1,9 +1,9 @@
-package java.dev.thatwhichis.rest.adapter.resources;
+package dev.thatwhichis.rest.adapter.resources;
 
+import dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import java.dev.thatwhichis.rest.adapter.templates.GlobalTemplates;
 
 import java.util.Objects;
 

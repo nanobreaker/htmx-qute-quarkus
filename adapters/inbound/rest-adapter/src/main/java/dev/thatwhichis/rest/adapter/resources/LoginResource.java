@@ -1,6 +1,5 @@
-package java.dev.thatwhichis.rest.adapter.resources;
+package dev.thatwhichis.rest.adapter.resources;
 
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.mutiny.Uni;
@@ -15,10 +14,11 @@ import org.jboss.resteasy.reactive.Cache;
 public class LoginResource {
 
     @CheckedTemplate(basePath = "login", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
-    record login() implements TemplateInstance {}
+    record login() implements TemplateInstance {
+
+    }
 
     @GET
-    @WithSpan
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> login() {

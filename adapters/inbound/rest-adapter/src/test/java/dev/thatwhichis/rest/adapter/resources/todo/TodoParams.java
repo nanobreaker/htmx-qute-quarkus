@@ -1,4 +1,4 @@
-package java.dev.thatwhichis.rest.adapter.resources.todo;
+package dev.thatwhichis.rest.adapter.resources.todo;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

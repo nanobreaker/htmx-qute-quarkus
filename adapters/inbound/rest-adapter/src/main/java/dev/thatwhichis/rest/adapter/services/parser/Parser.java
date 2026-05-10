@@ -1,22 +1,20 @@
-package java.dev.thatwhichis.rest.adapter.services.parser;
+package dev.thatwhichis.rest.adapter.services.parser;
 
+import dev.thatwhichis.library.error.Error;
+import dev.thatwhichis.library.option.None;
+import dev.thatwhichis.library.option.Option;
+import dev.thatwhichis.library.option.Some;
+import dev.thatwhichis.library.tuple.Pair;
+import dev.thatwhichis.rest.adapter.services.command.Command;
+import dev.thatwhichis.rest.adapter.services.tokenizer.KEYWORD;
+import dev.thatwhichis.rest.adapter.services.tokenizer.OPTION;
+import dev.thatwhichis.rest.adapter.services.tokenizer.Token;
+import dev.thatwhichis.rest.adapter.services.tokenizer.Tokenizer;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.dev.thatwhichis.rest.adapter.services.command.Command;
-import java.dev.thatwhichis.rest.adapter.services.command.Command.Todo.Create;
-import java.dev.thatwhichis.rest.adapter.services.tokenizer.KEYWORD;
-import java.dev.thatwhichis.rest.adapter.services.tokenizer.OPTION;
-import java.dev.thatwhichis.rest.adapter.services.tokenizer.Token;
-import java.dev.thatwhichis.rest.adapter.services.tokenizer.Tokenizer;
-import space.nanobreaker.library.error.Error;
-import space.nanobreaker.library.option.None;
-import space.nanobreaker.library.option.Option;
-import space.nanobreaker.library.option.Some;
-import space.nanobreaker.library.tuple.Pair;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -31,13 +29,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Gatherers;
 
+import static dev.thatwhichis.library.option.Option.none;
+import static dev.thatwhichis.library.option.Option.some;
 import static io.github.dcadea.jresult.Result.err;
 import static io.github.dcadea.jresult.Result.ok;
-import static java.dev.thatwhichis.rest.adapter.services.command.Command.Todo.Delete;
-import static java.dev.thatwhichis.rest.adapter.services.command.Command.Todo.List;
-import static java.dev.thatwhichis.rest.adapter.services.command.Command.Todo.Update;
-import static space.nanobreaker.library.option.Option.none;
-import static space.nanobreaker.library.option.Option.some;
 
 @ApplicationScoped
 public class Parser {
@@ -63,7 +58,6 @@ public class Parser {
         this.clock = clock;
     }
 
-    @WithSpan
     public Result<Command, Error> parse(final String input) {
         var tokens = tokenizer.tokenize(input);
         try {
@@ -102,7 +96,7 @@ public class Parser {
         void withDescription(Option<String> description) { this.description = description; }
         void withStart(Option<LocalDateTime> start) { this.start = start; }
         void withEnd(Option<LocalDateTime> end) { this.end = end; }
-        Create.Default build() { return new Create.Default(title, description, start, end); }
+        Command.Todo.Create.Default build() { return new Command.Todo.Create.Default(title, description, start, end); }
     }
     // @formatter:on
 
@@ -110,7 +104,7 @@ public class Parser {
         var subcommand = tokens.removeFirst();
         return switch (subcommand) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
-                yield ok(new Create.Help());
+                yield ok(new Command.Todo.Create.Help());
             }
             case Token.Text(var title) -> {
                 var isSingleArg = findArgs(tokens).isEmpty();
@@ -145,28 +139,28 @@ public class Parser {
         var subcommand = tokens.getFirst();
         return switch (subcommand) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
-                yield ok(new List.Help());
+                yield ok(new Command.Todo.List.Help());
             }
             case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> {
-                yield ok(new List.All());
+                yield ok(new Command.Todo.List.All());
             }
             default -> {
                 var args = findArgs(tokens);
                 var option = some(findOption(tokens, OPTION.FILTER));
                 yield switch (option) {
                     case Some(var filter) when args.isEmpty() -> {
-                        yield ok(new List.ByFilters(Set.of(filter)));
+                        yield ok(new Command.Todo.List.ByFilters(Set.of(filter)));
                     }
                     case Some(var filter) -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                        yield ok(new List.ByIdsAndFilters(ids, Set.of(filter)));
+                        yield ok(new Command.Todo.List.ByIdsAndFilters(ids, Set.of(filter)));
                     }
                     case None() when args.isEmpty() -> {
                         yield err(new ParserError.ArgumentNotFound());
                     }
                     case None() -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                        yield ok(new List.ByIds(ids));
+                        yield ok(new Command.Todo.List.ByIds(ids));
                     }
                 };
             }
@@ -184,7 +178,7 @@ public class Parser {
         void withDescription(Option<String> description) { this.description = description; }
         void withStart(Option<LocalDateTime> start) { this.start = start; }
         void withEnd(Option<LocalDateTime> end) { this.end = end; }
-        Update.Payload build() { return new Update.Payload(title, description, start, end); }
+        Command.Todo.Update.Payload build() { return new Command.Todo.Update.Payload(title, description, start, end); }
     }
     // @formatter:on
 
@@ -192,7 +186,7 @@ public class Parser {
         var subcommand = tokens.getFirst();
         return switch (subcommand) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
-                yield ok(new Update.Help());
+                yield ok(new Command.Todo.Update.Help());
             }
             default -> {
                 var args = findArgs(tokens);
@@ -221,12 +215,12 @@ public class Parser {
                 }
                 yield switch (filterOpt) {
                     case Some(var filter) when args.isEmpty() -> {
-                        var command = new Update.ByFilters(Set.of(filter), payloadBuilder.build());
+                        var command = new Command.Todo.Update.ByFilters(Set.of(filter), payloadBuilder.build());
                         yield ok(command);
                     }
                     case Some(var filter) -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                        var command = new Update.ByIdsAndFilters(ids, Set.of(filter), payloadBuilder.build());
+                        var command = new Command.Todo.Update.ByIdsAndFilters(ids, Set.of(filter), payloadBuilder.build());
                         yield ok(command);
                     }
                     case None() when args.isEmpty() -> {
@@ -234,7 +228,7 @@ public class Parser {
                     }
                     case None() -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                        var command = new Update.ByIds(ids, payloadBuilder.build());
+                        var command = new Command.Todo.Update.ByIds(ids, payloadBuilder.build());
                         yield ok(command);
                     }
                 };
@@ -245,15 +239,15 @@ public class Parser {
     private Result<Command, Error> parseTodoDeleteCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
         return switch (subcommand) {
-            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Delete.Help());
-            case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> ok(new Delete.All());
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Todo.Delete.Help());
+            case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> ok(new Command.Todo.Delete.All());
             default -> {
                 var args = findArgs(tokens);
                 if (args.isEmpty()) {
                     yield err(new ParserError.ArgumentNotFound());
                 } else {
                     var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
-                    yield ok(new Delete.ByIds(ids));
+                    yield ok(new Command.Todo.Delete.ByIds(ids));
                 }
             }
         };
