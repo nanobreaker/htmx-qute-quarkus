@@ -1,8 +1,8 @@
 target/
+adapters/inbound/rest-adapter/node_modules
+boot/node_modules
 
 .idea
 *.ipr
 *.iml
 *.iws
-
-adapters/inbound/node_modules

@@ -27,6 +27,10 @@
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
+            <groupId>dev.thatwhichis</groupId>
+            <artifactId>jpa-adapter</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.github.dcadea</groupId>
             <artifactId>jresult</artifactId>
         </dependency>

@@ -17,7 +17,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.jwt.Claim;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -48,8 +47,6 @@ public class CommandResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> execute(
-            @Claim("upn") String upn,
-            @Claim("sid") String sid,
             @CookieParam("time-zone") String zone,
             @FormParam("command") String input
     ) {

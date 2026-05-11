@@ -24,6 +24,7 @@
         <maven.compiler.release>25</maven.compiler.release>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -40,13 +41,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>${quarkus.platform.artifact-id}</artifactId>
-                <version>${quarkus.platform.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>dev.thatwhichis</groupId>
                 <artifactId>library</artifactId>
@@ -83,6 +77,23 @@
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkiverse.web-bundler</groupId>
+                <artifactId>quarkus-web-bundler</artifactId>
+                <version>2.3.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>missing.css</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+            <dependency>
                 <groupId>io.github.dcadea</groupId>
                 <artifactId>jresult</artifactId>
                 <version>0.1.1</version>
@@ -98,74 +109,27 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler-plugin.version}</version>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
             </plugin>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-                        <maven.home>${maven.home}</maven.home>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
+                <groupId>io.smallrye</groupId>
+                <artifactId>jandex-maven-plugin</artifactId>
+                <version>3.5.3</version>
                 <executions>
                     <execution>
+                        <id>make-index</id>
                         <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
+                            <goal>jandex</goal>
                         </goals>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <native.image.path>
-                                    ${project.build.directory}/${project.build.finalName}-runner
-                                </native.image.path>
-                                <java.util.logging.manager>org.jboss.logmanager.LogManager
-                                </java.util.logging.manager>
-                                <maven.home>${maven.home}</maven.home>
-                            </systemPropertyVariables>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
         <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>${quarkus.platform.group-id}</groupId>
-                    <artifactId>quarkus-maven-plugin</artifactId>
-                    <version>${quarkus.platform.version}</version>
-                    <extensions>true</extensions>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>build</goal>
-                                <goal>generate-code</goal>
-                                <goal>generate-code-tests</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
+
         </pluginManagement>
     </build>
-    <profiles>
-        <profile>
-            <id>quarkus-native</id>
-            <activation>
-                <property>
-                    <name>native</name>
-                </property>
-            </activation>
-            <properties>
-                <skipITs>false</skipITs>
-                <quarkus.package.type>native</quarkus.package.type>
-            </properties>
-        </profile>
-    </profiles>
 </project>

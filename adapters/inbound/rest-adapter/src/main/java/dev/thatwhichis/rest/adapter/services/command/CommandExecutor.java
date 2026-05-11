@@ -76,7 +76,7 @@ public class CommandExecutor {
                     case Ok(Todo todo) -> {
                         var location = "/todos/%d".formatted(todo.getId().getId());
                         var uri = URI.create(location);
-                        var html = new TodoResource.viewTodos$item(todo).render();
+                        var html = TodoResource.Templates.viewTodos$item(todo).render();
 
                         yield Response.created(uri)
                                 .header("HX-Reswap", "beforeend")
@@ -121,7 +121,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = new TodoResource.viewTodos$items(todos).render();
+                        var html = TodoResource.Templates.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -149,7 +149,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = new TodoResource.viewTodos$items(todos).render();
+                        var html = TodoResource.Templates.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -176,7 +176,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = new TodoResource.viewTodos$items(todos).render();
+                        var html = TodoResource.Templates.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -204,7 +204,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = new TodoResource.viewTodos$items(todos).render();
+                        var html = TodoResource.Templates.viewTodos$items(todos).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -361,7 +361,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        var html = new TodoResource.deleteAllTodos().render();
+                        var html = TodoResource.Templates.deleteAllTodos().render();
 
                         yield Response.ok(html)
                                 .header("HX-Reswap", "none")
@@ -388,7 +388,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        var html = new TodoResource.deleteTodos(ids).render();
+                        var html = TodoResource.Templates.deleteTodos(ids).render();
 
                         yield Response.ok(html)
                                 .header("HX-Reswap", "none")

@@ -49,13 +49,11 @@ public class Parser {
             [dd]
             """;
 
-    private final Clock clock;
     private final Tokenizer tokenizer;
 
     @Inject
-    public Parser(final Clock clock, final Tokenizer tokenizer) {
+    public Parser(final Tokenizer tokenizer) {
         this.tokenizer = tokenizer;
-        this.clock = clock;
     }
 
     public Result<Command, Error> parse(final String input) {
@@ -285,7 +283,7 @@ public class Parser {
     }
 
     public Result<LocalDateTime, Error> parseDateTime(final String string) {
-        var current = clock.instant().atZone(ZoneId.of("UTC"));
+        var current = Clock.systemUTC().instant().atZone(ZoneId.of("UTC"));
         var formatter = new DateTimeFormatterBuilder()
                 .appendPattern(datePattern)
                 .parseDefaulting(ChronoField.YEAR_OF_ERA, current.getYear())

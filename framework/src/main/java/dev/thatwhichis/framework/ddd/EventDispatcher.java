@@ -6,14 +6,18 @@ import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.eventbus.EventBus;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.function.Supplier;
 
+@ApplicationScoped
 public class EventDispatcher {
 
     private final EventBus eventBus;
 
+    @Inject
     public EventDispatcher(EventBus eventBus) {
         this.eventBus = eventBus;
     }

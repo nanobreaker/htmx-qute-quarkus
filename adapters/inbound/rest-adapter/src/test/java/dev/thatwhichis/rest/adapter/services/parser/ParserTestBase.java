@@ -9,7 +9,6 @@ import java.time.ZoneId;
 public abstract class ParserTestBase {
 
     protected Parser parser;
-    protected Clock clock;
 
     protected Integer year;
     protected Integer month;
@@ -18,10 +17,9 @@ public abstract class ParserTestBase {
     @BeforeEach
     void setUp() {
         final Tokenizer tokenizer = new Tokenizer();
-        clock = Clock.systemUTC();
-        parser = new Parser(clock, tokenizer);
+        parser = new Parser(tokenizer);
 
-        var now = clock.instant().atZone(ZoneId.of("UTC"));
+        var now = Clock.systemUTC().instant().atZone(ZoneId.of("UTC"));
         year = now.getYear();
         month = now.getMonth().getValue();
         day = now.getDayOfMonth();

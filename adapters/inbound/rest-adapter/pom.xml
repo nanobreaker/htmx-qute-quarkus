@@ -56,6 +56,15 @@
             <artifactId>quarkus-smallrye-health</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkiverse.web-bundler</groupId>
+            <artifactId>quarkus-web-bundler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>missing.css</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-test-keycloak-server</artifactId>
             <scope>test</scope>
@@ -76,5 +85,16 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

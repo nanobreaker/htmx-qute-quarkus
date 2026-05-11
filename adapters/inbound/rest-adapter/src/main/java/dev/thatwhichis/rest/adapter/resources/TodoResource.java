@@ -51,18 +51,28 @@ public class TodoResource {
     private final EventBus eventBus;
 
     //@formatter:off
+//    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
+//    public record createTodo()                     implements TemplateInstance {}
+//    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
+//    public record viewTodos(Set<Todo> todos)       implements TemplateInstance {}
+//    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
+//    public record viewTodos$items(Set<Todo> todos) implements TemplateInstance {}
+//    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
+//    public record viewTodos$item(Todo todo)        implements TemplateInstance {}
+//    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
+//    public record deleteTodos(Set<Integer> ids)    implements TemplateInstance {}
+//    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
+//    public record deleteAllTodos()                 implements TemplateInstance {}
+
     @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
-    public record createTodo()                     implements TemplateInstance {}
-    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
-    public record viewTodos(Set<Todo> todos)       implements TemplateInstance {}
-    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
-    public record viewTodos$items(Set<Todo> todos) implements TemplateInstance {}
-    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
-    public record viewTodos$item(Todo todo)        implements TemplateInstance {}
-    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
-    public record deleteTodos(Set<Integer> ids)    implements TemplateInstance {}
-    @CheckedTemplate(basePath = "todo", defaultName = CheckedTemplate.HYPHENATED_ELEMENT_NAME)
-    public record deleteAllTodos()                 implements TemplateInstance {}
+    public static class Templates {
+        public static native TemplateInstance createTodo();
+        public static native TemplateInstance viewTodos(Set<Todo> todos);
+        public static native TemplateInstance viewTodos$items(Set<Todo> todos);
+        public static native TemplateInstance viewTodos$item(Todo todo);
+        public static native TemplateInstance deleteTodos(Set<Integer> ids);
+        public static native TemplateInstance deleteAllTodos();
+    }
 
     public record TodoCreateRequest(
             @FormParam("title") @NotBlank String title,
@@ -104,7 +114,7 @@ public class TodoResource {
 
         return reply.map(result -> switch (result) {
             case Ok(var todos) -> Response.ok()
-                    .entity(new viewTodos(todos).render())
+                    .entity(Templates.viewTodos(todos).render())
                     .build();
             case Err(var err) -> Response.serverError()
                     .entity(new GlobalTemplates.error(err.toString()).render())
@@ -134,7 +144,7 @@ public class TodoResource {
 
         return reply.map(result -> switch (result) {
             case Ok(var todos) -> Response.ok()
-                    .entity(new viewTodos$items(todos).render())
+                    .entity(Templates.viewTodos$items(todos).render())
                     .build();
             case Err(var err) -> Response.serverError()
                     .entity(new GlobalTemplates.error(err.toString()).render())
@@ -158,7 +168,7 @@ public class TodoResource {
 
         return reply.map(result -> switch (result) {
             case Ok(Todo todo) -> Response.ok()
-                    .entity(new viewTodos$item(todo).render())
+                    .entity(Templates.viewTodos$item(todo).render())
                     .build();
             case Err(Error err) -> switch (err) {
                 case TodoError.NotFound _ -> Response.status(Response.Status.NOT_FOUND).build();
@@ -198,7 +208,7 @@ public class TodoResource {
             case Ok(Todo todo) -> {
                 var id = todo.getId().getId();
                 var location = URI.create("/todo/%s".formatted(id));
-                var html = new viewTodos$item(todo).render();
+                var html = Templates.viewTodos$item(todo).render();
 
                 yield Response.created(location)
                         .entity(html)
@@ -271,7 +281,7 @@ public class TodoResource {
     @Produces(MediaType.TEXT_HTML)
     @Cache(maxAge = 60 * 60 * 24)
     public Uni<String> getForm() {
-        var template = new createTodo();
+        var template = Templates.createTodo();
 
         return template.createUni();
     }

@@ -1,73 +1,73 @@
-{@java.util.List<dev.thatwhichis.core.domain.todo.Todo> todos}
+{@java.util.Set<dev.thatwhichis.core.domain.todo.Todo> todos}
 {@dev.thatwhichis.core.domain.todo.Todo todo}
 
 {#include base}
-    <div id="dashboard"
-         hx-ext="sse"
-         sse-connect="/sse"
-         class="fullscreen bg">
+<div id="dashboard"
+     hx-ext="sse"
+     sse-connect="/sse"
+     class="fullscreen bg">
 
-        <div id="top-bar"
-             hx-get="/topbar"
-             hx-trigger="load"
-             hx-swap="outerHTML">
+    <div id="top-bar"
+         hx-get="/topbar"
+         hx-trigger="load"
+         hx-swap="outerHTML">
+    </div>
+
+    <div id="content">
+        <div hidden="hidden"
+             hx-target="body"
+             hx-get="/todos/create"
+             hx-trigger="keyup[ctrlKey&&key=='a'] from:body">
         </div>
 
-        <div id="content">
-            <div hidden="hidden"
-                 hx-target="body"
-                 hx-get="/todos/create"
-                 hx-trigger="keyup[ctrlKey&&key=='a'] from:body">
+        <div id="todo-grid" class="todo-grid" sse-swap="todo.created" hx-swap="beforeend">
+            {#fragment id = items}
+            {#for todo in todos}
+            {#fragment id = item}
+            <div id="todo-{todo.id.id}"
+                 hx-get="/todo/{todo.id.id}"
+                 hx-trigger="sse:todo.updated.{todo.id.id}"
+                 class="todo crowded fade-me-out">
+
+                <div class="identifier fade-me-out"
+                     hx-delete="/todo/{todo.id.id}"
+                     hx-trigger="sse:todo.to.delete.{todo.id.id}"
+                     hx-target="#todo-{todo.id.id}"
+                     hx-swap="outerHTML swap:1s">
+                    {id:format(todo.id.id)}
+                </div>
+
+                <div class="title padding">{todo.title}</div>
+
+                {#if todo.start.isSome }
+                <div class="start-label">=>></div>
+                <div class="start-date-time">
+                    <div class="start-date padding">{todo.start.value.toString}</div>
+                </div>
+                {/if}
+
+                {#if todo.end.isSome }
+                <div class="end-label"><<=</div>
+                <div class="end-date-time">
+                    <div class="end-date padding">{todo.end.value.toString}</div>
+                </div>
+                {/if}
+
+                {#if todo.description.isSome }
+                <div class="description-label">*</div>
+                <div class="description padding">{todo.description.value}</div>
+                {/if}
             </div>
-
-            <div id="todo-grid" class="todo-grid" sse-swap="todo.created" hx-swap="beforeend">
-                {#fragment id = items}
-                    {#for todo in todos}
-                        {#fragment id = item}
-                            <div id="todo-{todo.id.id}"
-                                 hx-get="/todo/{todo.id.id}"
-                                 hx-trigger="sse:todo.updated.{todo.id.id}"
-                                 class="todo crowded fade-me-out">
-
-                                <div class="identifier fade-me-out"
-                                     hx-delete="/todo/{todo.id.id}"
-                                     hx-trigger="sse:todo.to.delete.{todo.id.id}"
-                                     hx-target="#todo-{todo.id.id}"
-                                     hx-swap="outerHTML swap:1s">
-                                    {id:format(todo.id.id)}
-                                </div>
-
-                                <div class="title padding">{todo.title}</div>
-
-                                {#if todo.start.isSome }
-                                    <div class="start-label">=>></div>
-                                    <div class="start-date-time">
-                                        <div class="start-date padding">{todo.start.value.toString}</div>
-                                    </div>
-                                {/if}
-
-                                {#if todo.end.isSome }
-                                    <div class="end-label"><<=</div>
-                                    <div class="end-date-time">
-                                        <div class="end-date padding">{todo.end.value.toString}</div>
-                                    </div>
-                                {/if}
-
-                                {#if todo.description.isSome }
-                                    <div class="description-label">*</div>
-                                    <div class="description padding">{todo.description.value}</div>
-                                {/if}
-                            </div>
-                        {/fragment}
-                    {/for}
-                {/fragment}
-            </div>
-        </div>
-
-        <div id="bottom-bar"
-             hx-get="/bottombar"
-             hx-trigger="load"
-             hx-swap="outerHTML">
+            {/fragment}
+            {/for}
+            {/fragment}
         </div>
     </div>
+
+    <div id="bottom-bar"
+         hx-get="/bottombar"
+         hx-trigger="load"
+         hx-swap="outerHTML">
+    </div>
+</div>
 {/include}
