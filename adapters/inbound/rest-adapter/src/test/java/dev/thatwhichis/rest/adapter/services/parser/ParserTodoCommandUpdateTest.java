@@ -1,6 +1,7 @@
 package dev.thatwhichis.rest.adapter.services.parser;
 
-import dev.thatwhichis.rest.adapter.services.command.Command;
+import dev.thatwhichis.rest.adapter.command.Command;
+import dev.thatwhichis.rest.adapter.parsing.ParserError;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

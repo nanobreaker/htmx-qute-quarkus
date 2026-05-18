@@ -27,7 +27,6 @@
     </div>
 
     <form class="command-line"
-          hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'
           hx-post="/commands/submit"
           hx-target="#todo-grid"
           hx-target-error="#feedback"

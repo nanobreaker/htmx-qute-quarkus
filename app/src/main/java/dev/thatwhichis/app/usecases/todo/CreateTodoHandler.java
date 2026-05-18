@@ -2,7 +2,7 @@ package dev.thatwhichis.app.usecases.todo;
 
 import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoEvent;
-import dev.thatwhichis.core.ports.inbound.TodoCommand;
+import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoIdSequenceGenerator;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
 import dev.thatwhichis.framework.cqrs.CommandHandler;
@@ -11,6 +11,7 @@ import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
@@ -38,6 +39,7 @@ public class CreateTodoHandler implements CommandHandler<TodoCommand.Create, Tod
     @Override
     @ConsumeEvent(value = "command.todo.create")
     @WithTransaction
+    @WithSpan("handleTodoCreateCommand")
     public Uni<Result<Todo, Error>> handle(final TodoCommand.Create command) {
         var username = command.username();
         var idUni = idSeq.next(username);

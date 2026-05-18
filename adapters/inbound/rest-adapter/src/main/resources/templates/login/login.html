@@ -1,32 +1,62 @@
 {#include base}
-    <main class="padding" style="display: grid;place-items: center;height: 80vh;"
-          xmlns="http://www.w3.org/1999/html"
-          _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
-                  set cookies['time-zone'] to { value: zone }">
-        <div id="login-content">
-            <h1 id="login-title" class="title-font">
+<body class="login-screen">
+<header class="login-header">
+    <span class="version"
+          is-="badge"
+    >
+        reactive-todos:1.0.0-SNAPSHOT
+    </span>
+    <input type="checkbox"
+           is-="switch"
+           size-="small"
+           _="on change call theme.toggle(me)"
+    />
+</header>
+<main class="login-main"
+      _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+                  set cookies['time-zone'] to { value: zone }"
+>
+    <div id="login-view"
+         class="login-view"
+         is-="view"
+    >
+        <div class="login-content"
+             is-="view-content"
+        >
+            <h1 class="logo">
                 REACTIVE TODOS
-                <sub-title>version 1.0.0</sub-title>
             </h1>
-            <h2 id="login-subtitle" class="secondary-font">
+            <h2 class="haiku">
                 In swift code it flows<br>
                 tasks arise and fade like waves<br>
                 scaling without end
             </h2>
-            <div id="buttons">
-                <a class="<button> big color plain"
-                   href="/todo"
-                   hx-boost="true"
-                   hx-trigger="keyup[key=='a'] from:body">
-                    AUTHENTICATE [A]
+            <div class="buttons">
+                <a is-="button"
+                   size-="small"
+                   hx-get="/auth"
+                   hx-trigger="click, keyup[key=='A'] from:body"
+                >
+                    [A]UTHENTICATE
                 </a>
-                <a class="<button> big color plain"
-                   href="/todo"
-                   hx-boost="true"
-                   hx-trigger="keyup[key=='r'] from:body">
-                    REGISTER [R]
+                <a is-="button"
+                   href="/todos"
+                   size-="small"
+                   hx-get="/register"
+                   hx-trigger="click, keyup[key=='R'] from:body"
+                >
+                    [R]EGISTER
                 </a>
             </div>
         </div>
-    </main>
+    </div>
+</main>
+<footer class="login-footer">
+    <div id="status-line"
+         class="status-line"
+    >
+        <span>2026-05-14 12:00</span>
+    </div>
+</footer>
+</body>
 {/include}

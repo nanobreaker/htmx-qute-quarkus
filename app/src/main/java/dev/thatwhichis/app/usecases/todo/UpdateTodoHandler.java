@@ -2,7 +2,7 @@ package dev.thatwhichis.app.usecases.todo;
 
 import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoEvent;
-import dev.thatwhichis.core.ports.inbound.TodoCommand;
+import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
 import dev.thatwhichis.framework.cqrs.CommandHandler;
 import dev.thatwhichis.framework.ddd.DomainEvent;
@@ -11,6 +11,7 @@ import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
@@ -38,6 +39,7 @@ public class UpdateTodoHandler implements CommandHandler<TodoCommand.Update, Voi
     @Override
     @ConsumeEvent(value = "command.todo.update")
     @WithSession
+    @WithSpan("handleTodoUpdateCommand")
     public Uni<Result<Void, Error>> handle(final TodoCommand.Update command) {
         return switch (command) {
             case TodoCommand.Update.ByIds(var ids, var payload) -> {

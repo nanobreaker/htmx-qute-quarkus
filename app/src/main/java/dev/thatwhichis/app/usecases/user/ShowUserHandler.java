@@ -1,6 +1,6 @@
 package dev.thatwhichis.app.usecases.user;
 
-import dev.thatwhichis.core.ports.inbound.UserQuery;
+import dev.thatwhichis.core.ports.inbound.user.UserQuery;
 import dev.thatwhichis.framework.cqrs.QueryHandler;
 import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Result;

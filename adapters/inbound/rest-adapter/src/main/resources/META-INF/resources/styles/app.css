@@ -1,0 +1,274 @@
+@layer base {
+
+    :root {
+        --font-size: 19px;
+        --line-height: 1.3;
+        --font-weight-bold: 700;
+        --font-weight-normal: 400;
+        --font-family: monospace;
+
+        --background0: #fff;
+        --background1: #ddd;
+        --background2: #bbb;
+        --background3: #999;
+        --foreground0: #000;
+        --foreground1: #444;
+        --foreground2: #888;
+
+        --rosewater: #f5e0dc;
+        --flamingo: #f2cdcd;
+        --pink: #f5c2e7;
+        --mauve: #cba6f7;
+        --red: #f38ba8;
+        --maroon: #eba0ac;
+        --peach: #fe8d4a;
+        --yellow: #f9e2af;
+        --green: #a6e3a1;
+        --teal: #94e2d5;
+        --sky: #89dceb;
+        --sapphire: #74c7ec;
+        --blue: #89b4fa;
+        --lavender: #b4befe;
+
+    }
+
+    [data-webtui-theme='dark'] {
+        --background0: #000;
+        --background1: #222;
+        --background2: #444;
+        --background3: #666;
+        --foreground0: #fff;
+        --foreground1: #ccc;
+        --foreground2: #999;
+
+        --rosewater: #f5e0dc;
+        --flamingo: #f2cdcd;
+        --pink: #f5c2e7;
+        --mauve: #cba6f7;
+        --red: #f38ba8;
+        --maroon: #eba0ac;
+        --peach: #fab387;
+        --yellow: #f9e2af;
+        --green: #a6e3a1;
+        --teal: #94e2d5;
+        --sky: #89dceb;
+        --sapphire: #74c7ec;
+        --blue: #89b4fa;
+        --lavender: #b4befe;
+    }
+
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    body {
+        min-height: 100dvh;
+    }
+
+}
+
+.login-screen {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 1lh 1fr 3lh;
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+
+    .login-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 1ch;
+        background-color: var(--background1);
+
+        .version {
+            margin-left: 1ch;
+            --badge-color: var(--background1);
+            --badge-text: var(--foreground0);
+        }
+    }
+
+    .login-main {
+        display: grid;
+        place-items: center;
+
+        .login-view {
+            .login-content {
+                display: grid;
+                grid-template-rows: auto auto auto;
+                place-items: center;
+
+                .logo {
+                    font-size: 44px;
+                    font-family: 'Heavy Data', monospace;
+                }
+
+                .haiku {
+                    text-align: center;
+                    padding-block: 1lh;
+                }
+
+                .buttons {
+                    a {
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
+
+    .login-footer {
+        display: grid;
+        grid-template-rows: 1lh 2lh;
+
+        .status-line {
+            justify-content: end;
+            padding-inline: 1ch;
+            background-color: var(--background1);
+        }
+    }
+}
+
+.todo-screen {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 1lh 1fr 3lh;
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+
+    .todo-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 1ch;
+        background-color: var(--background1);
+
+        .version {
+            margin-left: 1ch;
+            --badge-color: var(--background1);
+            --badge-text: var(--foreground0);
+        }
+    }
+
+    .todo-main {
+        margin: 2lh 2ch;
+        overflow: hidden;
+        display: grid;
+        gap: 3ch;
+        grid-template-columns: repeat(auto-fill, minmax(9rch, 36rch));
+        grid-template-rows: auto;
+        justify-items: center;
+
+        .todo-view {
+            height: min-content;
+
+            .todo-title {
+                display: flex;
+                justify-content: space-between;
+
+                span {
+                    background-color: var(--background0);
+                    padding: 0 1ch;
+                }
+            }
+
+            .todo-dates {
+                display: flex;
+                justify-content: space-between;
+
+                span {
+                    background-color: var(--background0);
+                    padding: 0 1ch;
+                }
+            }
+
+            .todo-content {
+                margin: 1lh 1ch 1lh 1ch;
+                text-align: center;
+            }
+        }
+
+    }
+
+    .todo-footer {
+        position: relative;
+        display: grid;
+        grid-template-rows: auto 1lh 3lh;
+    }
+}
+
+.feedback {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 3lh;
+
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+
+    pointer-events: none;
+}
+
+.feedback:not(:empty) {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.feedback-message {
+    padding: 0lh 1ch 0lh 1ch;
+}
+
+.feedback-info {
+    white-space: pre;
+    color: var(--foreground1);
+    background-color: var(--background1);
+}
+
+.feedback-error {
+    white-space: normal;
+    color: var(--red);
+    background-color: var(--background1);
+}
+
+.status-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 1ch;
+    background-color: var(--background1);
+}
+
+.command-spinner {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.htmx-request .command-spinner,
+.htmx-request.command-spinner {
+    opacity: 1;
+    visibility: visible;
+}
+
+.command-line {
+    display: grid;
+    grid-template-columns: 1ch 1fr 0ch;
+}
+
+.command-line label {
+    visibility: hidden;
+}
+
+.command-line:focus-within label {
+    visibility: visible;
+}
+
+.command-input {
+    background-color: var(--background0);
+    padding: 0ch 0ch;
+}

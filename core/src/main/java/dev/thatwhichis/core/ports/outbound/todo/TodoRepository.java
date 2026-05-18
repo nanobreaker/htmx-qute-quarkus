@@ -2,7 +2,7 @@ package dev.thatwhichis.core.ports.outbound.todo;
 
 import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoId;
-import dev.thatwhichis.core.ports.inbound.TodoCommand;
+import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.library.option.Option;
 import io.github.dcadea.jresult.Result;

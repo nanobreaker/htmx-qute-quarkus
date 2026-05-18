@@ -4,6 +4,7 @@ import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.eventbus.EventBus;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -22,6 +23,7 @@ public class EventDispatcher {
         this.eventBus = eventBus;
     }
 
+    @WithSpan("dispatchEvent")
     public <R> Uni<Result<R, Error>> on(
             final Supplier<Uni<Result<R, Error>>> operation,
             final DomainEvent event
@@ -39,6 +41,7 @@ public class EventDispatcher {
         });
     }
 
+    @WithSpan("dispatchEvent")
     public <R> Uni<Result<R, Error>> on(
             final Supplier<Uni<Result<R, Error>>> operation,
             final Collection<DomainEvent> events

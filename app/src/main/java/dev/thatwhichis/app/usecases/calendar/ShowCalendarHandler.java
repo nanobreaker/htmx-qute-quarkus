@@ -1,6 +1,6 @@
 package dev.thatwhichis.app.usecases.calendar;
 
-import dev.thatwhichis.core.ports.inbound.CalendarQuery;
+import dev.thatwhichis.core.ports.inbound.calendar.CalendarQuery;
 import dev.thatwhichis.framework.cqrs.QueryHandler;
 import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Result;

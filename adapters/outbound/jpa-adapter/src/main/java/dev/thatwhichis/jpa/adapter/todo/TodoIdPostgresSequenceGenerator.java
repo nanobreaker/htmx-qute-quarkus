@@ -2,6 +2,7 @@ package dev.thatwhichis.jpa.adapter.todo;
 
 import dev.thatwhichis.core.domain.todo.TodoId;
 import dev.thatwhichis.core.ports.outbound.todo.TodoIdSequenceGenerator;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.panache.common.Parameters;
@@ -13,6 +14,7 @@ public class TodoIdPostgresSequenceGenerator
         implements TodoIdSequenceGenerator, PanacheRepositoryBase<TodoJpaIdSequence, String> {
 
     @WithTransaction
+    @WithSpan("increment")
     public Uni<Void> increment(
             final String username
     ) {
@@ -24,6 +26,7 @@ public class TodoIdPostgresSequenceGenerator
     }
 
     @WithTransaction
+    @WithSpan("next")
     public Uni<TodoId> next(
             final String username
     ) {

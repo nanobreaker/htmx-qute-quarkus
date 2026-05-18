@@ -1,5 +1,6 @@
 package dev.thatwhichis.rest.adapter.services.parser;
 
+import dev.thatwhichis.rest.adapter.parsing.ParserError;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +22,7 @@ class ParserTest extends dev.thatwhichis.rest.adapter.services.parser.ParserTest
         var result = parser.parse(input);
 
         assertThat(result.isErr()).isTrue();
-        assertThat(result.err()).contains(new ParserError.UnknownProgram());
+        assertThat(result.err()).contains(new ParserError.UnknownToken(""));
     }
 
     @Test
@@ -30,6 +31,6 @@ class ParserTest extends dev.thatwhichis.rest.adapter.services.parser.ParserTest
         var result = parser.parse(input);
 
         assertThat(result.isErr()).isTrue();
-        assertThat(result.err()).contains(new ParserError.UnknownCommand());
+        assertThat(result.err()).contains(new ParserError.UnknownCommand(""));
     }
 }

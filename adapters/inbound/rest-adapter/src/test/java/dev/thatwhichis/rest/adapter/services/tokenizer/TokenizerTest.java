@@ -1,5 +1,8 @@
 package dev.thatwhichis.rest.adapter.services.tokenizer;
 
+import dev.thatwhichis.rest.adapter.parsing.token.KEYWORD;
+import dev.thatwhichis.rest.adapter.parsing.token.OPTION;
+import dev.thatwhichis.rest.adapter.parsing.token.Token;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +30,7 @@ class TokenizerTest extends TokenizerTestBase {
         var input = "donthelp";
         var tokens = tokenizer.tokenize(input);
 
-        assertThat(tokens).contains(new Token.Keyword(KEYWORD.UNKNOWN));
+        assertThat(tokens).contains(new Token.Unknown("donthelp"));
     }
 
     @Test
@@ -37,7 +40,7 @@ class TokenizerTest extends TokenizerTestBase {
 
         assertThat(tokens).containsExactly(
                 new Token.Keyword(KEYWORD.TODO),
-                new Token.Keyword(KEYWORD.UNKNOWN)
+                new Token.Unknown("crea")
         );
     }
 
@@ -47,8 +50,8 @@ class TokenizerTest extends TokenizerTestBase {
         var tokens = tokenizer.tokenize(input);
 
         assertThat(tokens).containsExactly(
-                new Token.Keyword(KEYWORD.UNKNOWN),
-                new Token.Keyword(KEYWORD.UNKNOWN)
+                new Token.Unknown("tod"),
+                new Token.Unknown("crea")
         );
     }
 

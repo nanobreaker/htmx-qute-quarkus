@@ -27,8 +27,8 @@
             <artifactId>jresult</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-mutiny</artifactId>
+            <groupId>io.smallrye.reactive</groupId>
+            <artifactId>mutiny</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.persistence</groupId>

@@ -1,13 +1,14 @@
 package dev.thatwhichis.app.usecases.todo;
 
 import dev.thatwhichis.core.domain.todo.TodoEvent;
-import dev.thatwhichis.core.ports.inbound.TodoCommand;
+import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
 import dev.thatwhichis.framework.cqrs.CommandHandler;
 import dev.thatwhichis.framework.ddd.DomainEvent;
 import dev.thatwhichis.framework.ddd.EventDispatcher;
 import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Result;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
@@ -35,6 +36,7 @@ public class DeleteTodoHandler implements CommandHandler<TodoCommand.Delete, Voi
     @Override
     @ConsumeEvent(value = "command.todo.delete")
     @WithTransaction
+    @WithSpan("handleTodoDeleteCommand")
     public Uni<Result<Void, Error>> handle(final TodoCommand.Delete command) {
         return switch (command) {
             case TodoCommand.Delete.All(var username) -> {

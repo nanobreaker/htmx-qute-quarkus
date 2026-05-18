@@ -1,7 +1,7 @@
 package dev.thatwhichis.library.option;
 
-import io.github.dcadea.jresult.Result;
 import dev.thatwhichis.library.error.Error;
+import io.github.dcadea.jresult.Result;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -82,8 +82,7 @@ public sealed interface Option<T> permits None, Some {
         };
     }
 
-    default T orElse(
-            final T other) {
+    default T orElse(final T other) {
         return switch (this) {
             case Some(T t) -> t;
             case None<T> _ -> other;

@@ -1,10 +1,12 @@
 package space.nanobreaker.library;
 
-import org.junit.jupiter.api.Test;
 import dev.thatwhichis.library.either.Either;
 import dev.thatwhichis.library.either.Left;
 import dev.thatwhichis.library.either.Right;
 import dev.thatwhichis.library.option.Option;
+import org.junit.jupiter.api.Test;
+
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,6 +14,9 @@ public class EitherTest {
 
     @Test
     void shouldReturnTrueIfLeftVariant() {
+        final Option<ZonedDateTime> option = Option.some(ZonedDateTime.now());
+        option.map(ZonedDateTime::toString).orElse("");
+
         final Either<Integer, Integer> left = new Left<>(42);
         assertThat(left.isLeft()).isEqualTo(true);
 

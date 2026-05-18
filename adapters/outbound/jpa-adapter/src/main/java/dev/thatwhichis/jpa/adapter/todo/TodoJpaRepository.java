@@ -2,13 +2,14 @@ package dev.thatwhichis.jpa.adapter.todo;
 
 import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoId;
-import dev.thatwhichis.core.ports.inbound.TodoCommand;
+import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
 import dev.thatwhichis.framework.ddd.Entity;
 import dev.thatwhichis.jpa.adapter.JpaError;
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.library.option.Option;
 import io.github.dcadea.jresult.Result;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
@@ -28,6 +29,7 @@ public class TodoJpaRepository
         implements TodoRepository, PanacheRepositoryBase<TodoJpaEntity, TodoJpaId> {
 
     @Override
+    @WithSpan("save")
     public Uni<Result<Todo, Error>> save(final Todo todo) {
         var jpaEntity = TodoJpaEntity.from(todo);
 
@@ -39,6 +41,7 @@ public class TodoJpaRepository
     }
 
     @Override
+    @WithSpan("find")
     public Uni<Result<Option<Todo>, Error>> find(final TodoId id) {
         var jpaId = TodoJpaId.from(id);
 

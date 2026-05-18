@@ -1,5 +1,8 @@
 package dev.thatwhichis.rest.adapter.services.tokenizer;
 
+import dev.thatwhichis.rest.adapter.parsing.token.KEYWORD;
+import dev.thatwhichis.rest.adapter.parsing.token.OPTION;
+import dev.thatwhichis.rest.adapter.parsing.token.Token;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

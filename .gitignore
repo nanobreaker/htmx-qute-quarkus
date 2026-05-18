@@ -1,8 +1,8 @@
-target/
-adapters/inbound/rest-adapter/node_modules
-boot/node_modules
+.env
 
 .idea
 *.ipr
 *.iml
 *.iws
+
+target/
