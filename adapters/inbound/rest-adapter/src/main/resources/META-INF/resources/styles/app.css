@@ -272,3 +272,37 @@
     background-color: var(--background0);
     padding: 0ch 0ch;
 }
+
+.user-dialog {
+    .box {
+        background-color: var(--background1);
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+
+            span {
+                padding: 0 1ch;
+                background-color: var(--background1);
+            }
+        }
+
+        .content {
+            display: grid;
+            grid-template-rows: 1lh 1lh 1lh 1lh 1lh;
+            padding: 1lh 1ch;
+            text-align: center;
+
+            .row {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .row > div:first-child {
+                background-color: var(--foreground0);
+                color: var(--background1);
+            }
+
+        }
+    }
+}

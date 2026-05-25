@@ -1,9 +1,9 @@
 package dev.thatwhichis.rest.adapter.http.command;
 
 import dev.thatwhichis.library.error.Error;
-import dev.thatwhichis.rest.adapter.command.Command;
-import dev.thatwhichis.rest.adapter.command.CommandExecutor;
-import dev.thatwhichis.rest.adapter.parsing.Parser;
+import dev.thatwhichis.rest.adapter.cli.Command;
+import dev.thatwhichis.rest.adapter.cli.CommandExecutor;
+import dev.thatwhichis.rest.adapter.cli.parser.Parser;
 import dev.thatwhichis.rest.adapter.qute.templates.ErrorTemplates;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
@@ -24,10 +24,10 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 
-import static dev.thatwhichis.rest.adapter.command.Command.Calendar;
-import static dev.thatwhichis.rest.adapter.command.Command.Help;
-import static dev.thatwhichis.rest.adapter.command.Command.Todo;
-import static dev.thatwhichis.rest.adapter.command.Command.User;
+import static dev.thatwhichis.rest.adapter.cli.Command.Calendar;
+import static dev.thatwhichis.rest.adapter.cli.Command.Help;
+import static dev.thatwhichis.rest.adapter.cli.Command.Todo;
+import static dev.thatwhichis.rest.adapter.cli.Command.User;
 
 @Path("commands")
 @Authenticated

@@ -2,9 +2,12 @@
 {@dev.thatwhichis.core.domain.todo.Todo todo}
 
 {#include base}
-<body class="todo-screen"
+<body id="body"
+      class="todo-screen"
       hx-ext="response-targets"
       _="on keyup[key is ':'] navigation.focusById('command-input') end"
+      _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+                  set cookies['time-zone'] to { value: zone }"
 >
 <header class="todo-header">
     <span class="version"
@@ -20,8 +23,6 @@
 </header>
 <main id="todo-main"
       class="todo-main"
-      _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
-                  set cookies['time-zone'] to { value: zone }"
 >
     {#fragment id = items}
     {#for todo in todos}
@@ -94,5 +95,7 @@
         />
     </form>
 </footer>
+<dialog id="user-dialog"></dialog>
+<dialog id="calendar-dialog"></dialog>
 </body>
 {/include}

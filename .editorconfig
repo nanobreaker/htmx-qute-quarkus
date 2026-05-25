@@ -9,7 +9,6 @@ insert_final_newline = false
 max_line_length = 140
 tab_width = 4
 
-
 [.editorconfig]
 ij_editorconfig_align_group_field_declarations = false
 ij_editorconfig_space_after_colon = false
@@ -275,8 +274,7 @@ ij_java_wrap_comments = false
 ij_java_wrap_first_method_in_call_chain = false
 ij_java_wrap_long_lines = false
 
-[*.qute.html]
-max_line_length = 120
+[*.html]
 ij_html_add_new_line_before_tags = body, div, p, form, h1, h2, h3
 ij_html_align_attributes = true
 ij_html_align_text = false
@@ -333,9 +331,6 @@ ij_json_space_before_comma = false
 ij_json_spaces_within_braces = false
 ij_json_spaces_within_brackets = false
 ij_json_wrap_long_lines = false
-
-[*.yml]
-indent_size = 2
 
 [*.properties]
 ij_properties_align_group_field_declarations = false

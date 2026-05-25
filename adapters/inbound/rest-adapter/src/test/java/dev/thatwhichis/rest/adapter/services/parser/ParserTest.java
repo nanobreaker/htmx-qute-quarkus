@@ -1,6 +1,6 @@
 package dev.thatwhichis.rest.adapter.services.parser;
 
-import dev.thatwhichis.rest.adapter.parsing.ParserError;
+import dev.thatwhichis.rest.adapter.cli.parser.ParserError;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

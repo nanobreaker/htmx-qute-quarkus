@@ -14,10 +14,6 @@ public class TodoTemplates {
     public static native TemplateInstance todos$item(Todo todo);
 
     public static native TemplateInstance todos$items(Set<Todo> todos);
-
-    public static native TemplateInstance deleteTodos(Set<Integer> ids);
-
-    public static native TemplateInstance deleteAllTodos();
 }
 
 

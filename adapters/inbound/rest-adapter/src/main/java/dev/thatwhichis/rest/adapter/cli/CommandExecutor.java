@@ -1,4 +1,4 @@
-package dev.thatwhichis.rest.adapter.command;
+package dev.thatwhichis.rest.adapter.cli;
 
 import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoId;
@@ -7,7 +7,9 @@ import dev.thatwhichis.core.ports.inbound.todo.TodoQuery;
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.rest.adapter.qute.templates.ErrorTemplates;
 import dev.thatwhichis.rest.adapter.qute.templates.HelpTemplates;
+import dev.thatwhichis.rest.adapter.qute.templates.OobTemplates;
 import dev.thatwhichis.rest.adapter.qute.templates.TodoTemplates;
+import dev.thatwhichis.rest.adapter.qute.templates.UserTemplates;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
@@ -362,7 +364,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        var html = TodoTemplates.deleteAllTodos().render();
+                        var html = OobTemplates.todosDeleteAll().render();
 
                         yield Response.ok(html)
                                 .header("HX-Reswap", "none")
@@ -389,7 +391,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(_) -> {
-                        var html = TodoTemplates.deleteTodos(ids).render();
+                        var html = OobTemplates.todosDeleteById(ids).render();
 
                         yield Response.ok(html)
                                 .header("HX-Reswap", "none")
@@ -426,8 +428,15 @@ public class CommandExecutor {
     }
 
     public Uni<Response> userShow(final Command.User ignored) {
-        // todo: Implement show user command
-        return Uni.createFrom()
-                .item(Response.serverError().build());
+        var template = UserTemplates.user();
+
+        return template.createUni()
+                .map(html -> Response
+                        .ok()
+                        .header("HX-Retarget", "#user-dialog")
+                        .header("HX-Reswap", "outerHTML")
+                        .entity(html)
+                        .build()
+                );
     }
 }

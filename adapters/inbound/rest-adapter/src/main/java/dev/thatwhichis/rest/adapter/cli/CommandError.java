@@ -1,4 +1,4 @@
-package dev.thatwhichis.rest.adapter.command;
+package dev.thatwhichis.rest.adapter.cli;
 
 import dev.thatwhichis.library.error.Error;
 

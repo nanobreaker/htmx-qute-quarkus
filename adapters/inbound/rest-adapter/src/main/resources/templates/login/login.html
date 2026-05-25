@@ -1,5 +1,8 @@
 {#include base}
-<body class="login-screen">
+<body class="login-screen"
+      _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+                  set cookies['time-zone'] to { value: zone }"
+>
 <header class="login-header">
     <span class="version"
           is-="badge"
@@ -12,10 +15,7 @@
            _="on change call theme.toggle(me)"
     />
 </header>
-<main class="login-main"
-      _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
-                  set cookies['time-zone'] to { value: zone }"
->
+<main class="login-main">
     <div id="login-view"
          class="login-view"
          is-="view"
@@ -34,18 +34,9 @@
             <div class="buttons">
                 <a is-="button"
                    size-="small"
-                   hx-get="/auth"
-                   hx-trigger="click, keyup[key=='A'] from:body"
-                >
-                    [A]UTHENTICATE
-                </a>
-                <a is-="button"
                    href="/todos"
-                   size-="small"
-                   hx-get="/register"
-                   hx-trigger="click, keyup[key=='R'] from:body"
                 >
-                    [R]EGISTER
+                    PROCEED
                 </a>
             </div>
         </div>

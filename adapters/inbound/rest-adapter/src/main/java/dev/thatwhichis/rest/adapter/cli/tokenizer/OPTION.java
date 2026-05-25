@@ -1,4 +1,4 @@
-package dev.thatwhichis.rest.adapter.parsing.token;
+package dev.thatwhichis.rest.adapter.cli.tokenizer;
 
 public enum OPTION {
     TITLE,

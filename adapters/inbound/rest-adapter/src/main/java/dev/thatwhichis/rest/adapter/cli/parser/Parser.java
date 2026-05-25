@@ -1,15 +1,15 @@
-package dev.thatwhichis.rest.adapter.parsing;
+package dev.thatwhichis.rest.adapter.cli.parser;
 
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.library.option.None;
 import dev.thatwhichis.library.option.Option;
 import dev.thatwhichis.library.option.Some;
 import dev.thatwhichis.library.tuple.Pair;
-import dev.thatwhichis.rest.adapter.command.Command;
-import dev.thatwhichis.rest.adapter.parsing.token.KEYWORD;
-import dev.thatwhichis.rest.adapter.parsing.token.OPTION;
-import dev.thatwhichis.rest.adapter.parsing.token.Token;
-import dev.thatwhichis.rest.adapter.parsing.token.Tokenizer;
+import dev.thatwhichis.rest.adapter.cli.Command;
+import dev.thatwhichis.rest.adapter.cli.tokenizer.KEYWORD;
+import dev.thatwhichis.rest.adapter.cli.tokenizer.OPTION;
+import dev.thatwhichis.rest.adapter.cli.tokenizer.Token;
+import dev.thatwhichis.rest.adapter.cli.tokenizer.Tokenizer;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
@@ -258,8 +258,13 @@ public class Parser {
         return err(new ParserError.NotSupportedOperation());
     }
 
-    private Result<Command, Error> parseUserProgram(final SequencedCollection<Token> ignored) {
-        return err(new ParserError.NotSupportedOperation());
+    private Result<Command, Error> parseUserProgram(final SequencedCollection<Token> tokens) {
+        var commandToken = tokens.removeFirst();
+        return switch (commandToken) {
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.User.Help());
+            case Token.Keyword(var keyword) when keyword == KEYWORD.SHOW -> ok(new Command.User.Show());
+            default -> err(new ParserError.UnknownCommand(commandToken.toString()));
+        };
     }
 
     private static Optional<String> findOption(SequencedCollection<Token> tokens, OPTION target) {

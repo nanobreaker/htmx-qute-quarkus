@@ -1,4 +1,4 @@
-package dev.thatwhichis.rest.adapter.parsing.token;
+package dev.thatwhichis.rest.adapter.cli.tokenizer;
 
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;

@@ -2,6 +2,7 @@ package dev.thatwhichis.rest.adapter.error;
 
 import dev.thatwhichis.rest.adapter.qute.templates.ErrorTemplates;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.quarkus.logging.Log;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -19,6 +20,8 @@ public class ErrorMapper implements ExceptionMapper<Throwable> {
         var template = ErrorTemplates.error(message);
         var html = template.render();
 
+        Log.error(exception);
+        
         return Response.serverError()
                 .entity(html)
                 .build();
