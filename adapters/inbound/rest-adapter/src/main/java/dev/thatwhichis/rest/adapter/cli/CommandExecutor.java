@@ -460,4 +460,13 @@ public class CommandExecutor {
                     }
                 });
     }
+
+    public Uni<Response> logout() {
+        var response = Response.ok()
+                .header("HX-Redirect", "/logout")
+                .build();
+
+        return Uni.createFrom()
+                .item(response);
+    }
 }

@@ -1,7 +1,10 @@
 {#include base}
 <body class="login-screen"
-      _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
-                  set cookies['time-zone'] to { value: zone }"
+      _="
+        init
+            set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+            set cookies['time-zone'] to { value: zone }
+        "
 >
 <header class="login-header">
     <span class="version"
@@ -9,11 +12,31 @@
     >
         reactive-todos:1.0.0-SNAPSHOT
     </span>
-    <input type="checkbox"
-           is-="switch"
-           size-="small"
-           _="on change call theme.toggle(me)"
-    />
+    <div>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(1)
+            end
+            "
+        >
+            +
+        </span>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(-1)
+            end
+            "
+        >
+            -
+        </span>
+        <input type="checkbox"
+               is-="switch"
+               size-="small"
+               _="on change call theme.toggle(me)"
+        />
+    </div>
 </header>
 <main class="login-main">
     <div id="login-view"
@@ -35,8 +58,11 @@
                 <a is-="button"
                    size-="small"
                    href="/todos"
+                   _="on keyup[key.toLowerCase() is 'p'] from document
+                        call my.click()
+                      end"
                 >
-                    PROCEED
+                    [P]ROCEED
                 </a>
             </div>
         </div>

@@ -14,7 +14,14 @@ public class CommandDescriber {
                 todo
                 user
                 calendar
+                logout
             """;
+
+    private static final String logout = """
+            USAGE
+                logout
+            """;
+
     private static final String todo_help = """
             USAGE 
                 todo <command> "<args>" [options]
@@ -25,6 +32,7 @@ public class CommandDescriber {
                 update
                 delete
             """;
+
     private static final String todo_create_help = """
             USAGE
                 todo create "<arg>" [-d"<description>"] [-s"<start>"] [-e"<end>"]
@@ -44,6 +52,7 @@ public class CommandDescriber {
                 todo create "country trip" -d"prepare car" -s"21 09:00" -e"22 18:00"
                 todo create "vacation" -d"barcelona again?" -s"04/12" -e"22/12"
             """;
+
     private static final String todo_list_help = """
             USAGE
                 todo list ["<arg>"]
@@ -59,6 +68,7 @@ public class CommandDescriber {
                 todo list "1" "2" "2"
             \s
             """;
+
     private static final String todo_update_help = """
             USAGE 
                 todo update ["<arg(s)>"] [-f"<title>"] [-t"<title>"] [-d"<description>"] [-s"<start>"] [-e"<end>"]
@@ -82,6 +92,7 @@ public class CommandDescriber {
                 todo update "0" -d"buy new bottle"
             \s
             """;
+
     private static final String todo_delete_help = """
             USAGE 
                 todo delete "<arg(s)>"
@@ -92,6 +103,7 @@ public class CommandDescriber {
             EXAMPLES 
                 todo delete "1" "2" "3"
             """;
+
     private static final String calendar_help = """
             USAGE
                  calendar <command>
@@ -100,6 +112,7 @@ public class CommandDescriber {
                  show
             \s
             """;
+
     private static final String calendar_show_help = """
             USAGE 
                 calendar show
@@ -107,6 +120,7 @@ public class CommandDescriber {
             DESCRIPTION
                 display calendar of the user
             """;
+
     private static final String user_help = """
             USAGE 
                 user <command>
@@ -114,6 +128,7 @@ public class CommandDescriber {
             COMMANDS 
                 show
             """;
+
     private static final String user_show_help = """
             USAGE 
                 user show
@@ -124,16 +139,19 @@ public class CommandDescriber {
 
     public String describe(Command command) {
         return switch (command) {
-            case Command.Help _ -> help;
-            case Command.Todo.Help _ -> todo_help;
-            case Command.Todo.Create _ -> todo_create_help;
-            case Command.Todo.List _ -> todo_list_help;
-            case Command.Todo.Update _ -> todo_update_help;
-            case Command.Todo.Delete _ -> todo_delete_help;
-            case Command.Calendar.Help _ -> calendar_help;
-            case Command.Calendar.Show _ -> calendar_show_help;
-            case Command.User.Help _ -> user_help;
-            case Command.User.Show _ -> user_show_help;
+            //@formatter:off
+            case Command.Help           _ -> help;
+            case Command.Logout         _ -> logout;
+            case Command.Todo.Help      _ -> todo_help;
+            case Command.Todo.Create    _ -> todo_create_help;
+            case Command.Todo.List      _ -> todo_list_help;
+            case Command.Todo.Update    _ -> todo_update_help;
+            case Command.Todo.Delete    _ -> todo_delete_help;
+            case Command.Calendar.Help  _ -> calendar_help;
+            case Command.Calendar.Show  _ -> calendar_show_help;
+            case Command.User.Help      _ -> user_help;
+            case Command.User.Show      _ -> user_show_help;
+            //@formatter:on
         };
     }
 }

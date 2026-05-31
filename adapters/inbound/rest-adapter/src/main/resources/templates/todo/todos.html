@@ -5,9 +5,15 @@
 <body id="body"
       class="todo-screen"
       hx-ext="response-targets"
-      _="on keyup[key is ':'] navigation.focusById('command-input') end"
-      _="init set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
-                  set cookies['time-zone'] to { value: zone }"
+      _="
+        init
+            set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+            set cookies['time-zone'] to { value: zone }
+
+        on keyup[key is ':'] from document
+            navigation.focusById('command-input')
+        end
+        "
 >
 <header class="todo-header">
     <span class="version"
@@ -15,11 +21,31 @@
     >
         alice@reactive-todos:1.0.0-SNAPSHOT
     </span>
-    <input type="checkbox"
-           is-="switch"
-           size-="small"
-           _="on change call theme.toggle(me)"
-    />
+    <div>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(1)
+            end
+            "
+        >
+            +
+        </span>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(-1)
+            end
+            "
+        >
+            -
+        </span>
+        <input type="checkbox"
+               is-="switch"
+               size-="small"
+               _="on change call theme.toggle(me)"
+        />
+    </div>
 </header>
 <main id="todo-main"
       class="todo-main"

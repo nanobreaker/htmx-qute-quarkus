@@ -8,12 +8,14 @@ import java.util.Set;
 public sealed interface Command
         permits
         Command.Help,
+        Command.Logout,
         Command.Todo,
         Command.Calendar,
         Command.User {
 
     // @formatter:off
     record Help() implements Command { }
+    record Logout() implements Command { }
 
     sealed interface Todo extends Command {
         record Help() implements Todo { }

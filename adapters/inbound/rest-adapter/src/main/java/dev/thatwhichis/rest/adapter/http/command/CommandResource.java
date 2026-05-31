@@ -2,6 +2,7 @@ package dev.thatwhichis.rest.adapter.http.command;
 
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.rest.adapter.cli.Command;
+import dev.thatwhichis.rest.adapter.cli.Command.Logout;
 import dev.thatwhichis.rest.adapter.cli.CommandExecutor;
 import dev.thatwhichis.rest.adapter.cli.parser.Parser;
 import dev.thatwhichis.rest.adapter.qute.templates.ErrorTemplates;
@@ -74,6 +75,7 @@ public class CommandResource {
                 case Todo.Delete    delete  -> executor.todoDelete(delete);
                 case Calendar.Show  show    -> executor.calendarShow(show);
                 case User.Show      show    -> executor.userShow(show);
+                case Logout         _       -> executor.logout();
             };
             // @formatter:on
             case Err(Error error) -> {

@@ -66,6 +66,7 @@ public class Parser {
         var programToken = tokens.removeFirst();
         return switch (programToken) {
             case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Help());
+            case Token.Keyword(var keyword) when keyword == KEYWORD.LOGOUT -> ok(new Command.Logout());
             case Token.Keyword(var keyword) when keyword == KEYWORD.TODO -> parseTodoProgram(tokens);
             case Token.Keyword(var keyword) when keyword == KEYWORD.CALENDAR -> parseCalendarProgram(tokens);
             case Token.Keyword(var keyword) when keyword == KEYWORD.USER -> parseUserProgram(tokens);

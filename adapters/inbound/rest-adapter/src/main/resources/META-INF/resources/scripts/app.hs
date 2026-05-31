@@ -14,6 +14,18 @@ def theme.toggle(switch)
     end
 end
 
+// function to change font size
+def ui.changeFontSize(delta)
+    js(delta)
+        const root = document.documentElement;
+        const current = getComputedStyle(root).getPropertyValue('--font-size').trim();
+        const value = Number.parseFloat(current || '22px');
+        const next = Math.max(10, Math.min(40, value + delta));
+
+        root.style.setProperty('--font-size', `${next}px`);
+    end
+end
+
 // function to fetch local time and update the element
 def datetime.fetchAndInsert(element)
     js(element)

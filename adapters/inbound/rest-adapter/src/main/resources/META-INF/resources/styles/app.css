@@ -104,7 +104,7 @@
                 place-items: center;
 
                 .logo {
-                    font-size: 44px;
+                    font-size: calc(var(--font-size) + 30px);
                     font-family: 'Heavy Data', monospace;
                 }
 
@@ -127,6 +127,7 @@
         grid-template-rows: 1lh 2lh;
 
         .status-line {
+            display: flex;
             justify-content: end;
             padding-inline: 1ch;
             background-color: var(--background1);
