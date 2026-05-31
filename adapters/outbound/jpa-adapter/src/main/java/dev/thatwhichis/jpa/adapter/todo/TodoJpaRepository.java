@@ -5,8 +5,8 @@ import dev.thatwhichis.core.domain.todo.TodoId;
 import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
 import dev.thatwhichis.framework.ddd.Entity;
-import dev.thatwhichis.jpa.adapter.JpaError;
 import dev.thatwhichis.library.error.Error;
+import dev.thatwhichis.library.error.JpaError;
 import dev.thatwhichis.library.option.Option;
 import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -37,7 +37,7 @@ public class TodoJpaRepository
                 .persistAndFlush(jpaEntity)
                 .map(TodoJpaEntity::into)
                 .map(Result::<Todo, Error>ok)
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -45,12 +45,11 @@ public class TodoJpaRepository
     public Uni<Result<Option<Todo>, Error>> find(final TodoId id) {
         var jpaId = TodoJpaId.from(id);
 
-        return this.getSession()
-                .flatMap(session -> session.find(TodoJpaEntity.class, jpaId))
+        return this.findById(jpaId)
                 .map(Option::some)
                 .map(jpaEntity -> jpaEntity.map(TodoJpaEntity::into))
                 .map(Result::<Option<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -66,7 +65,7 @@ public class TodoJpaRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -85,7 +84,7 @@ public class TodoJpaRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -102,7 +101,7 @@ public class TodoJpaRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -122,7 +121,7 @@ public class TodoJpaRepository
                         .collect(Collectors.toCollection(LinkedHashSet::new))
                 )
                 .map(Result::<Set<Todo>, Error>ok)
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -159,7 +158,7 @@ public class TodoJpaRepository
                                 .chain(this::flush)
                                 .replaceWith(Result.<Void, Error>empty())
                 )
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -171,7 +170,7 @@ public class TodoJpaRepository
                         ? Result.<Void, Error>empty()
                         : Result.<Void, Error>err(new JpaError.DeleteNotFound())
                 )
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -182,9 +181,9 @@ public class TodoJpaRepository
         return this.delete("id in :ids", params)
                 .map(count -> count == ids.size()
                         ? Result.<Void, Error>empty()
-                        : Result.<Void, Error>err(new JpaError.IncosistentDelete(count, (long) ids.size()))
+                        : Result.<Void, Error>err(new JpaError.InconsistentDelete(count, (long) ids.size()))
                 )
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
     @Override
@@ -193,6 +192,6 @@ public class TodoJpaRepository
 
         return this.delete("id.username = :username", params)
                 .map(_ -> Result.<Void, Error>empty())
-                .onFailure().recoverWithItem(t -> err(new JpaError.ThrowableError(t)));
+                .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 }

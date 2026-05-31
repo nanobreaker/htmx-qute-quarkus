@@ -3,71 +3,61 @@ package dev.thatwhichis.core.domain.user;
 import dev.thatwhichis.framework.ddd.Entity;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class User extends Entity<UUID> {
 
     private final String username;
-    private final List<String> sessions;
-
-    private Integer todoCreatedCount;
-    private Integer todoUpdatedCount;
-    private Integer todoDeletedCount;
-
-    private final Instant firstLogin;
-    private Instant lastLogin;
+    private final Instant createdAt;
+    private Instant touchedAt;
+    private Set<UserSession> sessions;
 
     protected User(
             final UUID id,
             final String username,
-            final List<String> sessions,
-            final Integer todoCreatedCount,
-            final Integer todoUpdatedCount,
-            final Integer todoDeletedCount,
-            final Instant firstLogin,
-            final Instant lastLogin
+            final Instant createdAt,
+            final Instant touchedAt,
+            final Set<UserSession> sessions
     ) {
         super(id);
         this.username = username;
+        this.createdAt = createdAt;
+        this.touchedAt = touchedAt;
         this.sessions = sessions;
-        this.todoCreatedCount = todoCreatedCount;
-        this.todoUpdatedCount = todoUpdatedCount;
-        this.todoDeletedCount = todoDeletedCount;
-        this.firstLogin = firstLogin;
-        this.lastLogin = lastLogin;
     }
 
-    public void updateSession(String session) {
+    public String getUsername() {
+        return username;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getTouchedAt() {
+        return touchedAt;
+    }
+
+    public Set<UserSession> getSessions() {
+        return sessions;
+    }
+
+    public void setTouchedAt(Instant touchedAt) {
+        this.touchedAt = touchedAt;
+    }
+
+    public void updateSession(UserSession session) {
         this.sessions.add(session);
-    }
-
-    public void setLastLogin(Instant lastLogin) {
-        this.lastLogin = lastLogin;
-    }
-
-    public void setTodoCreatedCount(Integer todoCreatedCount) {
-        this.todoCreatedCount = todoCreatedCount;
-    }
-
-    public void setTodoUpdatedCount(Integer todoUpdatedCount) {
-        this.todoUpdatedCount = todoUpdatedCount;
-    }
-
-    public void setTodoDeletedCount(Integer todoDeletedCount) {
-        this.todoDeletedCount = todoDeletedCount;
     }
 
     public static final class Builder {
 
         private final UUID id;
         private String username;
-        private List<String> sessions;
-        private Integer todoCreatedCount;
-        private Integer todoUpdatedCount;
-        private Integer todoDeletedCount;
-        private Instant lastLogin;
-        private Instant firstLogin;
+        private Instant createdAt;
+        private Instant touchedAt;
+        private Set<UserSession> sessions;
 
         public Builder(UUID id) {
             this.id = id;
@@ -78,33 +68,18 @@ public class User extends Entity<UUID> {
             return this;
         }
 
-        public Builder withSessions(List<String> sessions) {
+        public Builder withSessions(Set<UserSession> sessions) {
             this.sessions = sessions;
             return this;
         }
 
-        public Builder withTodoCreatedCount(Integer todoCreatedCount) {
-            this.todoCreatedCount = todoCreatedCount;
+        public Builder withCreatedAt(Instant createdAt) {
+            this.createdAt = createdAt;
             return this;
         }
 
-        public Builder withTodoUpdatedCount(Integer todoUpdatedCount) {
-            this.todoUpdatedCount = todoUpdatedCount;
-            return this;
-        }
-
-        public Builder withTodoDeletedCount(Integer todoDeletedCount) {
-            this.todoDeletedCount = todoDeletedCount;
-            return this;
-        }
-
-        public Builder withLastLogin(Instant lastLogin) {
-            this.lastLogin = lastLogin;
-            return this;
-        }
-
-        public Builder withFirstLogin(Instant firstLogin) {
-            this.firstLogin = firstLogin;
+        public Builder withTouchedAt(Instant touchedAt) {
+            this.touchedAt = touchedAt;
             return this;
         }
 
@@ -112,12 +87,9 @@ public class User extends Entity<UUID> {
             return new User(
                     id,
                     username,
-                    sessions,
-                    todoCreatedCount,
-                    todoUpdatedCount,
-                    todoDeletedCount,
-                    lastLogin,
-                    firstLogin
+                    createdAt,
+                    touchedAt,
+                    sessions
             );
         }
     }

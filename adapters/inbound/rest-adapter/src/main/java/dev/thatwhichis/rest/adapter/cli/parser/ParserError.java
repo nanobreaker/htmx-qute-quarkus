@@ -5,7 +5,7 @@ import dev.thatwhichis.library.error.Error;
 public sealed interface ParserError extends Error {
 
     // @formatter:off
-    record UnknownToken(String program)               implements ParserError { }
+    record UnknownToken(String program)                 implements ParserError { }
     record NotProgram(String keyword)                   implements ParserError { }
     record NotKeyword(String value)                     implements ParserError { }
     record UnknownCommand(String command)               implements ParserError { }
@@ -30,11 +30,15 @@ public sealed interface ParserError extends Error {
             case ArgumentNotFound           _ ->    "parser error: argument required";
             case ArgumentOrFilterNotFound   _ ->    "parser error: argument or filter required";
             case NotSupportedOperation      _ ->    "parser error: not supported operation";
-            case UnknownToken             e ->    "parser error: program \"%s\" not supported".formatted(e.program());
-            case NotProgram                 e ->    "parser error: provided keyword \"%s\" is not a program".formatted(e.keyword());
-            case NotKeyword                 e ->    "parser error: \"%s\" is not a valid keyword".formatted(e.value());
-            case UnknownCommand             e ->    "parser error: command \"%s\" not supported".formatted(e.command());
-            case DateTimeParseError         e ->    "parser error: string \"%s\" is not a valid date time"
+            case UnknownToken               e ->    "parser error: program \"%s\" not supported"
+                                                    .formatted(e.program());
+            case NotProgram                 e ->    "parser error: provided keyword \"%s\" is not a program"
+                                                    .formatted(e.keyword());
+            case NotKeyword                 e ->    "parser error: \"%s\" is not a valid keyword"
+                                                    .formatted(e.value());
+            case UnknownCommand             e ->    "parser error: command \"%s\" not supported"
+                                                    .formatted(e.command());
+            case DateTimeParseError         e ->    "parser error: string \"%s\" is not a valid date issuedAt"
                                                     .formatted(e.description());
             case DateParseError             e ->    "parser error: string \"%s\" is not a valid date"
                                                     .formatted(e.description());

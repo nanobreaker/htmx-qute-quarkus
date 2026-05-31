@@ -2,8 +2,10 @@ package dev.thatwhichis.rest.adapter.cli;
 
 import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoId;
+import dev.thatwhichis.core.domain.user.User;
 import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.inbound.todo.TodoQuery;
+import dev.thatwhichis.core.ports.inbound.user.UserQuery;
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.rest.adapter.qute.templates.ErrorTemplates;
 import dev.thatwhichis.rest.adapter.qute.templates.HelpTemplates;
@@ -13,6 +15,7 @@ import dev.thatwhichis.rest.adapter.qute.templates.UserTemplates;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
+import io.quarkus.oidc.runtime.OidcJwtCallerPrincipal;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
@@ -20,10 +23,12 @@ import io.vertx.mutiny.core.eventbus.Message;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.jwt.Claims;
 
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -31,17 +36,17 @@ public class CommandExecutor {
 
     private final EventBus eventBus;
     private final CommandDescriber describer;
-    private final SecurityIdentity securityIdentity;
+    private final SecurityIdentity identity;
 
     @Inject
     public CommandExecutor(
             EventBus eventBus,
             CommandDescriber describer,
-            SecurityIdentity securityIdentity
+            SecurityIdentity identity
     ) {
         this.eventBus = eventBus;
         this.describer = describer;
-        this.securityIdentity = securityIdentity;
+        this.identity = identity;
     }
 
     public Uni<Response> help(final Command cmd) {
@@ -67,7 +72,7 @@ public class CommandExecutor {
                     var start,
                     var end
             ) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var startZoned = start.map(s -> s.atZone(zoneId));
                 var endZoned = end.map(e -> e.atZone(zoneId));
                 var command = new TodoCommand.Create(username, title, description, startZoned, endZoned);
@@ -116,7 +121,7 @@ public class CommandExecutor {
     ) {
         return switch (cmd) {
             case Command.Todo.List.All _ -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var query = new TodoQuery.List.All(username);
                 var responseUni = eventBus
                         .<Result<Set<Todo>, Error>>request("query.todo.list", query)
@@ -142,7 +147,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.List.ByIds(var ids) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
                 var query = new TodoQuery.List.ByIds(idz);
 
@@ -170,7 +175,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.List.ByFilters(var filters) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var query = new TodoQuery.List.ByFilters(username, filters);
 
                 var responseUni = eventBus
@@ -197,7 +202,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.List.ByIdsAndFilters(var ids, var filters) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
                 var query = new TodoQuery.List.ByIdsAndFilters(idz, filters);
 
@@ -243,7 +248,7 @@ public class CommandExecutor {
     ) {
         return switch (cmd) {
             case Command.Todo.Update.ByIds(var ids, var payload) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
                 var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
@@ -275,7 +280,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.Update.ByFilters(var filters, var payload) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
                         payload.description(),
@@ -307,7 +312,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.Update.ByIdsAndFilters(var ids, var filters, var payload) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
                 var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
@@ -356,7 +361,7 @@ public class CommandExecutor {
     public Uni<Response> todoDelete(final Command.Todo.Delete cmd) {
         return switch (cmd) {
             case Command.Todo.Delete.All _ -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var command = new TodoCommand.Delete.All(username);
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.delete", command)
@@ -382,7 +387,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.Delete.ByIds(var ids) -> {
-                var username = securityIdentity.getPrincipal().getName();
+                var username = identity.getPrincipal().getName();
                 var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
                 var command = new TodoCommand.Delete.ByIds(idz);
                 var responseUni = eventBus
@@ -428,15 +433,31 @@ public class CommandExecutor {
     }
 
     public Uni<Response> userShow(final Command.User ignored) {
-        var template = UserTemplates.user();
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+        var query = new UserQuery.Show(userId);
 
-        return template.createUni()
-                .map(html -> Response
-                        .ok()
-                        .header("HX-Retarget", "#user-dialog")
-                        .header("HX-Reswap", "outerHTML")
-                        .entity(html)
-                        .build()
-                );
+        return eventBus
+                .<Result<User, Error>>request("query.user.show", query)
+                .map(Message::body)
+                .map(result -> switch (result) {
+                    case Ok(var user) -> {
+                        var html = UserTemplates.user(user).render();
+
+                        yield Response.ok()
+                                .header("HX-Retarget", "#user-dialog")
+                                .header("HX-Reswap", "outerHTML")
+                                .entity(html)
+                                .build();
+                    }
+                    case Err(Error err) -> {
+                        var text = err.describe();
+                        var html = ErrorTemplates.error(text).render();
+
+                        yield Response.serverError()
+                                .entity(html)
+                                .build();
+                    }
+                });
     }
 }

@@ -9,9 +9,10 @@ public interface UserCommand extends Command {
 
     record Authenticate(
             UUID id,
-            String username,
-            String session,
-            Instant time
+            String upn,
+            String sid,
+            Instant issuedAt,
+            Instant expiresAt
     ) implements UserCommand {
 
     }

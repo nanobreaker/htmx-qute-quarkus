@@ -12,8 +12,11 @@ import java.time.ZonedDateTime;
 @Entity
 public class TodoJpaEntity {
 
-    @Version private Integer version;
-    @EmbeddedId private TodoJpaId id;
+    @Version
+    private Integer version;
+
+    @EmbeddedId
+    private TodoJpaId id;
 
     private String title;
     private String description;

@@ -1,6 +1,7 @@
 package dev.thatwhichis.app.usecases.user;
 
 import dev.thatwhichis.core.domain.user.User;
+import dev.thatwhichis.core.domain.user.UserSession;
 import dev.thatwhichis.core.ports.inbound.user.UserCommand;
 import dev.thatwhichis.core.ports.outbound.user.UserRepository;
 import dev.thatwhichis.framework.cqrs.CommandHandler;
@@ -17,7 +18,8 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @ApplicationScoped
 public class UserAuthenticatedHandler implements CommandHandler<UserCommand.Authenticate, Void> {
@@ -39,23 +41,22 @@ public class UserAuthenticatedHandler implements CommandHandler<UserCommand.Auth
 
         return userUniResOpt.flatMap(result -> switch (result) {
             case Ok(Some(var user)) -> {
-                user.updateSession(command.session());
-                user.setLastLogin(command.time());
+                var session = new UserSession(command.sid(), command.issuedAt(), command.expiresAt());
 
-                // todo: handle result, in case of error propagate
+                user.updateSession(session);
+                user.setTouchedAt(command.issuedAt());
+
                 yield userRepository
                         .save(user)
                         .replaceWith(Result.empty());
             }
             case Ok(None()) -> {
+                var session = new UserSession(command.sid(), command.issuedAt(), command.expiresAt());
                 var user = new User.Builder(id)
-                        .withUsername(command.username())
-                        .withSessions(List.of(command.session()))
-                        .withFirstLogin(command.time())
-                        .withLastLogin(command.time())
-                        .withTodoCreatedCount(0)
-                        .withTodoUpdatedCount(0)
-                        .withTodoDeletedCount(0)
+                        .withUsername(command.upn())
+                        .withSessions(new HashSet<>(Set.of(session)))
+                        .withCreatedAt(command.issuedAt())
+                        .withTouchedAt(command.issuedAt())
                         .build();
 
                 // todo: handle result, in case of error propagate

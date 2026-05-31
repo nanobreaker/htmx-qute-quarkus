@@ -34,7 +34,7 @@
          shear-="both"
     >
         <div class="todo-title">
-            <span>#{todo.id.id}</span>
+            <span>#{id:format(todo.id.id)}</span>
             <span>[{todo.title}]</span>
         </div>
         <div class="todo-content"
@@ -64,7 +64,11 @@
               is-="spinner"
         >
         </span>
-        <span>2026-05-14 12:00</span>
+        <span _="init repeat forever
+                    datetime.fetchAndInsert(me)
+                    wait 60s
+                 end">
+        </span>
     </div>
     <form id="command-line"
           class="command-line"

@@ -1,4 +1,11 @@
 package dev.thatwhichis.core.domain.user;
 
-public record UserSession() {
+import java.time.Instant;
+
+public record UserSession(
+        String id,
+        Instant createdAt,
+        Instant expiresAt
+) {
+
 }

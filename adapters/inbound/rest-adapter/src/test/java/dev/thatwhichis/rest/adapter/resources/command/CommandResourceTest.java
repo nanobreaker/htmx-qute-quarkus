@@ -38,7 +38,7 @@ public class CommandResourceTest extends TestBase {
                     .auth().oauth2(ACCESS_TOKEN)
                     .header("X-CSRF-TOKEN", CSRF_TOKEN)
                     .cookie("csrf-token", CSRF_TOKEN)
-                    .cookie("time-zone", USER_TIME_ZONE)
+                    .cookie("issuedAt-zone", USER_TIME_ZONE)
                     .contentType(ContentType.URLENC)
                     .formParams(Map.of("command", query))
                 .when()

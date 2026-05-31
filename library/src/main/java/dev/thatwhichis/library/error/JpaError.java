@@ -1,11 +1,10 @@
-package dev.thatwhichis.jpa.adapter;
-
-import dev.thatwhichis.library.error.Error;
+package dev.thatwhichis.library.error;
 
 public sealed interface JpaError extends Error {
 
     // @formatter:off
-    record ThrowableError(Throwable throwable) implements JpaError { }
+    record Uncategorized(Throwable throwable) implements JpaError { }
+    record EntityNotFound() implements JpaError { }
     record DeleteNotFound() implements JpaError { }
     record InconsistentDelete(Long actual, Long expected) implements JpaError { }
     // @formatter:on
@@ -13,7 +12,8 @@ public sealed interface JpaError extends Error {
     @Override
     default String describe() {
         return switch (this) {
-            case ThrowableError t -> "jpa error: throwable error %s".formatted(t.throwable().getMessage());
+            case Uncategorized t -> "jpa error: throwable error %s".formatted(t.throwable().getMessage());
+            case EntityNotFound _ -> "jpa error: entity not found";
             case DeleteNotFound _ -> "jpa error: entity to delete not found";
             case InconsistentDelete _ -> "jpa error: number of deleted entities does match with request";
         };

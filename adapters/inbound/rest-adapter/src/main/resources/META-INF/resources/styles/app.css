@@ -200,77 +200,77 @@
         position: relative;
         display: grid;
         grid-template-rows: auto 1lh 3lh;
+
+        .feedback {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 3lh;
+
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+
+            pointer-events: none;
+
+            .feedback-message {
+                padding: 0lh 1ch 0lh 1ch;
+            }
+
+            .feedback-info {
+                white-space: pre;
+                color: var(--foreground1);
+                background-color: var(--background1);
+            }
+
+            .feedback-error {
+                white-space: normal;
+                color: var(--red);
+                background-color: var(--background1);
+            }
+        }
+
+        .feedback:not(:empty) {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .status-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-inline: 1ch;
+            background-color: var(--background1);
+
+            .command-spinner {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            .htmx-request .command-spinner,
+            .htmx-request.command-spinner {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        .command-line {
+            display: grid;
+            grid-template-columns: 1ch 1fr 0ch;
+
+            .command-input {
+                background-color: var(--background0);
+                padding: 0ch 0ch;
+            }
+        }
+
+        .command-line label {
+            visibility: hidden;
+        }
+
+        .command-line:focus-within label {
+            visibility: visible;
+        }
     }
-}
-
-.feedback {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 3lh;
-
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-
-    pointer-events: none;
-}
-
-.feedback:not(:empty) {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.feedback-message {
-    padding: 0lh 1ch 0lh 1ch;
-}
-
-.feedback-info {
-    white-space: pre;
-    color: var(--foreground1);
-    background-color: var(--background1);
-}
-
-.feedback-error {
-    white-space: normal;
-    color: var(--red);
-    background-color: var(--background1);
-}
-
-.status-line {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-inline: 1ch;
-    background-color: var(--background1);
-}
-
-.command-spinner {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.htmx-request .command-spinner,
-.htmx-request.command-spinner {
-    opacity: 1;
-    visibility: visible;
-}
-
-.command-line {
-    display: grid;
-    grid-template-columns: 1ch 1fr 0ch;
-}
-
-.command-line label {
-    visibility: hidden;
-}
-
-.command-line:focus-within label {
-    visibility: visible;
-}
-
-.command-input {
-    background-color: var(--background0);
-    padding: 0ch 0ch;
 }
 
 .user-dialog {
@@ -279,7 +279,7 @@
 
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
 
             span {
                 padding: 0 1ch;
@@ -288,19 +288,56 @@
         }
 
         .content {
-            display: grid;
-            grid-template-rows: 1lh 1lh 1lh 1lh 1lh;
-            padding: 1lh 1ch;
-            text-align: center;
+            .user {
+                .id-header {
+                    text-align: center;
 
-            .row {
-                display: flex;
-                justify-content: space-between;
+                    color: var(--background0);
+                    background-color: var(--foreground0);
+                }
+
+                .id-value {
+                    text-align: center;
+                }
+
+                .created-touched-headers {
+                    display: flex;
+                    justify-content: space-evenly;
+
+                    color: var(--background0);
+                    background-color: var(--foreground0);
+                }
+
+                .created-touched-values {
+                    display: flex;
+                    justify-content: space-evenly;
+                }
             }
 
-            .row > div:first-child {
+            .sessions-header {
+                text-align: center;
+
+                color: var(--background0);
                 background-color: var(--foreground0);
-                color: var(--background1);
+            }
+
+            .sessions-column-headers {
+                display: grid;
+                grid-template-columns: 24ch 17ch 17ch;
+                grid-template-rows: auto;
+                text-align: center;
+                gap: 2ch;
+
+                color: var(--background0);
+                background-color: var(--foreground0);
+            }
+
+            .sessions {
+                display: grid;
+                grid-template-columns: 24ch 17ch 17ch;
+                grid-template-rows: auto;
+                text-align: center;
+                gap: 2ch;
             }
 
         }

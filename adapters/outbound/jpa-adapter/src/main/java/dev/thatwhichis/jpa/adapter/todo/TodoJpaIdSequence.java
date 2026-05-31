@@ -8,6 +8,7 @@ public class TodoJpaIdSequence {
 
     @Id
     private String username;
+
     private Integer seq;
 
     public void setSeq(Integer id) {

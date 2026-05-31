@@ -10,7 +10,9 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-    Uni<Result<Option<User>, Error>> find(UUID id);
-
     Uni<Result<User, Error>> save(User user);
+
+    Uni<Result<User, Error>> get(UUID userId);
+
+    Uni<Result<Option<User>, Error>> find(UUID userId);
 }
