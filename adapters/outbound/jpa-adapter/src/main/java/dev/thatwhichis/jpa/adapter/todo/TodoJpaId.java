@@ -4,19 +4,20 @@ import dev.thatwhichis.core.domain.todo.TodoId;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Embeddable
 public class TodoJpaId implements Serializable {
 
     private Integer id;
-    private String username;
+    private UUID userId;
 
     public TodoJpaId(
             final Integer id,
-            final String username
+            final UUID userId
     ) {
         this.id = id;
-        this.username = username;
+        this.userId = userId;
     }
 
     public TodoJpaId() {
@@ -26,23 +27,23 @@ public class TodoJpaId implements Serializable {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public String getUsername() {
-        return username;
+    public UUID getUserId() {
+        return userId;
     }
 
     public TodoId into() {
-        return new TodoId(this.id, this.username);
+        return new TodoId(this.id, this.userId);
     }
 
     public static TodoJpaId from(TodoId id) {
-        return new TodoJpaId(id.getId(), id.getUsername());
+        return new TodoJpaId(id.id(), id.userId());
     }
 }

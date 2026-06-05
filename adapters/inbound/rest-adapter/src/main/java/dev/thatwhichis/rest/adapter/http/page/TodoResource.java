@@ -14,7 +14,9 @@ import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
 import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.quarkus.oidc.runtime.OidcJwtCallerPrincipal;
 import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -36,14 +38,15 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.Claims;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Path("todos")
@@ -51,7 +54,7 @@ import java.util.stream.Collectors;
 public class TodoResource {
 
     private final EventBus eventBus;
-    private final JsonWebToken jwt;
+    private final SecurityIdentity identity;
 
     //@formatter:off
     public record TodoCreateRequest(
@@ -79,24 +82,29 @@ public class TodoResource {
     //@formatter:on
 
     @Inject
-    public TodoResource(final EventBus eventBus, JsonWebToken jwt) {
+    public TodoResource(
+            final EventBus eventBus,
+            final SecurityIdentity identity
+    ) {
         this.eventBus = eventBus;
-        this.jwt = jwt;
+        this.identity = identity;
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @WithSpan("todos")
-    public Uni<Response> todos(@CookieParam("time-zone") String zone) {
-        var username = jwt.<String>getClaim(Claims.upn);
-        var query = new TodoQuery.List.All(username);
+    public Uni<Response> todos(@CookieParam("time-zone") final String zone) {
+        var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+        var query = new TodoQuery.List.All(userId);
 
         var reply = eventBus
                 .<Result<Set<Todo>, Error>>request("query.todo.list", query)
                 .map(Message::body);
 
         return reply.flatMap(result -> switch (result) {
-            case Ok(var todos) -> TodoTemplates.todos(todos)
+            case Ok(var todos) -> TodoTemplates.todos(todos, zoneId)
                     .createUni()
                     .map(html -> Response.ok(html).build());
             case Err(var err) -> ErrorTemplates.error(err.toString())
@@ -109,15 +117,18 @@ public class TodoResource {
     @Path("search")
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> search(
-            @QueryParam("id") Set<Integer> ids,
-            @QueryParam("filters") Set<String> filters
+            @QueryParam("id") final Set<Integer> ids,
+            @QueryParam("filters") final Set<String> filters,
+            @CookieParam("time-zone") final String zone
     ) {
-        var username = jwt.<String>getClaim(Claims.upn);
-        var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
+        var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+        var idz = ids.stream().map(id -> new TodoId(id, userId)).collect(Collectors.toSet());
         var query = switch (Pair.of(idz, filters)) {
-            case Pair(var i, var f) when i.isEmpty() && f.isEmpty() -> new TodoQuery.List.All(username);
+            case Pair(var i, var f) when i.isEmpty() && f.isEmpty() -> new TodoQuery.List.All(userId);
             case Pair(var i, var f) when f.isEmpty() -> new TodoQuery.List.ByIds(i);
-            case Pair(var i, var f) when i.isEmpty() -> new TodoQuery.List.ByFilters(username, f);
+            case Pair(var i, var f) when i.isEmpty() -> new TodoQuery.List.ByFilters(userId, f);
             case Pair(var _, var _) -> new TodoQuery.List.ByIdsAndFilters(idz, filters);
         };
 
@@ -127,7 +138,7 @@ public class TodoResource {
 
         return reply.map(result -> switch (result) {
             case Ok(var todos) -> Response.ok()
-                    .entity(TodoTemplates.todos$items(todos).render())
+                    .entity(TodoTemplates.todos$items(todos, zoneId).render())
                     .build();
             case Err(var err) -> Response.serverError()
                     .entity(ErrorTemplates.error(err.toString()).render())
@@ -139,10 +150,13 @@ public class TodoResource {
     @Path("{id}")
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> get(
-            @PathParam("id") Integer id
+            @PathParam("id") final Integer id,
+            @CookieParam("time-zone") final String zone
     ) {
-        var username = jwt.<String>getClaim(Claims.upn);
-        var todoId = new TodoId(id, username);
+        var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+        var todoId = new TodoId(id, userId);
         var query = new TodoQuery.Get.ById(todoId);
 
         var reply = eventBus
@@ -151,7 +165,7 @@ public class TodoResource {
 
         return reply.map(result -> switch (result) {
             case Ok(Todo todo) -> Response.ok()
-                    .entity(TodoTemplates.todos$item(todo).render())
+                    .entity(TodoTemplates.todos$item(todo, zoneId).render())
                     .build();
             case Err(Error err) -> switch (err) {
                 case TodoError.NotFound _ -> Response.status(Response.Status.NOT_FOUND).build();
@@ -166,17 +180,18 @@ public class TodoResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> create(
-            @CookieParam("time-zone") String zone,
-            @Valid @BeanParam TodoCreateRequest request
+            @CookieParam("time-zone") final String zone,
+            @Valid @BeanParam final TodoCreateRequest request
     ) {
-        var username = jwt.<String>getClaim(Claims.upn);
         var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
         var title = request.title();
         var description = request.getDescription();
-        var start = request.getStart().map(s -> s.atZone(zoneId));
-        var end = request.getEnd().map(e -> e.atZone(zoneId));
+        var start = request.getStart().map(s -> s.atZone(zoneId)).map(ZonedDateTime::toInstant);
+        var end = request.getEnd().map(e -> e.atZone(zoneId)).map(ZonedDateTime::toInstant);
         var command = new TodoCommand.Create(
-                username,
+                userId,
                 title,
                 description,
                 start,
@@ -189,9 +204,9 @@ public class TodoResource {
 
         return reply.map(result -> switch (result) {
             case Ok(Todo todo) -> {
-                var id = todo.getId().getId();
+                var id = todo.getId().id();
                 var location = URI.create("/todo/%s".formatted(id));
-                var html = TodoTemplates.todos$item(todo).render();
+                var html = TodoTemplates.todos$item(todo, zoneId).render();
 
                 yield Response.created(location)
                         .entity(html)
@@ -208,15 +223,16 @@ public class TodoResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Uni<Response> patch(
-            @CookieParam("time-zone") String zone,
-            @PathParam("id") Integer pathId,
-            @Valid @BeanParam TodoUpdateRequest request
+            @CookieParam("time-zone") final String zone,
+            @PathParam("id") final Integer pathId,
+            @Valid @BeanParam final TodoUpdateRequest request
     ) {
-        var username = jwt.<String>getClaim(Claims.upn);
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
         var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
-        var start = request.getStart().map(dt -> dt.atZone(zoneId));
-        var end = request.getEnd().map(dt -> dt.atZone(zoneId));
-        var id = new TodoId(pathId, username);
+        var start = request.getStart().map(dt -> dt.atZone(zoneId)).map(ZonedDateTime::toInstant);
+        var end = request.getEnd().map(dt -> dt.atZone(zoneId)).map(ZonedDateTime::toInstant);
+        var id = new TodoId(pathId, userId);
         var payload = new TodoCommand.Update.Payload(
                 request.getTitle(),
                 request.getDescription(),
@@ -240,9 +256,10 @@ public class TodoResource {
     @DELETE
     @Path("{id}")
     @Produces(MediaType.TEXT_HTML)
-    public Uni<Response> delete(@PathParam("id") Integer id) {
-        var username = jwt.<String>getClaim(Claims.upn);
-        var todoId = new TodoId(id, username);
+    public Uni<Response> delete(@PathParam("id") final Integer id) {
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+        var todoId = new TodoId(id, userId);
         var command = new TodoCommand.Delete.ByIds(Set.of(todoId));
 
         var reply = eventBus

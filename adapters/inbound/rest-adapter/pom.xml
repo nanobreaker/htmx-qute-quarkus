@@ -17,15 +17,15 @@
     <dependencies>
         <dependency>
             <groupId>dev.thatwhichis</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>dev.thatwhichis</groupId>
             <artifactId>library</artifactId>
         </dependency>
         <dependency>
             <groupId>dev.thatwhichis</groupId>
             <artifactId>framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.thatwhichis</groupId>
+            <artifactId>core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -79,6 +79,11 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jacoco</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -86,6 +91,9 @@
             <plugin>
                 <groupId>io.smallrye</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

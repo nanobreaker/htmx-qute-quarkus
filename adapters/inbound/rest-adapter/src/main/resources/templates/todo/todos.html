@@ -1,4 +1,5 @@
 {@java.util.Set<dev.thatwhichis.core.domain.todo.Todo> todos}
+{@java.time.ZoneId zone}
 {@dev.thatwhichis.core.domain.todo.Todo todo}
 
 {#include base}
@@ -60,7 +61,7 @@
          shear-="both"
     >
         <div class="todo-title">
-            <span>#{id:format(todo.id.id)}</span>
+            <span>[{id:format(todo.id.id)}]</span>
             <span>[{todo.title}]</span>
         </div>
         <div class="todo-content"
@@ -69,8 +70,8 @@
             {todo.getDescription.orElse("")}
         </div>
         <div class="todo-dates">
-            <span>{date:format(todo.getStart)}</span>
-            <span>{date:format(todo.getEnd)}</span>
+            <span>{date:format(todo.getStart, zone)}</span>
+            <span>{date:format(todo.getEnd, zone)}</span>
         </div>
     </div>
     {/fragment}

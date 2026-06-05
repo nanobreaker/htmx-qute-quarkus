@@ -4,8 +4,8 @@ import dev.thatwhichis.core.domain.todo.TodoEvent;
 import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
 import dev.thatwhichis.framework.cqrs.CommandHandler;
-import dev.thatwhichis.framework.ddd.DomainEvent;
-import dev.thatwhichis.framework.ddd.EventDispatcher;
+import dev.thatwhichis.framework.event.DomainEvent;
+import dev.thatwhichis.framework.event.EventDispatcher;
 import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -39,15 +39,15 @@ public class DeleteTodoHandler implements CommandHandler<TodoCommand.Delete, Voi
     @WithSpan("handleTodoDeleteCommand")
     public Uni<Result<Void, Error>> handle(final TodoCommand.Delete command) {
         return switch (command) {
-            case TodoCommand.Delete.All(var username) -> {
-                var domainEvents = Set.<DomainEvent>of(new TodoEvent.DeletedAll());
+            case TodoCommand.Delete.All(var userId) -> {
+                var domainEvents = Set.<DomainEvent>of(new TodoEvent.DeletedAll(userId));
 
-                yield eventDispatcher.on(() -> todoRepository.deleteAll(username), domainEvents);
+                yield eventDispatcher.on(() -> todoRepository.deleteAll(userId), domainEvents);
             }
             case TodoCommand.Delete.ByIds(var ids) -> {
                 var domainEvents = ids.stream()
                         .map(TodoEvent.Deleted::new)
-                        .collect(Collectors.<DomainEvent>toUnmodifiableList());
+                        .collect(Collectors.<DomainEvent>toSet());
 
                 yield eventDispatcher.on(() -> todoRepository.delete(ids), domainEvents);
             }

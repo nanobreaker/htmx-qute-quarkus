@@ -1,10 +1,12 @@
 package dev.thatwhichis.app.usecases.user;
 
 import dev.thatwhichis.core.domain.user.User;
+import dev.thatwhichis.core.domain.user.UserEvent;
 import dev.thatwhichis.core.domain.user.UserSession;
 import dev.thatwhichis.core.ports.inbound.user.UserCommand;
 import dev.thatwhichis.core.ports.outbound.user.UserRepository;
 import dev.thatwhichis.framework.cqrs.CommandHandler;
+import dev.thatwhichis.framework.event.EventDispatcher;
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.library.option.None;
 import dev.thatwhichis.library.option.Some;
@@ -21,14 +23,19 @@ import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.github.dcadea.jresult.Result.empty;
+import static io.github.dcadea.jresult.Result.err;
+
 @ApplicationScoped
 public class UserAuthenticatedHandler implements CommandHandler<UserCommand.Authenticate, Void> {
 
-    private final UserRepository userRepository;
+    private final UserRepository repository;
+    private final EventDispatcher eventDispatcher;
 
     @Inject
-    public UserAuthenticatedHandler(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserAuthenticatedHandler(UserRepository repository, EventDispatcher eventDispatcher) {
+        this.repository = repository;
+        this.eventDispatcher = eventDispatcher;
     }
 
     @Override
@@ -37,7 +44,7 @@ public class UserAuthenticatedHandler implements CommandHandler<UserCommand.Auth
     @WithSpan("handleUserAuthenticatedCommand")
     public Uni<Result<Void, Error>> handle(UserCommand.Authenticate command) {
         var id = command.id();
-        var userUniResOpt = userRepository.find(id);
+        var userUniResOpt = repository.find(id);
 
         return userUniResOpt.flatMap(result -> switch (result) {
             case Ok(Some(var user)) -> {
@@ -46,9 +53,12 @@ public class UserAuthenticatedHandler implements CommandHandler<UserCommand.Auth
                 user.updateSession(session);
                 user.setTouchedAt(command.issuedAt());
 
-                yield userRepository
+                yield repository
                         .save(user)
-                        .replaceWith(Result.empty());
+                        .map(r -> switch (r) {
+                            case Ok(_) -> empty();
+                            case Err(Error error) -> err(error);
+                        });
             }
             case Ok(None()) -> {
                 var session = new UserSession(command.sid(), command.issuedAt(), command.expiresAt());
@@ -59,12 +69,14 @@ public class UserAuthenticatedHandler implements CommandHandler<UserCommand.Auth
                         .withTouchedAt(command.issuedAt())
                         .build();
 
-                // todo: handle result, in case of error propagate
-                yield userRepository
-                        .save(user)
-                        .replaceWith(Result.empty());
+                yield eventDispatcher
+                        .on(() -> repository.save(user), new UserEvent.Created(user))
+                        .map(r -> switch (r) {
+                            case Ok(_) -> empty();
+                            case Err(Error error) -> err(error);
+                        });
             }
-            case Err(var error) -> Uni.createFrom().item(Result.err(error));
+            case Err(var error) -> Uni.createFrom().item(err(error));
         });
     }
 }

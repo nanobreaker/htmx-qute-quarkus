@@ -23,7 +23,11 @@ public class SseResource {
     private final Sse sse;
 
     @Inject
-    public SseResource(SseRegistry sseRegistry, JsonWebToken jwt, Sse sse) {
+    public SseResource(
+            final SseRegistry sseRegistry,
+            final JsonWebToken jwt,
+            final Sse sse
+    ) {
         this.sseRegistry = sseRegistry;
         this.jwt = jwt;
         this.sse = sse;
@@ -32,7 +36,7 @@ public class SseResource {
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @WithSpan("register")
-    public void register(@Context SseEventSink eventSink) {
+    public void register(@Context final SseEventSink eventSink) {
         var upn = jwt.<String>getClaim(Claims.upn);
         var sid = jwt.<String>getClaim("sid");
         sseRegistry.register(upn, sid, eventSink);

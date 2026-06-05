@@ -18,6 +18,7 @@
         <module>adapters/inbound/rest-adapter</module>
         <module>adapters/outbound/jpa-adapter</module>
         <module>boot</module>
+        <module>e2e</module>
     </modules>
 
     <properties>
@@ -141,6 +142,16 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <quarkus.jacoco.data-file>${maven.multiModuleProjectDirectory}/target/jacoco.exec</quarkus.jacoco.data-file>
+                            <quarkus.jacoco.reuse-data-file>true</quarkus.jacoco.reuse-data-file>
+                            <quarkus.jacoco.report-location>${maven.multiModuleProjectDirectory}/target/coverage</quarkus.jacoco.report-location>
+                        </systemPropertyVariables>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

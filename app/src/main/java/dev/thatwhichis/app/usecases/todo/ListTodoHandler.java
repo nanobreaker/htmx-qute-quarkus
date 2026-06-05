@@ -31,9 +31,9 @@ public class ListTodoHandler implements QueryHandler<TodoQuery.List, Set<Todo>> 
     @WithSpan("handleTodoListQuery")
     public Uni<Result<Set<Todo>, Error>> execute(final TodoQuery.List query) {
         return switch (query) {
-            case TodoQuery.List.All(var username) -> todoRepository.list(username);
+            case TodoQuery.List.All(var userId) -> todoRepository.list(userId);
             case TodoQuery.List.ByIds(var ids) -> todoRepository.list(ids);
-            case TodoQuery.List.ByFilters(var username, var filters) -> todoRepository.list(username, filters);
+            case TodoQuery.List.ByFilters(var userId, var filters) -> todoRepository.list(userId, filters);
             case TodoQuery.List.ByIdsAndFilters(var ids, var filters) -> todoRepository.list(ids, filters);
         };
     }

@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static jakarta.persistence.FetchType.EAGER;
+
 @Entity
 public class CalendarJpaEntity {
 
@@ -21,8 +23,8 @@ public class CalendarJpaEntity {
     @Id
     private UUID id;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "calendar_id", nullable = false)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = EAGER)
+    @JoinColumn(name = "calendar_id")
     private Set<CalendarEntryJpaEntity> entries;
 
     public CalendarJpaEntity(UUID id, Set<CalendarEntryJpaEntity> entries) {
@@ -34,8 +36,13 @@ public class CalendarJpaEntity {
 
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public Calendar into() {
-        var entries = this.entries
+        var entries = this
+                .entries
                 .stream()
                 .map(CalendarEntryJpaEntity::into)
                 .collect(Collectors.toSet());
@@ -46,7 +53,8 @@ public class CalendarJpaEntity {
     }
 
     public static CalendarJpaEntity from(Calendar calendar) {
-        var entries = calendar.getEntries()
+        var entries = calendar
+                .getEntries()
                 .stream()
                 .map(CalendarEntryJpaEntity::from)
                 .collect(Collectors.toSet());

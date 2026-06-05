@@ -1,7 +1,7 @@
 @layer base {
 
     :root {
-        --font-size: 19px;
+        --font-size: 22px;
         --line-height: 1.3;
         --font-weight-bold: 700;
         --font-weight-normal: 400;
@@ -322,25 +322,74 @@
                 background-color: var(--foreground0);
             }
 
-            .sessions-column-headers {
+            .sessions {
                 display: grid;
-                grid-template-columns: 24ch 17ch 17ch;
-                grid-template-rows: auto;
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(auto-fill, 1lh);
                 text-align: center;
-                gap: 2ch;
+            }
+
+        }
+    }
+}
+
+.calendar-dialog {
+    .box {
+        background-color: var(--background1);
+
+        .header-top {
+            display: flex;
+            justify-content: center;
+
+            span {
+                padding: 0 1ch;
+                background-color: var(--background1);
+            }
+        }
+
+        .header-bottom {
+            display: flex;
+            justify-content: space-between;
+
+            span {
+                padding: 0 1ch;
+                background-color: var(--background1);
+            }
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(auto-fill, 1lh);
+
+            .row-header {
+                display: grid;
+                grid-template-columns: repeat(7, 5ch);
+                grid-template-rows: 1lh;
+                place-items: center;
 
                 color: var(--background0);
                 background-color: var(--foreground0);
             }
 
-            .sessions {
+            .row {
                 display: grid;
-                grid-template-columns: 24ch 17ch 17ch;
+                grid-template-columns: repeat(7, 5ch);
                 grid-template-rows: auto;
-                text-align: center;
-                gap: 2ch;
-            }
+                place-items: center;
+                align-items: baseline;
 
+                .cell {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    place-items: center;
+
+                    .id {
+                        color: var(--background0);
+                        background-color: var(--foreground0);
+                    }
+                }
+            }
         }
     }
 }

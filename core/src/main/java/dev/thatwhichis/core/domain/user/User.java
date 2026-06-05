@@ -1,6 +1,6 @@
 package dev.thatwhichis.core.domain.user;
 
-import dev.thatwhichis.framework.ddd.Entity;
+import dev.thatwhichis.framework.entity.Entity;
 
 import java.time.Instant;
 import java.util.Set;

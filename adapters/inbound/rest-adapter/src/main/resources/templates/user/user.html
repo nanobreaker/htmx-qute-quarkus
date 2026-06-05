@@ -1,3 +1,4 @@
+{@java.time.ZoneId zone}
 {@dev.thatwhichis.core.domain.user.User user}
 {@dev.thatwhichis.core.domain.user.UserSession session}
 
@@ -6,13 +7,13 @@
         container-="auto"
         _="on load call my.showModal()"
 >
-    <div class="box" is-="view" box-="square" shear-="top">
+    <div class="box" box-="square" shear-="top">
         <div class="header">
             <span>
                [{user.getUsername}]
             </span>
         </div>
-        <div is-="view-content" class="content">
+        <div class="content">
             <div class="user">
                 <div class="id-header">
                     id
@@ -25,35 +26,18 @@
                     <div>accessed</div>
                 </div>
                 <div class="created-touched-values">
-                    <div>{date:format(user.getCreatedAt)}</div>
-                    <div>{date:format(user.getTouchedAt)}</div>
+                    <div>{date:format(user.getCreatedAt, zone)}</div>
+                    <div>{date:format(user.getTouchedAt, zone)}</div>
                 </div>
             </div>
             <div class="sessions-header">
-                active sessions
-            </div>
-            <div class="sessions-column-headers">
-                <div>
-                    id
-                </div>
-                <div>
-                    created
-                </div>
-                <div>
-                    expires
-                </div>
+                sessions
             </div>
             <div class="sessions">
                 {#for session in user.getSessions}
-                <div>
-                    {session.id}
-                </div>
-                <div>
-                    {date:format(session.createdAt)}
-                </div>
-                <div>
-                    {date:format(session.expiresAt)}
-                </div>
+                <div>{session.id}</div>
+                <div>{date:format(session.createdAt, zone)} --> {date:format(session.expiresAt, zone)}</div>
+                <div is-="separator"></div>
                 {/for}
             </div>
         </div>

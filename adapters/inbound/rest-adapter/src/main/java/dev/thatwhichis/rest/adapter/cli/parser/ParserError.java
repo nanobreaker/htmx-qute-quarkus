@@ -22,6 +22,7 @@ public sealed interface ParserError extends Error {
     record EmptyTime()                                  implements ParserError { }
     record Empty()                                      implements ParserError { }
     record Unreachable()                                implements ParserError { }
+    record Uncategorized(Exception exception)           implements ParserError { }
 
     @Override
     default String describe() {
@@ -51,6 +52,8 @@ public sealed interface ParserError extends Error {
                  EmptyDate                  _,
                  EmptyTime                  _ ->    "parser error: empty input";
             case Unreachable                _ ->    "parser error: unreachable branch reached";
+            case Uncategorized              e ->    "parser error: uncategorized error: %s"
+                                                    .formatted(e.exception().getMessage());
         };
     }
     // @formatter:on

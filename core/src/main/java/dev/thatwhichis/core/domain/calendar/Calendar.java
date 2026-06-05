@@ -1,7 +1,8 @@
 package dev.thatwhichis.core.domain.calendar;
 
-import dev.thatwhichis.framework.ddd.Entity;
+import dev.thatwhichis.framework.entity.Entity;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,6 +34,11 @@ public class Calendar extends Entity<UUID> {
 
         public Builder withEntries(Set<CalendarEntry> entries) {
             this.entries = entries;
+            return this;
+        }
+
+        public Builder withNoEntries() {
+            this.entries = new HashSet<>();
             return this;
         }
 

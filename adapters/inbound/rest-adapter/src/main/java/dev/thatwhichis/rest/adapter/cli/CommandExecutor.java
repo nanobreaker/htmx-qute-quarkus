@@ -1,12 +1,15 @@
 package dev.thatwhichis.rest.adapter.cli;
 
+import dev.thatwhichis.core.domain.calendar.Calendar;
 import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoId;
 import dev.thatwhichis.core.domain.user.User;
+import dev.thatwhichis.core.ports.inbound.calendar.CalendarQuery;
 import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.inbound.todo.TodoQuery;
 import dev.thatwhichis.core.ports.inbound.user.UserQuery;
 import dev.thatwhichis.library.error.Error;
+import dev.thatwhichis.rest.adapter.qute.templates.CalendarTemplates;
 import dev.thatwhichis.rest.adapter.qute.templates.ErrorTemplates;
 import dev.thatwhichis.rest.adapter.qute.templates.HelpTemplates;
 import dev.thatwhichis.rest.adapter.qute.templates.OobTemplates;
@@ -27,6 +30,7 @@ import org.eclipse.microprofile.jwt.Claims;
 
 import java.net.URI;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -72,19 +76,20 @@ public class CommandExecutor {
                     var start,
                     var end
             ) -> {
-                var username = identity.getPrincipal().getName();
-                var startZoned = start.map(s -> s.atZone(zoneId));
-                var endZoned = end.map(e -> e.atZone(zoneId));
-                var command = new TodoCommand.Create(username, title, description, startZoned, endZoned);
+                var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+                var userId = UUID.fromString(principal.getClaim(Claims.sub));
+                var startZoned = start.map(s -> s.atZone(zoneId)).map(ZonedDateTime::toInstant);
+                var endZoned = end.map(e -> e.atZone(zoneId)).map(ZonedDateTime::toInstant);
+                var command = new TodoCommand.Create(userId, title, description, startZoned, endZoned);
                 var reply = eventBus
                         .<Result<Todo, Error>>request("command.todo.create", command)
                         .map(Message::body);
 
                 yield reply.map(result -> switch (result) {
                     case Ok(Todo todo) -> {
-                        var location = "/todos/%d".formatted(todo.getId().getId());
+                        var location = "/todos/%d".formatted(todo.getId().id());
                         var uri = URI.create(location);
-                        var html = TodoTemplates.todos$item(todo).render();
+                        var html = TodoTemplates.todos$item(todo, zoneId).render();
 
                         yield Response.created(uri)
                                 .header("HX-Reswap", "beforeend")
@@ -119,17 +124,19 @@ public class CommandExecutor {
             final Command.Todo.List cmd,
             final ZoneId zoneId
     ) {
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+
         return switch (cmd) {
             case Command.Todo.List.All _ -> {
-                var username = identity.getPrincipal().getName();
-                var query = new TodoQuery.List.All(username);
+                var query = new TodoQuery.List.All(userId);
                 var responseUni = eventBus
                         .<Result<Set<Todo>, Error>>request("query.todo.list", query)
                         .map(Message::body);
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos$items(todos).render();
+                        var html = TodoTemplates.todos$items(todos, zoneId).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -147,8 +154,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.List.ByIds(var ids) -> {
-                var username = identity.getPrincipal().getName();
-                var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
+                var idz = ids.stream().map(id -> new TodoId(id, userId)).collect(Collectors.toSet());
                 var query = new TodoQuery.List.ByIds(idz);
 
                 var responseUni = eventBus
@@ -157,7 +163,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos$items(todos).render();
+                        var html = TodoTemplates.todos$items(todos, zoneId).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -175,8 +181,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.List.ByFilters(var filters) -> {
-                var username = identity.getPrincipal().getName();
-                var query = new TodoQuery.List.ByFilters(username, filters);
+                var query = new TodoQuery.List.ByFilters(userId, filters);
 
                 var responseUni = eventBus
                         .<Result<Set<Todo>, Error>>request("query.todo.list", query)
@@ -184,7 +189,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos$items(todos).render();
+                        var html = TodoTemplates.todos$items(todos, zoneId).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -202,8 +207,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.List.ByIdsAndFilters(var ids, var filters) -> {
-                var username = identity.getPrincipal().getName();
-                var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
+                var idz = ids.stream().map(id -> new TodoId(id, userId)).collect(Collectors.toSet());
                 var query = new TodoQuery.List.ByIdsAndFilters(idz, filters);
 
                 var responseUni = eventBus
@@ -212,7 +216,7 @@ public class CommandExecutor {
 
                 yield responseUni.map(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var html = TodoTemplates.todos$items(todos).render();
+                        var html = TodoTemplates.todos$items(todos, zoneId).render();
 
                         yield Response.ok()
                                 .header("HX-Trigger", "command.empty")
@@ -246,15 +250,17 @@ public class CommandExecutor {
             final Command.Todo.Update cmd,
             final ZoneId zoneId
     ) {
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+
         return switch (cmd) {
             case Command.Todo.Update.ByIds(var ids, var payload) -> {
-                var username = identity.getPrincipal().getName();
-                var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
+                var idz = ids.stream().map(id -> new TodoId(id, userId)).collect(Collectors.toSet());
                 var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
                         payload.description(),
-                        payload.start().map(d -> d.atZone(zoneId)),
-                        payload.end().map(d -> d.atZone(zoneId))
+                        payload.start().map(d -> d.atZone(zoneId)).map(ZonedDateTime::toInstant),
+                        payload.end().map(d -> d.atZone(zoneId)).map(ZonedDateTime::toInstant)
                 );
                 var command = new TodoCommand.Update.ByIds(idz, payloadz);
                 var responseUni = eventBus
@@ -280,14 +286,13 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.Update.ByFilters(var filters, var payload) -> {
-                var username = identity.getPrincipal().getName();
                 var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
                         payload.description(),
-                        payload.start().map(d -> d.atZone(zoneId)),
-                        payload.end().map(d -> d.atZone(zoneId))
+                        payload.start().map(d -> d.atZone(zoneId)).map(ZonedDateTime::toInstant),
+                        payload.end().map(d -> d.atZone(zoneId)).map(ZonedDateTime::toInstant)
                 );
-                var command = new TodoCommand.Update.ByFilters(username, filters, payloadz);
+                var command = new TodoCommand.Update.ByFilters(userId, filters, payloadz);
 
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.update", command)
@@ -312,13 +317,12 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.Update.ByIdsAndFilters(var ids, var filters, var payload) -> {
-                var username = identity.getPrincipal().getName();
-                var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
+                var idz = ids.stream().map(id -> new TodoId(id, userId)).collect(Collectors.toSet());
                 var payloadz = new TodoCommand.Update.Payload(
                         payload.title(),
                         payload.description(),
-                        payload.start().map(d -> d.atZone(zoneId)),
-                        payload.end().map(d -> d.atZone(zoneId))
+                        payload.start().map(d -> d.atZone(zoneId)).map(ZonedDateTime::toInstant),
+                        payload.end().map(d -> d.atZone(zoneId)).map(ZonedDateTime::toInstant)
                 );
                 var command = new TodoCommand.Update.ByIdsAndFilters(idz, filters, payloadz);
 
@@ -359,10 +363,12 @@ public class CommandExecutor {
     }
 
     public Uni<Response> todoDelete(final Command.Todo.Delete cmd) {
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+
         return switch (cmd) {
             case Command.Todo.Delete.All _ -> {
-                var username = identity.getPrincipal().getName();
-                var command = new TodoCommand.Delete.All(username);
+                var command = new TodoCommand.Delete.All(userId);
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.delete", command)
                         .map(Message::body);
@@ -387,8 +393,7 @@ public class CommandExecutor {
                 });
             }
             case Command.Todo.Delete.ByIds(var ids) -> {
-                var username = identity.getPrincipal().getName();
-                var idz = ids.stream().map(id -> new TodoId(id, username)).collect(Collectors.toSet());
+                var idz = ids.stream().map(id -> new TodoId(id, userId)).collect(Collectors.toSet());
                 var command = new TodoCommand.Delete.ByIds(idz);
                 var responseUni = eventBus
                         .<Result<Void, Error>>request("command.todo.delete", command)
@@ -426,13 +431,43 @@ public class CommandExecutor {
         };
     }
 
-    public Uni<Response> calendarShow(final Command.Calendar ignored) {
-        // todo: Implement show calendar command
-        return Uni.createFrom()
-                .item(Response.serverError().build());
+    public Uni<Response> calendarShow(
+            final Command.Calendar ignored,
+            final ZoneId zoneId
+    ) {
+        var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
+        var userId = UUID.fromString(principal.getClaim(Claims.sub));
+        var query = new CalendarQuery.Show(userId);
+
+        return eventBus
+                .<Result<Calendar, Error>>request("query.calendar.show", query)
+                .map(Message::body)
+                .map(result -> switch (result) {
+                    case Ok(var calendar) -> {
+
+                        var html = CalendarTemplates.calendar(calendar, zoneId).render();
+
+                        yield Response.ok()
+                                .header("HX-Retarget", "#calendar-dialog")
+                                .header("HX-Reswap", "outerHTML")
+                                .entity(html)
+                                .build();
+                    }
+                    case Err(Error err) -> {
+                        var text = err.describe();
+                        var html = ErrorTemplates.error(text).render();
+
+                        yield Response.serverError()
+                                .entity(html)
+                                .build();
+                    }
+                });
     }
 
-    public Uni<Response> userShow(final Command.User ignored) {
+    public Uni<Response> userShow(
+            final Command.User ignored,
+            final ZoneId zoneId
+    ) {
         var principal = identity.getPrincipal(OidcJwtCallerPrincipal.class);
         var userId = UUID.fromString(principal.getClaim(Claims.sub));
         var query = new UserQuery.Show(userId);
@@ -442,7 +477,7 @@ public class CommandExecutor {
                 .map(Message::body)
                 .map(result -> switch (result) {
                     case Ok(var user) -> {
-                        var html = UserTemplates.user(user).render();
+                        var html = UserTemplates.user(user, zoneId).render();
 
                         yield Response.ok()
                                 .header("HX-Retarget", "#user-dialog")

@@ -18,10 +18,11 @@ import static io.github.dcadea.jresult.Result.err;
 public class CalendarJpaRepository implements CalendarRepository, PanacheRepositoryBase<CalendarJpaEntity, UUID> {
 
     @Override
-    public Uni<Result<Calendar, Error>> save(Calendar calendar) {
+    public Uni<Result<Calendar, Error>> save(final Calendar calendar) {
         var jpaEntity = CalendarJpaEntity.from(calendar);
 
-        return PanacheRepositoryBase.super
+        return PanacheRepositoryBase
+                .super
                 .persistAndFlush(jpaEntity)
                 .map(CalendarJpaEntity::into)
                 .map(Result::<Calendar, Error>ok)
@@ -29,8 +30,9 @@ public class CalendarJpaRepository implements CalendarRepository, PanacheReposit
     }
 
     @Override
-    public Uni<Result<Calendar, Error>> get(UUID calendarId) {
-        return this.findById(calendarId)
+    public Uni<Result<Calendar, Error>> get(final UUID calendarId) {
+        return this
+                .findById(calendarId)
                 .map(CalendarJpaEntity::into)
                 .map(Result::<Calendar, Error>ok)
                 .onFailure().recoverWithItem(throwable -> switch (throwable) {
@@ -40,8 +42,9 @@ public class CalendarJpaRepository implements CalendarRepository, PanacheReposit
     }
 
     @Override
-    public Uni<Result<Option<Calendar>, Error>> find(UUID calendarId) {
-        return this.findById(calendarId)
+    public Uni<Result<Option<Calendar>, Error>> find(final UUID calendarId) {
+        return this
+                .findById(calendarId)
                 .map(Option::some)
                 .map(option -> option.map(CalendarJpaEntity::into))
                 .map(Result::<Option<Calendar>, Error>ok)

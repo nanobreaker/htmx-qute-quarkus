@@ -52,8 +52,8 @@ public class CommandResource {
     @Produces(MediaType.TEXT_HTML)
     @WithSpan("submit")
     public Uni<Response> execute(
-            @CookieParam("time-zone") String zone,
-            @FormParam("command") String input
+            @CookieParam("time-zone") final String zone,
+            @FormParam("command") final String input
     ) {
         var zoneId = ZoneId.of(URLDecoder.decode(zone, StandardCharsets.UTF_8));
         var parserResult = parser.parse(input);
@@ -73,8 +73,8 @@ public class CommandResource {
                 case Todo.List      list    -> executor.todoList(list, zoneId);
                 case Todo.Update    update  -> executor.todoUpdate(update, zoneId);
                 case Todo.Delete    delete  -> executor.todoDelete(delete);
-                case Calendar.Show  show    -> executor.calendarShow(show);
-                case User.Show      show    -> executor.userShow(show);
+                case Calendar.Show  show    -> executor.calendarShow(show, zoneId);
+                case User.Show      show    -> executor.userShow(show, zoneId);
                 case Logout         _       -> executor.logout();
             };
             // @formatter:on
@@ -82,7 +82,8 @@ public class CommandResource {
                 var text = error.describe();
                 var template = ErrorTemplates.error(text);
 
-                yield template.createUni()
+                yield template
+                        .createUni()
                         .map(html -> Response
                                 .serverError()
                                 .entity(html)

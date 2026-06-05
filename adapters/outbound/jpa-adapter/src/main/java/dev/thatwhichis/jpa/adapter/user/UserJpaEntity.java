@@ -3,7 +3,6 @@ package dev.thatwhichis.jpa.adapter.user;
 import dev.thatwhichis.core.domain.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -13,6 +12,8 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static jakarta.persistence.FetchType.EAGER;
 
 @Entity
 public class UserJpaEntity {
@@ -28,7 +29,7 @@ public class UserJpaEntity {
     private Instant createdAt;
     private Instant touchedAt;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private Set<UserSessionJpaEntity> sessions;
 
@@ -58,8 +59,8 @@ public class UserJpaEntity {
 
         return new User.Builder(this.id)
                 .withUsername(this.username)
-                .withTouchedAt(this.createdAt)
-                .withCreatedAt(this.touchedAt)
+                .withCreatedAt(this.createdAt)
+                .withTouchedAt(this.touchedAt)
                 .withSessions(sessions)
                 .build();
     }

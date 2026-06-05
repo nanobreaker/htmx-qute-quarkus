@@ -1,13 +1,12 @@
 package dev.thatwhichis.jpa.adapter.todo;
 
 import dev.thatwhichis.core.domain.todo.Todo;
+import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Version;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 @Entity
 public class TodoJpaEntity {
@@ -18,26 +17,30 @@ public class TodoJpaEntity {
     @EmbeddedId
     private TodoJpaId id;
 
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "description")
     private String description;
-    private Instant startDateTime;
-    private Instant endDateTime;
-    private String timeZone;
+
+    @Column(name = "start_timestamp")
+    private Instant start;
+
+    @Column(name = "end_timestamp")
+    private Instant end;
 
     public TodoJpaEntity(
             final TodoJpaId id,
             final String title,
             final String description,
-            final Instant startDateTime,
-            final Instant endDateTime,
-            final String timeZone
+            final Instant start,
+            final Instant end
     ) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-        this.timeZone = timeZone;
+        this.start = start;
+        this.end = end;
     }
 
     public TodoJpaEntity() {
@@ -52,26 +55,32 @@ public class TodoJpaEntity {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
     }
 
-    public ZonedDateTime getStartDateTime() {
-        if (startDateTime == null) {
-            return null;
-        }
-        return ZonedDateTime.ofInstant(startDateTime, ZoneId.of(timeZone));
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public ZonedDateTime getEndDateTime() {
-        if (endDateTime == null) {
-            return null;
-        }
-        return ZonedDateTime.ofInstant(endDateTime, ZoneId.of(timeZone));
+    public Instant getStart() {
+        return start;
     }
 
-    public int getVersion() {
-        return version;
+    public void setStart(Instant start) {
+        this.start = start;
+    }
+
+    public Instant getEnd() {
+        return end;
+    }
+
+    public void setEnd(Instant end) {
+        this.end = end;
     }
 
     public Todo into() {
@@ -81,24 +90,20 @@ public class TodoJpaEntity {
                 id,
                 this.getTitle(),
                 this.getDescription(),
-                this.getStartDateTime(),
-                this.getEndDateTime()
+                this.getStart(),
+                this.getEnd()
         );
     }
 
-    public static TodoJpaEntity from(Todo todo) {
+    public static TodoJpaEntity from(final Todo todo) {
         var id = TodoJpaId.from(todo.getId());
-        var zoneFromStart = todo.getStart().map(d -> d.getZone().getId());
-        var zoneFromEnd = todo.getEnd().map(d -> d.getZone().getId());
-        var timeZone = zoneFromStart.orElseGet(() -> zoneFromEnd.orElse("UTC"));
 
         return new TodoJpaEntity(
                 id,
                 todo.getTitle(),
                 todo.getDescription().orElse(null),
-                todo.getStart().map(ZonedDateTime::toInstant).orElse(null),
-                todo.getEnd().map(ZonedDateTime::toInstant).orElse(null),
-                timeZone
+                todo.getStart().orElse(null),
+                todo.getEnd().orElse(null)
         );
     }
 }

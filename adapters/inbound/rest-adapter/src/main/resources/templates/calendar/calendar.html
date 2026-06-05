@@ -1,16 +1,53 @@
+{@dev.thatwhichis.core.domain.calendar.Calendar calendar}
+{@dev.thatwhichis.core.domain.calendar.CalendarEntry entry}
+{@dev.thatwhichis.rest.adapter.qute.extensions.CalendarExtension$CalendarView calendarView}
+{@java.time.ZoneId zone}
+{@java.util.Set<java.util.Map$Entry<java.time.DayOfWeek,dev.thatwhichis.library.option.Option<dev.thatwhichis.rest.adapter.qute.extensions.CalendarExtension$Day>>> days}
+{@java.util.Map$Entry<java.time.DayOfWeek,dev.thatwhichis.library.option.Option<dev.thatwhichis.rest.adapter.qute.extensions.CalendarExtension$Day>> day}
+{@dev.thatwhichis.library.option.Option<dev.thatwhichis.rest.adapter.qute.extensions.CalendarExtension$Day> dayValue}
+
 <dialog id="calendar-dialog"
         class="calendar-dialog"
         container-="auto"
         _="on load call my.showModal()"
 >
-    <div class="box" box-="square" shear-="top">
-        <div class="header">
-            <span>
-                [user calendar]
-            </span>
+    {#let calendarView = calendar:view(calendar, zone)}
+    <div class="box" box-="square" shear-="both">
+        <div class="header-top">
+            <span>[calendar]</span>
         </div>
         <div class="content">
-            <!-- todo: figure out a way to show a very simple calendar using html tables -->
+            <div class="row-header">
+                <div>mon</div>
+                <div>tue</div>
+                <div>wed</div>
+                <div>thu</div>
+                <div>fri</div>
+                <div>sat</div>
+                <div>sun</div>
+            </div>
+            {#for week in calendarView.weeks.entrySet()}
+            <div class="row">
+                {#let days = week.getValue.days.entrySet}
+                {#for day in days}
+                {#let dayValue = day.getValue}
+                {#if dayValue.isSome}
+                <div class="cell">
+                    <div>{dayValue.value.dayOfMonth}</div>
+                    {#for id in dayValue.value.ids}
+                    <div class="id">{id:format(id)}</div>
+                    {/for}
+                </div>
+                {#else}
+                <div></div>
+                {/if}
+                {/for}
+            </div>
+            {/for}
+        </div>
+        <div class="header-bottom">
+            <span>[{calendarView.month.toString().toLowerCase}]</span>
+            <span>[{calendarView.year.getValue()}]</span>
         </div>
     </div>
 </dialog>

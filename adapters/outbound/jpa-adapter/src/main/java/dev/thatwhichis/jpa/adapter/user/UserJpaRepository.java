@@ -17,7 +17,7 @@ import static io.github.dcadea.jresult.Result.err;
 @ApplicationScoped
 public class UserJpaRepository implements UserRepository, PanacheRepositoryBase<UserJpaEntity, UUID> {
 
-    public Uni<Result<User, Error>> save(User user) {
+    public Uni<Result<User, Error>> save(final User user) {
         var jpaEntity = UserJpaEntity.from(user);
 
         return this.persistAndFlush(jpaEntity)
@@ -27,7 +27,7 @@ public class UserJpaRepository implements UserRepository, PanacheRepositoryBase<
     }
 
     @Override
-    public Uni<Result<User, Error>> get(UUID userId) {
+    public Uni<Result<User, Error>> get(final UUID userId) {
         return this.findById(userId)
                 .map(UserJpaEntity::into)
                 .map(Result::<User, Error>ok)
@@ -38,7 +38,7 @@ public class UserJpaRepository implements UserRepository, PanacheRepositoryBase<
     }
 
     @Override
-    public Uni<Result<Option<User>, Error>> find(UUID userId) {
+    public Uni<Result<Option<User>, Error>> find(final UUID userId) {
         return this.findById(userId)
                 .map(Option::some)
                 .map(option -> option.map(UserJpaEntity::into))

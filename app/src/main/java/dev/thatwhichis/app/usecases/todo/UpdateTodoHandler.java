@@ -5,8 +5,8 @@ import dev.thatwhichis.core.domain.todo.TodoEvent;
 import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
 import dev.thatwhichis.framework.cqrs.CommandHandler;
-import dev.thatwhichis.framework.ddd.DomainEvent;
-import dev.thatwhichis.framework.ddd.EventDispatcher;
+import dev.thatwhichis.framework.event.DomainEvent;
+import dev.thatwhichis.framework.event.EventDispatcher;
 import dev.thatwhichis.library.error.Error;
 import io.github.dcadea.jresult.Err;
 import io.github.dcadea.jresult.Ok;
@@ -20,6 +20,8 @@ import jakarta.inject.Inject;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static io.github.dcadea.jresult.Result.err;
 
 @ApplicationScoped
 public class UpdateTodoHandler implements CommandHandler<TodoCommand.Update, Void> {
@@ -47,33 +49,39 @@ public class UpdateTodoHandler implements CommandHandler<TodoCommand.Update, Voi
 
                 yield resultUni.flatMap(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var domainEvents = todos.stream()
-                                .map(TodoEvent.Updated::new)
-                                .collect(Collectors.<DomainEvent>toUnmodifiableList());
+                        var domainEvents = todos
+                                .stream()
+                                .map(todo -> new TodoEvent.Updated(todo, payload))
+                                .collect(Collectors.<DomainEvent>toSet());
 
-                        yield eventDispatcher.on(() -> todoRepository.update(todos, payload), domainEvents);
+                        var todoIds = todos
+                                .stream()
+                                .map(Todo::getId)
+                                .collect(Collectors.toSet());
+
+                        yield eventDispatcher.on(() -> todoRepository.update(todoIds, payload), domainEvents);
                     }
-                    case Err(Error error) -> {
-                        yield Uni.createFrom()
-                                .item(Result.err(error));
-                    }
+                    case Err(Error error) -> Uni.createFrom().item(err(error));
                 });
             }
-            case TodoCommand.Update.ByFilters(var username, var filters, var payload) -> {
-                var resultUni = todoRepository.list(username, filters);
+            case TodoCommand.Update.ByFilters(var userId, var filters, var payload) -> {
+                var resultUni = todoRepository.list(userId, filters);
 
                 yield resultUni.flatMap(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var domainEvents = todos.stream()
-                                .map(TodoEvent.Updated::new)
-                                .collect(Collectors.<DomainEvent>toUnmodifiableList());
+                        var domainEvents = todos
+                                .stream()
+                                .map(todo -> new TodoEvent.Updated(todo, payload))
+                                .collect(Collectors.<DomainEvent>toSet());
 
-                        yield eventDispatcher.on(() -> todoRepository.update(todos, payload), domainEvents);
+                        var todoIds = todos
+                                .stream()
+                                .map(Todo::getId)
+                                .collect(Collectors.toSet());
+
+                        yield eventDispatcher.on(() -> todoRepository.update(todoIds, payload), domainEvents);
                     }
-                    case Err(Error error) -> {
-                        yield Uni.createFrom()
-                                .item(Result.err(error));
-                    }
+                    case Err(Error error) -> Uni.createFrom().item(err(error));
                 });
             }
             case TodoCommand.Update.ByIdsAndFilters(var ids, var filters, var payload) -> {
@@ -81,16 +89,19 @@ public class UpdateTodoHandler implements CommandHandler<TodoCommand.Update, Voi
 
                 yield resultUni.flatMap(result -> switch (result) {
                     case Ok(Set<Todo> todos) -> {
-                        var domainEvents = todos.stream()
-                                .map(TodoEvent.Updated::new)
-                                .collect(Collectors.<DomainEvent>toUnmodifiableList());
+                        var domainEvents = todos
+                                .stream()
+                                .map(todo -> new TodoEvent.Updated(todo, payload))
+                                .collect(Collectors.<DomainEvent>toSet());
 
-                        yield eventDispatcher.on(() -> todoRepository.update(todos, payload), domainEvents);
+                        var todoIds = todos
+                                .stream()
+                                .map(Todo::getId)
+                                .collect(Collectors.toSet());
+
+                        yield eventDispatcher.on(() -> todoRepository.update(todoIds, payload), domainEvents);
                     }
-                    case Err(Error error) -> {
-                        yield Uni.createFrom()
-                                .item(Result.err(error));
-                    }
+                    case Err(Error error) -> Uni.createFrom().item(err(error));
                 });
             }
         };

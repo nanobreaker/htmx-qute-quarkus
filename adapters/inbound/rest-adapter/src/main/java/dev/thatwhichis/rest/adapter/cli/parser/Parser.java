@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.SequencedCollection;
 import java.util.Set;
@@ -64,16 +65,23 @@ public class Parser {
             return err(new ParserError.Empty());
 
         var programToken = tokens.removeFirst();
-        return switch (programToken) {
-            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Help());
-            case Token.Keyword(var keyword) when keyword == KEYWORD.LOGOUT -> ok(new Command.Logout());
-            case Token.Keyword(var keyword) when keyword == KEYWORD.TODO -> parseTodoProgram(tokens);
-            case Token.Keyword(var keyword) when keyword == KEYWORD.CALENDAR -> parseCalendarProgram(tokens);
-            case Token.Keyword(var keyword) when keyword == KEYWORD.USER -> parseUserProgram(tokens);
-            case Token.Keyword(var keyword) -> err(new ParserError.NotProgram(keyword.toString()));
-            case Token.Text _, Token.Option _ -> err(new ParserError.NotProgram(programToken.toString()));
-            case Token.Unknown(var unknown) -> err(new ParserError.UnknownToken(unknown));
-        };
+        try {
+            return switch (programToken) {
+                case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Help());
+                case Token.Keyword(var keyword) when keyword == KEYWORD.LOGOUT -> ok(new Command.Logout());
+                case Token.Keyword(var keyword) when keyword == KEYWORD.TODO -> parseTodoProgram(tokens);
+                case Token.Keyword(var keyword) when keyword == KEYWORD.CALENDAR -> parseCalendarProgram(tokens);
+                case Token.Keyword(var keyword) when keyword == KEYWORD.USER -> parseUserProgram(tokens);
+                case Token.Keyword(var keyword) -> err(new ParserError.NotProgram(keyword.toString()));
+                case Token.Text _, Token.Option _ -> err(new ParserError.NotProgram(programToken.toString()));
+                case Token.Unknown(var unknown) -> err(new ParserError.UnknownToken(unknown));
+            };
+        } catch (Exception e) {
+            return switch (e) {
+                case NoSuchElementException _ -> err(new ParserError.Empty());
+                default -> err(new ParserError.Uncategorized(e));
+            };
+        }
     }
 
     private Result<Command, Error> parseTodoProgram(final SequencedCollection<Token> tokens) {
@@ -105,9 +113,7 @@ public class Parser {
     private Result<Command, Error> parseTodoCreateCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.removeFirst();
         return switch (subcommand) {
-            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
-                yield ok(new Command.Todo.Create.Help());
-            }
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Todo.Create.Help());
             case Token.Text(var title) -> {
                 var isSingleArg = findArgs(tokens).isEmpty();
                 if (!isSingleArg) {
@@ -131,35 +137,25 @@ public class Parser {
                 var command = builder.build();
                 yield ok(command);
             }
-            default -> {
-                yield err(new ParserError.ArgumentNotFound());
-            }
+            default -> err(new ParserError.ArgumentNotFound());
         };
     }
 
     private Result<Command, Error> parseTodoListCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
         return switch (subcommand) {
-            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
-                yield ok(new Command.Todo.List.Help());
-            }
-            case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> {
-                yield ok(new Command.Todo.List.All());
-            }
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Todo.List.Help());
+            case Token.Keyword(var keyword) when keyword == KEYWORD.ALL -> ok(new Command.Todo.List.All());
             default -> {
                 var args = findArgs(tokens);
                 var option = some(findOption(tokens, OPTION.FILTER));
                 yield switch (option) {
-                    case Some(var filter) when args.isEmpty() -> {
-                        yield ok(new Command.Todo.List.ByFilters(Set.of(filter)));
-                    }
+                    case Some(var filter) when args.isEmpty() -> ok(new Command.Todo.List.ByFilters(Set.of(filter)));
                     case Some(var filter) -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
                         yield ok(new Command.Todo.List.ByIdsAndFilters(ids, Set.of(filter)));
                     }
-                    case None() when args.isEmpty() -> {
-                        yield err(new ParserError.ArgumentNotFound());
-                    }
+                    case None() when args.isEmpty() -> err(new ParserError.ArgumentNotFound());
                     case None() -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
                         yield ok(new Command.Todo.List.ByIds(ids));
@@ -187,9 +183,7 @@ public class Parser {
     private Result<Command, Error> parseTodoUpdateCommand(final SequencedCollection<Token> tokens) {
         var subcommand = tokens.getFirst();
         return switch (subcommand) {
-            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> {
-                yield ok(new Command.Todo.Update.Help());
-            }
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Todo.Update.Help());
             default -> {
                 var args = findArgs(tokens);
                 var filterOpt = some(findOption(tokens, OPTION.FILTER));
@@ -225,9 +219,7 @@ public class Parser {
                         var command = new Command.Todo.Update.ByIdsAndFilters(ids, Set.of(filter), payloadBuilder.build());
                         yield ok(command);
                     }
-                    case None() when args.isEmpty() -> {
-                        yield err(new ParserError.ArgumentNotFound());
-                    }
+                    case None() when args.isEmpty() -> err(new ParserError.ArgumentNotFound());
                     case None() -> {
                         var ids = args.stream().map(Integer::parseInt).collect(Collectors.toSet());
                         var command = new Command.Todo.Update.ByIds(ids, payloadBuilder.build());
@@ -255,8 +247,13 @@ public class Parser {
         };
     }
 
-    private Result<Command, Error> parseCalendarProgram(final SequencedCollection<Token> ignored) {
-        return err(new ParserError.NotSupportedOperation());
+    private Result<Command, Error> parseCalendarProgram(final SequencedCollection<Token> tokens) {
+        var commandToken = tokens.removeFirst();
+        return switch (commandToken) {
+            case Token.Keyword(var keyword) when keyword == KEYWORD.HELP -> ok(new Command.Calendar.Help());
+            case Token.Keyword(var keyword) when keyword == KEYWORD.SHOW -> ok(new Command.Calendar.Show());
+            default -> err(new ParserError.UnknownCommand(commandToken.toString()));
+        };
     }
 
     private Result<Command, Error> parseUserProgram(final SequencedCollection<Token> tokens) {

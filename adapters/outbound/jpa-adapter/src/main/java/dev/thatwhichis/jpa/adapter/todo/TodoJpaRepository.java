@@ -4,22 +4,20 @@ import dev.thatwhichis.core.domain.todo.Todo;
 import dev.thatwhichis.core.domain.todo.TodoId;
 import dev.thatwhichis.core.ports.inbound.todo.TodoCommand;
 import dev.thatwhichis.core.ports.outbound.todo.TodoRepository;
-import dev.thatwhichis.framework.ddd.Entity;
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.library.error.JpaError;
 import dev.thatwhichis.library.option.Option;
 import io.github.dcadea.jresult.Result;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
-import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static io.github.dcadea.jresult.Result.err;
@@ -53,11 +51,11 @@ public class TodoJpaRepository
     }
 
     @Override
-    public Uni<Result<Set<Todo>, Error>> list(final String username) {
-        var params = Parameters.with("username", username);
+    public Uni<Result<Set<Todo>, Error>> list(final UUID userId) {
+        var params = Parameters.with("userId", userId);
         var sorting = Sort.ascending("id.id");
 
-        return this.find("id.username = :username", sorting, params)
+        return this.find("id.userId = :userId", sorting, params)
                 .list()
                 .map(jpaEntities -> jpaEntities
                         .stream()
@@ -70,13 +68,13 @@ public class TodoJpaRepository
 
     @Override
     public Uni<Result<Set<Todo>, Error>> list(
-            final String username,
+            final UUID userId,
             final Set<String> filters
     ) {
-        var params = Parameters.with("username", username).and("filters", filters);
+        var params = Parameters.with("userId", userId).and("filters", filters);
         var sorting = Sort.ascending("id.id");
 
-        return this.find("id.username = :username and title in :filters", sorting, params)
+        return this.find("id.userId = :userId and title in :filters", sorting, params)
                 .list()
                 .map(jpaEntities -> jpaEntities
                         .stream()
@@ -126,38 +124,35 @@ public class TodoJpaRepository
 
     @Override
     public Uni<Result<Void, Error>> update(
-            final Set<Todo> todos,
+            final Set<TodoId> ids,
             final TodoCommand.Update.Payload payload
     ) {
-        var jpaIds = todos.stream().map(Entity::getId).map(TodoJpaId::from).toList();
-        var parameters = Parameters.with("ids", jpaIds);
-        var fields = new ArrayList<String>();
+        var jpaIds = ids.stream().map(TodoJpaId::from).toList();
+        var params = Parameters.with("ids", jpaIds);
+        var sorting = Sort.by("id.id");
 
-        payload.title().ifPresent(title -> {
-            parameters.and("title", title);
-            fields.add("title = :title");
-        });
-        payload.description().ifPresent(description -> {
-            parameters.and("description", description);
-            fields.add("description = :description");
-        });
-        payload.start().ifPresent(start -> {
-            parameters.and("start", start.toInstant());
-            fields.add("startDateTime = :start");
-        });
-        payload.end().ifPresent(end -> {
-            parameters.and("end", end.toInstant());
-            fields.add("endDateTime = :end");
-        });
+        return this
+                .find("id in :ids", sorting, params)
+                .list()
+                .flatMap(jpaEntities -> {
+                            var updates = jpaEntities
+                                    .stream()
+                                    .map(entry -> {
+                                        payload.description().ifPresent(description -> entry.setDescription(description));
+                                        payload.title().ifPresent(title -> entry.setTitle(title));
+                                        payload.start().ifPresent(start -> entry.setStart(start));
+                                        payload.end().ifPresent(end -> entry.setEnd(end));
+                                        return this.flush().replaceWith(Result.<Void, Error>empty());
+                                    })
+                                    .toList();
 
-        var fieldsJoined = String.join(",", fields);
-        var query = "%s where id in :ids".formatted(fieldsJoined);
-
-        return Panache.withTransaction(
-                        () -> this.update(query, parameters)
-                                .chain(this::flush)
-                                .replaceWith(Result.<Void, Error>empty())
+                            return Uni
+                                    .join()
+                                    .all(updates)
+                                    .andFailFast();
+                        }
                 )
+                .map(_ -> Result.<Void, Error>empty())
                 .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }
 
@@ -187,10 +182,10 @@ public class TodoJpaRepository
     }
 
     @Override
-    public Uni<Result<Void, Error>> deleteAll(final String username) {
-        var params = Parameters.with("username", username);
+    public Uni<Result<Void, Error>> deleteAll(final UUID userId) {
+        var params = Parameters.with("userId", userId);
 
-        return this.delete("id.username = :username", params)
+        return this.delete("id.userId = :userId", params)
                 .map(_ -> Result.<Void, Error>empty())
                 .onFailure().recoverWithItem(t -> err(new JpaError.Uncategorized(t)));
     }

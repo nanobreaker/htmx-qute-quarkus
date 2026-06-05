@@ -1,24 +1,24 @@
 package dev.thatwhichis.core.domain.todo;
 
-import dev.thatwhichis.framework.ddd.Entity;
+import dev.thatwhichis.framework.entity.Entity;
 import dev.thatwhichis.library.option.Option;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 public class Todo extends Entity<TodoId> {
 
     private final String title;
     private final String description;
-    private final ZonedDateTime start;
-    private final ZonedDateTime end;
+    private final Instant start;
+    private final Instant end;
 
     public Todo(
             final TodoId todoId,
             final String title,
             final String description,
-            final ZonedDateTime start,
-            final ZonedDateTime end
+            final Instant start,
+            final Instant end
     ) {
         super(todoId);
         this.title = Objects.requireNonNull(title);
@@ -35,11 +35,11 @@ public class Todo extends Entity<TodoId> {
         return Option.some(this.description);
     }
 
-    public Option<ZonedDateTime> getStart() {
+    public Option<Instant> getStart() {
         return Option.some(this.start);
     }
 
-    public Option<ZonedDateTime> getEnd() {
+    public Option<Instant> getEnd() {
         return Option.some(this.end);
     }
 
@@ -47,9 +47,9 @@ public class Todo extends Entity<TodoId> {
 
         private final TodoId id;
         private final String title;
-        private ZonedDateTime start;
-        private ZonedDateTime end;
         private String description;
+        private Instant start;
+        private Instant end;
 
         public Builder(
                 TodoId id,
@@ -59,18 +59,18 @@ public class Todo extends Entity<TodoId> {
             this.title = title;
         }
 
-        public Builder withEnd(ZonedDateTime end) {
-            this.end = end;
-            return this;
-        }
-
-        public Builder withStart(ZonedDateTime start) {
-            this.start = start;
-            return this;
-        }
-
         public Builder withDescription(String description) {
             this.description = description;
+            return this;
+        }
+
+        public Builder withEnd(Instant ends) {
+            this.end = ends;
+            return this;
+        }
+
+        public Builder withStart(Instant starts) {
+            this.start = starts;
             return this;
         }
 

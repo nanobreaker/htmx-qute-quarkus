@@ -26,8 +26,9 @@ class CalendarJpaRepositoryTest {
     @Test
     @TestReactiveTransaction
     void should_save_calendar(UniAsserter asserter) {
-        var entry = new CalendarEntry(0, Option.some(Instant.now()), Option.none());
-        var calendar = new Calendar.Builder(UUID.randomUUID())
+        var calendarId = UUID.randomUUID();
+        var entry = new CalendarEntry(0, calendarId, Option.some(Instant.now()), Option.none());
+        var calendar = new Calendar.Builder(calendarId)
                 .withEntries(Set.of(entry))
                 .build();
 
@@ -40,12 +41,14 @@ class CalendarJpaRepositoryTest {
     @Test
     @TestReactiveTransaction
     void should_get_existing_calendar_by_uuid(UniAsserter asserter) {
-        var entry = new CalendarEntry(0, Option.some(Instant.now()), Option.none());
-        var calendar = new Calendar.Builder(UUID.randomUUID())
+        var calendarId = UUID.randomUUID();
+        var entry = new CalendarEntry(0, calendarId, Option.some(Instant.now()), Option.none());
+        var calendar = new Calendar.Builder(calendarId)
                 .withEntries(Set.of(entry))
                 .build();
 
         asserter.execute(() -> repository.save(calendar));
+
         asserter.assertThat(
                 () -> repository.get(calendar.getId()),
                 result -> assertThat(result.unwrap()).usingRecursiveComparison().isEqualTo(calendar)
@@ -64,12 +67,14 @@ class CalendarJpaRepositoryTest {
     @Test
     @TestReactiveTransaction
     void should_find_existing_calendar_by_uuid(UniAsserter asserter) {
-        var entry = new CalendarEntry(0, Option.some(Instant.now()), Option.none());
-        var calendar = new Calendar.Builder(UUID.randomUUID())
+        var calendarId = UUID.randomUUID();
+        var entry = new CalendarEntry(0, calendarId, Option.some(Instant.now()), Option.none());
+        var calendar = new Calendar.Builder(calendarId)
                 .withEntries(Set.of(entry))
                 .build();
 
         asserter.execute(() -> repository.save(calendar));
+
         asserter.assertThat(
                 () -> repository.find(calendar.getId()),
                 result -> assertThat(result.unwrap()).usingRecursiveComparison().isEqualTo(Option.some(calendar))
@@ -88,18 +93,19 @@ class CalendarJpaRepositoryTest {
     @Test
     @TestReactiveTransaction
     void should_update_calendar(UniAsserter asserter) {
-        var firstEntry = new CalendarEntry(0, Option.some(Instant.now()), Option.none());
-        var secondEntry = new CalendarEntry(1, Option.none(), Option.none());
+        var calendarId = UUID.randomUUID();
+        var firstEntry = new CalendarEntry(0, calendarId, Option.some(Instant.now()), Option.none());
+        var secondEntry = new CalendarEntry(1, calendarId, Option.none(), Option.none());
         var entries = new HashSet<>(Set.of(firstEntry, secondEntry));
 
-        var calendar = new Calendar.Builder(UUID.randomUUID())
+        var calendar = new Calendar.Builder(calendarId)
                 .withEntries(entries)
                 .build();
 
         asserter.execute(() -> repository.save(calendar));
 
         entries.remove(secondEntry);
-        entries.add(new CalendarEntry(2, Option.some(Instant.now()), Option.some(Instant.now())));
+        entries.add(new CalendarEntry(2, calendarId, Option.some(Instant.now()), Option.some(Instant.now())));
         calendar.setEntries(entries);
 
         asserter.execute(() -> repository.save(calendar));

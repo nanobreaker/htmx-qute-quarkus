@@ -51,6 +51,7 @@ class UserJpaRepositoryTest {
                 .build();
 
         asserter.execute(() -> repository.save(user));
+
         asserter.assertThat(
                 () -> repository.get(user.getId()),
                 result -> assertThat(result.unwrap()).usingRecursiveComparison().isEqualTo(user)
@@ -72,12 +73,13 @@ class UserJpaRepositoryTest {
         var session = new UserSession("test-sid", Instant.now(), Instant.now());
         var user = new User.Builder(UUID.randomUUID())
                 .withUsername("test")
-                .withTouchedAt(Instant.now())
                 .withCreatedAt(Instant.now())
+                .withTouchedAt(Instant.now())
                 .withSessions(Set.of(session))
                 .build();
 
         asserter.execute(() -> repository.save(user));
+
         asserter.assertThat(
                 () -> repository.find(user.getId()),
                 result -> assertThat(result.unwrap()).usingRecursiveComparison().isEqualTo(Option.some(user))

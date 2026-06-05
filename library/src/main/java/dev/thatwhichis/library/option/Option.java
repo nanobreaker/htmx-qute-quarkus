@@ -54,6 +54,13 @@ public sealed interface Option<T> permits None, Some {
         }
     }
 
+    default void ifPresentOrElse(Consumer<? super T> action, Runnable emptyAction) {
+        switch (this) {
+            case Some(T v) -> action.accept(v);
+            case None() -> emptyAction.run();
+        }
+    }
+
     default <NV> Option<NV> map(final Function<? super T, ? extends NV> valueMapper) {
         return switch (this) {
             case Some(T v) -> Option.some(valueMapper.apply(v));

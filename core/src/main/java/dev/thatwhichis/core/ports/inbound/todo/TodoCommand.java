@@ -4,64 +4,53 @@ import dev.thatwhichis.core.domain.todo.TodoId;
 import dev.thatwhichis.framework.cqrs.Command;
 import dev.thatwhichis.library.option.Option;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 
 sealed public interface TodoCommand extends Command {
 
+    //@formatter:off
     record Create(
-            String username,
+            UUID userId,
             String title,
             Option<String> description,
-            Option<ZonedDateTime> start,
-            Option<ZonedDateTime> end
-    ) implements TodoCommand {
-
-    }
+            Option<Instant> start,
+            Option<Instant> end
+    ) implements TodoCommand { }
 
     sealed interface Update extends TodoCommand {
 
         record ByIds(
                 Set<TodoId> ids,
                 Payload payload
-        ) implements Update {
-
-        }
+        ) implements Update { }
 
         record ByFilters(
-                String username,
+                UUID userId,
                 Set<String> filters,
                 Payload payload
-        ) implements Update {
-
-        }
+        ) implements Update { }
 
         record ByIdsAndFilters(
                 Set<TodoId> ids,
                 Set<String> filters,
                 Payload payload
-        ) implements Update {
-
-        }
+        ) implements Update { }
 
         record Payload(
                 Option<String> title,
                 Option<String> description,
-                Option<ZonedDateTime> start,
-                Option<ZonedDateTime> end
-        ) {
-
-        }
+                Option<Instant> start,
+                Option<Instant> end
+        ) { }
     }
 
     sealed interface Delete extends TodoCommand {
 
-        record All(String username) implements Delete {
+        record All(UUID userId) implements Delete { }
 
-        }
-
-        record ByIds(Set<TodoId> ids) implements Delete {
-
-        }
+        record ByIds(Set<TodoId> ids) implements Delete { }
     }
+    //@formatter:on
 }
