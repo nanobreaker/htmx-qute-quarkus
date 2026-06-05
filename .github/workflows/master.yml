@@ -1,0 +1,36 @@
+name: Build and Verify
+
+on:
+    pull_request:
+        branches:
+            - master
+            - main
+
+permissions:
+    contents: read
+
+concurrency:
+    group: build-verify-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build:
+        name: Maven build and verify
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v5
+
+            -   name: Setup Java
+                uses: actions/setup-java@v5
+                with:
+                    distribution: temurin
+                    java-version: '25'
+                    cache: maven
+
+            -   name: Make Maven wrapper executable
+                run: chmod +x ./mvnw
+
+            -   name: Build and verify
+                run: ./mvnw --batch-mode --no-transfer-progress clean verify
