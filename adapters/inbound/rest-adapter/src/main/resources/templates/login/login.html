@@ -1,0 +1,83 @@
+{#include base}
+<body class="login-screen"
+      _="
+        init
+            set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+            set cookies['time-zone'] to { value: zone }
+        "
+>
+<header class="login-header">
+    <span class="version"
+          is-="badge"
+    >
+        reactive-todos:1.0.0-SNAPSHOT
+    </span>
+    <div>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(1)
+            end
+            "
+        >
+            +
+        </span>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(-1)
+            end
+            "
+        >
+            -
+        </span>
+        <input type="checkbox"
+               is-="switch"
+               size-="small"
+               _="on change call theme.toggle(me)"
+        />
+    </div>
+</header>
+<main class="login-main">
+    <div id="login-view"
+         class="login-view"
+         is-="view"
+    >
+        <div class="login-content"
+             is-="view-content"
+        >
+            <h1 class="logo">
+                REACTIVE TODOS
+            </h1>
+            <h2 class="haiku">
+                In swift code it flows<br>
+                tasks arise and fade like waves<br>
+                scaling without end
+            </h2>
+            <div class="buttons">
+                <a is-="button"
+                   size-="small"
+                   href="/todos"
+                   _="on keyup[key.toLowerCase() is 'p'] from document
+                        call my.click()
+                      end"
+                >
+                    [P]ROCEED
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+<footer class="login-footer">
+    <div id="status-line"
+         class="status-line"
+    >
+        <span _="init repeat forever
+                    datetime.fetchAndInsert(me)
+                    wait 60s
+                 end">
+        </span>
+    </div>
+</footer>
+</body>
+{/include}

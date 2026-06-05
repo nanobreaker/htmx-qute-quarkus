@@ -1,0 +1,132 @@
+{@java.util.Set<dev.thatwhichis.core.domain.todo.Todo> todos}
+{@java.time.ZoneId zone}
+{@dev.thatwhichis.core.domain.todo.Todo todo}
+
+{#include base}
+<body id="body"
+      class="todo-screen"
+      hx-ext="response-targets"
+      _="
+        init
+            set zone to (window.Intl.DateTimeFormat().resolvedOptions().timeZone)
+            set cookies['time-zone'] to { value: zone }
+
+        on keyup[key is ':'] from document
+            navigation.focusById('command-input')
+        end
+        "
+>
+<header class="todo-header">
+    <span class="version"
+          is-="badge"
+    >
+        alice@reactive-todos:1.0.0-SNAPSHOT
+    </span>
+    <div>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(1)
+            end
+            "
+        >
+            +
+        </span>
+        <span
+            _="
+            on click
+                call ui.changeFontSize(-1)
+            end
+            "
+        >
+            -
+        </span>
+        <input type="checkbox"
+               is-="switch"
+               size-="small"
+               _="on change call theme.toggle(me)"
+        />
+    </div>
+</header>
+<main id="todo-main"
+      class="todo-main"
+>
+    {#fragment id = items}
+    {#for todo in todos}
+    {#fragment id = item}
+    <div id="todo-{todo.id.id}"
+         class="todo-view"
+         is-="view"
+         box-="square"
+         shear-="both"
+    >
+        <div class="todo-title">
+            <span>[{id:format(todo.id.id)}]</span>
+            <span>[{todo.title}]</span>
+        </div>
+        <div class="todo-content"
+             is-="view-content"
+        >
+            {todo.getDescription.orElse("")}
+        </div>
+        <div class="todo-dates">
+            <span>{date:format(todo.getStart, zone)}</span>
+            <span>{date:format(todo.getEnd, zone)}</span>
+        </div>
+    </div>
+    {/fragment}
+    {/for}
+    {/fragment}
+</main>
+<footer class="todo-footer">
+    <div id="feedback"
+         class="feedback"
+    >
+    </div>
+    <div id="status-line"
+         class="status-line"
+    >
+        <span id="command-spinner"
+              class="command-spinner"
+              is-="spinner"
+        >
+        </span>
+        <span _="init repeat forever
+                    datetime.fetchAndInsert(me)
+                    wait 60s
+                 end">
+        </span>
+    </div>
+    <form id="command-line"
+          class="command-line"
+          hx-post="/commands/submit"
+          hx-indicator="#command-spinner"
+          hx-target="#todo-main"
+          hx-target-error="#feedback"
+          hx-swap="innerHTML"
+          _="on htmx:afterRequest
+                if event.detail.xhr.status >= 200 and event.detail.xhr.status < 300
+                    set #command-input.value to ''
+                end
+             end"
+    >
+        <label for="command-input">:</label>
+        <input id="command-input"
+               class="command-input"
+               name="command"
+               type="search"
+               _="on keydown[key is 'Escape']
+                    set #feedback.innerHTML to ''
+                  end"
+        />
+        <input type="submit"
+               hidden="hidden"
+               style="all: unset;"
+               hx-trigger="key[Enter]"
+        />
+    </form>
+</footer>
+<dialog id="user-dialog"></dialog>
+<dialog id="calendar-dialog"></dialog>
+</body>
+{/include}

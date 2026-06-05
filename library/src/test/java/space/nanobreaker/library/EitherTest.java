@@ -1,10 +1,12 @@
 package space.nanobreaker.library;
 
+import dev.thatwhichis.library.either.Either;
+import dev.thatwhichis.library.either.Left;
+import dev.thatwhichis.library.either.Right;
+import dev.thatwhichis.library.option.Option;
 import org.junit.jupiter.api.Test;
-import space.nanobreaker.library.either.Either;
-import space.nanobreaker.library.either.Left;
-import space.nanobreaker.library.either.Right;
-import space.nanobreaker.library.option.Option;
+
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,6 +14,9 @@ public class EitherTest {
 
     @Test
     void shouldReturnTrueIfLeftVariant() {
+        final Option<ZonedDateTime> option = Option.some(ZonedDateTime.now());
+        option.map(ZonedDateTime::toString).orElse("");
+
         final Either<Integer, Integer> left = new Left<>(42);
         assertThat(left.isLeft()).isEqualTo(true);
 
@@ -31,7 +36,7 @@ public class EitherTest {
     @Test
     void shouldConvertLeftSideOfEitherToOption() {
         final Either<Integer, Integer> left = new Left<>(42);
-        assertThat(left.left()).isEqualTo(Option.of(42));
+        assertThat(left.left()).isEqualTo(Option.some(42));
 
         final Either<Integer, Integer> right = new Right<>(666);
         assertThat(right.left()).isEqualTo(Option.none());
@@ -40,7 +45,7 @@ public class EitherTest {
     @Test
     void shouldConvertRightSideOfEitherToOption() {
         final Either<Integer, Integer> right = new Right<>(42);
-        assertThat(right.right()).isEqualTo(Option.of(42));
+        assertThat(right.right()).isEqualTo(Option.some(42));
 
         final Either<Integer, Integer> left = new Left<>(666);
         assertThat(left.right()).isEqualTo(Option.none());
@@ -76,11 +81,9 @@ public class EitherTest {
     @Test
     void shouldApplyFunctionsToBothSidesIfPresent() {
         final Either<String, String> left = new Left<>("TeSt");
-        assertThat(left.mapEither(String::toLowerCase, String::length))
-                .isEqualTo(new Left<>("test"));
+        assertThat(left.mapEither(String::toLowerCase, String::length)).isEqualTo(new Left<>("test"));
 
         final Either<String, String> right = new Right<>("TeSt");
-        assertThat(right.mapEither(String::toLowerCase, String::length))
-                .isEqualTo(new Right<>(4));
+        assertThat(right.mapEither(String::toLowerCase, String::length)).isEqualTo(new Right<>(4));
     }
 }

@@ -1,0 +1,45 @@
+{@java.time.ZoneId zone}
+{@dev.thatwhichis.core.domain.user.User user}
+{@dev.thatwhichis.core.domain.user.UserSession session}
+
+<dialog id="user-dialog"
+        class="user-dialog"
+        container-="auto"
+        _="on load call my.showModal()"
+>
+    <div class="box" box-="square" shear-="top">
+        <div class="header">
+            <span>
+               [{user.getUsername}]
+            </span>
+        </div>
+        <div class="content">
+            <div class="user">
+                <div class="id-header">
+                    id
+                </div>
+                <div class="id-value">
+                    {user.getId}
+                </div>
+                <div class="created-touched-headers">
+                    <div>created</div>
+                    <div>accessed</div>
+                </div>
+                <div class="created-touched-values">
+                    <div>{date:format(user.getCreatedAt, zone)}</div>
+                    <div>{date:format(user.getTouchedAt, zone)}</div>
+                </div>
+            </div>
+            <div class="sessions-header">
+                sessions
+            </div>
+            <div class="sessions">
+                {#for session in user.getSessions}
+                <div>{session.id}</div>
+                <div>{date:format(session.createdAt, zone)} --> {date:format(session.expiresAt, zone)}</div>
+                <div is-="separator"></div>
+                {/for}
+            </div>
+        </div>
+    </div>
+</dialog>

@@ -2,8 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>space.nanobreaker</groupId>
+
+    <groupId>dev.thatwhichis</groupId>
     <artifactId>htmx-qute-quarkus</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -11,25 +13,33 @@
     <modules>
         <module>library</module>
         <module>framework</module>
-        <module>application/configuration/monolith-configuration</module>
-        <module>application/core/domain/v1</module>
-        <module>application/core/usecases/v1</module>
-        <module>application/infrastructure/dataproviders/postgres-dataprovider/v1</module>
+        <module>core</module>
+        <module>app</module>
+        <module>adapters/inbound/rest-adapter</module>
+        <module>adapters/outbound/jpa-adapter</module>
+        <module>boot</module>
+        <module>e2e</module>
     </modules>
 
     <properties>
-        <maven.compiler.release>23</maven.compiler.release>
-        <maven.compiler.source>23</maven.compiler.source>
-        <maven.compiler.target>23</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.16.2</quarkus.platform.version>
+        <quarkus.platform.version>3.35.2</quarkus.platform.version>
+
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
         <surefire-plugin.version>3.1.2</surefire-plugin.version>
+
         <skipITs>true</skipITs>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -40,77 +50,69 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>space.nanobreaker</groupId>
+                <groupId>dev.thatwhichis</groupId>
                 <artifactId>library</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>space.nanobreaker</groupId>
+                <groupId>dev.thatwhichis</groupId>
                 <artifactId>framework</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>space.nanobreaker</groupId>
-                <artifactId>core-domain-v1</artifactId>
+                <groupId>dev.thatwhichis</groupId>
+                <artifactId>core</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>space.nanobreaker</groupId>
-                <artifactId>core-usecases-v1</artifactId>
+                <groupId>dev.thatwhichis</groupId>
+                <artifactId>app</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>space.nanobreaker</groupId>
-                <artifactId>infrastructure-dataproviders-postgres-v1</artifactId>
+                <groupId>dev.thatwhichis</groupId>
+                <artifactId>rest-adapter</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.thatwhichis</groupId>
+                <artifactId>jpa-adapter</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.thatwhichis</groupId>
+                <artifactId>boot</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>io.github.dcadea</groupId>
                 <artifactId>jresult</artifactId>
-                <version>0.1.0</version>
+                <version>0.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye.reactive</groupId>
+                <artifactId>mutiny</artifactId>
+                <version>3.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-common</artifactId>
+                <version>26.6.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+                <version>2.27.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.27.7</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <java.util.logging.manager>org.jboss.logmanager.LogManager
-                        </java.util.logging.manager>
-                        <maven.home>${maven.home}</maven.home>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <native.image.path>
-                                    ${project.build.directory}/${project.build.finalName}-runner
-                                </native.image.path>
-                                <java.util.logging.manager>org.jboss.logmanager.LogManager
-                                </java.util.logging.manager>
-                                <maven.home>${maven.home}</maven.home>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -118,14 +120,6 @@
                     <artifactId>quarkus-maven-plugin</artifactId>
                     <version>${quarkus.platform.version}</version>
                     <extensions>true</extensions>
-                    <configuration>
-                        <source>${maven.compiler.source}</source>
-                        <target>${maven.compiler.target}</target>
-                        <compilerArgs>
-                            <arg>--enable-preview</arg>
-                        </compilerArgs>
-                        <jvmArgs>--enable-preview</jvmArgs>
-                    </configuration>
                     <executions>
                         <execution>
                             <goals>
@@ -136,53 +130,30 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>io.smallrye</groupId>
+                    <artifactId>jandex-maven-plugin</artifactId>
+                    <version>3.5.3</version>
+                    <executions>
+                        <execution>
+                            <id>make-index</id>
+                            <goals>
+                                <goal>jandex</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <quarkus.jacoco.data-file>${maven.multiModuleProjectDirectory}/target/jacoco.exec</quarkus.jacoco.data-file>
+                            <quarkus.jacoco.reuse-data-file>true</quarkus.jacoco.reuse-data-file>
+                            <quarkus.jacoco.report-location>${maven.multiModuleProjectDirectory}/target/coverage</quarkus.jacoco.report-location>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
-    <profiles>
-        <profile>
-            <id>quarkus-native</id>
-            <activation>
-                <property>
-                    <name>native</name>
-                </property>
-            </activation>
-            <properties>
-                <skipITs>false</skipITs>
-                <quarkus.package.type>native</quarkus.package.type>
-            </properties>
-        </profile>
-        <profile>
-            <id>monolith</id>
-            <activation/>
-            <modules>
-                <module>library</module>
-                <module>framework</module>
-                <module>application/configuration/monolith-configuration</module>
-                <module>application/core/domain/v1</module>
-                <module>application/core/usecases/v1</module>
-                <module>application/infrastructure/dataproviders/postgres-dataprovider/v1</module>
-            </modules>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>${quarkus.platform.group-id}</groupId>
-                        <artifactId>${quarkus.platform.artifact-id}</artifactId>
-                        <version>${quarkus.platform.version}</version>
-                        <type>pom</type>
-                        <scope>import</scope>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-        </profile>
-        <profile>
-            <id>locker</id>
-            <activation>
-                <property>
-                    <name>!unlocked</name>
-                </property>
-            </activation>
-            <dependencyManagement/>
-        </profile>
-    </profiles>
 </project>
