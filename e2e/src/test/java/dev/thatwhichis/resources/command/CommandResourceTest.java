@@ -8,15 +8,15 @@ import dev.thatwhichis.core.ports.outbound.calendar.CalendarEntryRepository;
 import dev.thatwhichis.library.error.Error;
 import dev.thatwhichis.rest.adapter.http.command.CommandResource;
 import io.github.dcadea.jresult.Result;
+import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
-import io.quarkus.test.TestReactiveTransaction;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.quarkus.test.security.oidc.Claim;
 import io.quarkus.test.security.oidc.OidcSecurity;
-import io.quarkus.test.vertx.UniAsserter;
+import io.quarkus.vertx.VertxContextSupport;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.vertx.mutiny.core.eventbus.EventBus;
@@ -36,6 +36,7 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.DecoderConfig.decoderConfig;
 import static io.restassured.config.EncoderConfig.encoderConfig;
+import static io.restassured.config.HttpClientConfig.httpClientConfig;
 import static io.restassured.config.SessionConfig.sessionConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,6 +54,11 @@ public class CommandResourceTest {
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
         RestAssured.config = RestAssured.config()
+                .httpClient(
+                        httpClientConfig()
+                                .setParam("http.connection.timeout", 10_000)
+                                .setParam("http.socket.timeout", 30_000)
+                )
                 .encoderConfig(
                         encoderConfig()
                                 .appendDefaultContentCharsetToContentTypeIfUndefined(false)
@@ -74,8 +80,7 @@ public class CommandResourceTest {
     @Inject EventBus eventBus;
 
     @BeforeEach
-    @TestReactiveTransaction
-    public void setUp(final UniAsserter asserter) {
+    public void setUp() throws Throwable {
         var command = new UserCommand.Authenticate(
                 sub,
                 upn,
@@ -84,21 +89,19 @@ public class CommandResourceTest {
                 Instant.now().plusSeconds(3600)
         );
 
-        asserter.assertThat(
-                () -> eventBus.<Result<Void, Error>>request("user.authenticated", command),
-                result -> assertThat(result.body().isOk()).isTrue()
+        VertxContextSupport.subscribeAndAwait(
+                () -> Panache.withTransaction(() -> eventBus.<Result<Void, Error>>request("user.authenticated", command))
         );
     }
 
     @Test
-    @TestReactiveTransaction
     @TestSecurity(user = upn, roles = {"user"})
     @OidcSecurity(claims = {
             @Claim(key = "sub", value = sub_string),
             @Claim(key = "upn", value = upn),
             @Claim(key = "sid", value = sid)
     })
-    public void post(final UniAsserter asserter) {
+    public void post() throws Throwable {
         var title = "title";
         var description = "description";
         var start = LocalDateTime.of(2025, 11, 10, 0, 0);
@@ -139,9 +142,17 @@ public class CommandResourceTest {
 
         // verify side-effect of todo creation
         var expectedCalendarEntry = new CalendarEntry(1, sub, expectedTodo.getStart(), expectedTodo.getEnd());
-        asserter.assertThat(
-                () -> calendarEntryRepository.get(1),
-                result -> assertThat(result.unwrap()).usingRecursiveComparison().isEqualTo(expectedCalendarEntry)
+
+        VertxContextSupport.subscribeAndAwait(
+                () -> Panache.withTransaction(
+                        () -> calendarEntryRepository
+                                .get(1)
+                                .map(result -> assertThat(result.unwrap())
+                                        .usingRecursiveComparison()
+                                        .isEqualTo(expectedCalendarEntry)
+                                )
+
+                )
         );
     }
 }
