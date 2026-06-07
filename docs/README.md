@@ -38,89 +38,70 @@ For the UI I chose a TUI-like interface implemented with the help of a [webtui](
 
 ```
 .
+├── core
+├── app
 ├── adapters
 │   ├── inbound
 │   │   └── rest-adapter
 │   └── outbound
 │       └── jpa-adapter
-├── app
 ├── boot
-├── core
-├── docs
 ├── e2e
-├── framework
-└── library
+├── library
+└── framework
 ```
 
-### Adapters
-
-Adapters are implementations of the port interfaces defined in the core layer. Like ports, there are two kinds of adapters: inbound and
-outbound. Inbound adapters describe how external systems communicate with the domain, while outbound adapters describe how the domain
-interacts with external systems.
-
-#### rest-adapter
-
-An inbound REST adapter that provides HTTP endpoints for interacting with the todo application. It uses htmx and Qute templates to render
-the UI and handle user interactions.
-
-#### jpa-adapter
-
-An outbound adapter that provides JPA repositories for interacting with the database.
-
-### App
-
-The application and business logic layer. It defines handlers for inbound calls and relies on outbound adapters to interact with the
-database.
-
-### Boot
-
-The bootstrapping layer is responsible for starting the Quarkus application. It also contains application configuration.
-
-### Core
-
-The core layer that defines domain models and interfaces, also known as ports.
-
-### Docs
-
-Project documentation.
-
-### E2E
-
-Integration tests.
-
-### Framework
-
-A custom framework implementation is used to reduce the amount of boilerplate code.
-
-### Library
-
-A simple helper library that contains my custom implementations, such as Option and Tuple, inspired by Rust.
+| module       	 | description                                                                                                                                                                    	 |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| core         	 | The core layer that defines domain models and interfaces, also known as ports.                                                                                                 	 |
+| app          	 | The application and business logic layer. It defines handlers for inbound calls and relies on outbound adapters to interact with the database.                                 	 |
+| rest-adapter 	 | An inbound REST adapter that provides HTTP endpoints for interacting with the todo application. It uses htmx and Qute templates to render the UI and handle user interactions. 	 |
+| jpa-adapter  	 | An outbound adapter that provides JPA repositories for interacting with the database.                                                                                          	 |
+| boot         	 | The bootstrapping layer is responsible for starting the Quarkus application. It also contains application configuration.                                                       	 |
+| e2e          	 | Integration tests.                                                                                                                                                             	 |
+| library      	 | A simple helper library that contains my custom implementations, such as Option and Tuple, inspired by Rust.                                                                   	 |
+| framework    	 | A custom framework implementation is used to reduce the amount of boilerplate code.                                                                                            	 |
 
 ## Usage
 
-You can create, list, update, delete todos using the command line interface. To list available commands you can simply run `help`, to
-explore further just run `todo help`, `todo create help` and so on. Additionally, I implemented user and calendar commands that give you
-information about your user and a small calendar that reflects todos with timelines on it.
+As I mentioned earlier, this web application has a Vim-like interface, and all interactions are performed through the command-line interface
+at the bottom of the screen. There is also a Shift+: keybind that focuses the CLI, so you do not need to use the mouse at all.
 
-To select CLI from anywhere just press `Shift+:`.
+If a request fails, an error message is displayed above the CLI. You can press Esc to dismiss it.
+
+You can also change the theme and font size using the buttons in the top-right corner of the screen.
+If request fails, an error message will be displayed above the cli, you can press `Esc` to dismiss it.
 
 ### Login
+
+A simple page whose only function is to redirect the user to the identity provider and then back to the todos page. You can initiate the
+redirect by pressing P.
 
 ![login](images/login.png)
 
 ### Command Line Interface
 
+There are multiple commands available. Use help to see what is implemented. You can also use help with a specific command to see more
+details.
+
 ![commands](images/cli.png)
 
 ### Todos
+
+You can create, list, update, and delete todos. See the details of each command to understand how to build the query.
 
 ![todos](images/todos.png)
 
 ### User
 
+A simple command that shows user information.
+
 ![users](images/user.png)
 
 ### Calendar
+
+A simple command that shows the user's calendar with reflected todos if those todos have any time-related markers such as
+start or end dates.
 
 ![calendar](images/calendar.png)
 
