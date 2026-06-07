@@ -65,12 +65,11 @@ For the UI I chose a TUI-like interface implemented with the help of a [webtui](
 ## Usage
 
 As I mentioned earlier, this web application has a Vim-like interface, and all interactions are performed through the command-line interface
-at the bottom of the screen. There is also a Shift+: keybind that focuses the CLI, so you do not need to use the mouse at all.
+at the bottom of the screen. There is also a `Shift+:` keybind that focuses the CLI, so you do not need to use the mouse at all.
 
-If a request fails, an error message is displayed above the CLI. You can press Esc to dismiss it.
+If a request fails, an error message is displayed above the CLI, press `Esc` to dismiss it.
 
 You can also change the theme and font size using the buttons in the top-right corner of the screen.
-If request fails, an error message will be displayed above the cli, you can press `Esc` to dismiss it.
 
 ### Login
 
