@@ -96,6 +96,28 @@ A custom framework implementation is used to reduce the amount of boilerplate co
 
 A simple helper library that contains my custom implementations, such as Option and Tuple, inspired by Rust.
 
+## Usage
+
+You can create, list, update, delete todos using the command line interface. To list available commands you can simply run `help`, to
+explore further just run `todo help`, `todo create help` and so on. Additionally, I implemented user and calendar commands that give you
+information about your user and a small calendar that reflects todos with timelines on it.
+
+### Login
+
+[login](images/login.png)
+
+### Commands
+
+[commands](images/commands.png)
+
+### User
+
+[users](images/users.png)
+
+### Calendar
+
+[calendar](images/calendar.png)
+
 # Getting Started
 
 ## Prerequisites
