@@ -102,21 +102,27 @@ You can create, list, update, delete todos using the command line interface. To 
 explore further just run `todo help`, `todo create help` and so on. Additionally, I implemented user and calendar commands that give you
 information about your user and a small calendar that reflects todos with timelines on it.
 
+To select CLI from anywhere just press `Shift+:`.
+
 ### Login
 
-[login](images/login.png)
+![login](images/login.png)
 
-### Commands
+### Command Line Interface
 
-[commands](images/commands.png)
+![commands](images/cli.png)
+
+### Todos
+
+![todos](images/todos.png)
 
 ### User
 
-[users](images/users.png)
+![users](images/user.png)
 
 ### Calendar
 
-[calendar](images/calendar.png)
+![calendar](images/calendar.png)
 
 # Getting Started
 
