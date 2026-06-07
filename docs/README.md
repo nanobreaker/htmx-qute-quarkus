@@ -151,4 +151,4 @@ java -jar boot/target/quarkus-app/quarkus-run.jar
 
 # Licensing
 
-The code in this project is licensed under MIT license. Check [LICENSE](LICENSE) for further details.
+The code in this project is licensed under MIT license. Check [LICENSE](LICENSE.md) for further details.
