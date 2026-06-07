@@ -1,174 +1,145 @@
+# Preview
+
 <div style="margin-top: 2rem" align="center">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="/logo/demo-dark.png">
-      <img alt="demo" src="/logo/demo-light.png">
+      <source media="(prefers-color-scheme: dark)" srcset="logo/demo-dark.png">
+      <img alt="demo" src="logo/demo-light.png">
     </picture>
 </div>
 
-<h3 align="center">HTMX QUTE QUARKUS</h3>
+## Motivation
 
-## Description
+I have always disliked the way most web applications are built. My gut feeling told me that something was wrong, but because I lacked
+experience and did not fully understand how the web had evolved, I could not clearly explain where things had gone off track.
 
-It began as a simple project, a way to learn how to build hypermedia applications using HTMX. But as
-you dive deeper, new ideas emerge, leading to more exploration in search of insights. This journey
-is fascinating but time-consuming. Eventually, I found myself building a scalable, high-performance,
-and maintainable web application. With an enterprise Java background, the journey took shape
-quickly!
+Frameworks like Angular, React, Vue, and others often feel bloated to me. They seem to suffer from a fundamental problem at the root of
+their design, which is why they constantly try to reinvent themselves. In my opinion, the culprit is that many modern frameworks ignore what
+the browser already gives us out of the box. Combined with REST and hypermedia, the web should be simple. Instead, we have made it
+unnecessarily complicated.
 
-For the server side, I chose Quarkus to embrace the reactive programming model offered by the Mutiny
-library. Quarkus itself has a robust and well-developed ecosystem, including tools like Qute for
-template rendering, Quarkus REST, CSRF protection, authorization, Hibernate Panache, and more—all of
-which sped up development. I’ve never been a big fan of the Spring ecosystem and had been looking
-for a replacement; Quarkus has more than fulfilled that role.
+At some point, I discovered htmx, a hypermedia library created by Carson Gross. It described a way of building web applications that deeply
+resonated with me, and I felt that this was the right direction. I bought the book, and by the end of that journey, I was convinced that
+much of the modern web had taken the wrong path. For many applications, the true way to build slim and efficient web interfaces is to
+embrace hypermedia.
 
-Coming from a background in enterprise microservices, I wanted to deepen my understanding of
-architectural design and used this project as a means to explore these patterns. I ended up adopting
-the Ports & Adapters (Hexagonal) architecture. The resulting structure made the project remarkably
-flexible and scalable, especially useful for larger applications. It allows the application to be
-modularized into smaller, manageable instances. EventBus from Vert.x was invaluable, enabling
-communication between REST and domain layers using the CQRS pattern, which naturally supports
-scalability through its request/reply model. Scaling the application with additional instances
-became almost seamless.
+This project is my playground for exploring how to build a hypermedia-driven web application.
 
-Of course, the heart of this project was HTMX. I’m not a fan of the current state of web
-development, especially when simple enterprise web pages require a new language and a mountain of
-libraries just to manage basic operations. To me, this approach adds unnecessary mental overhead and
-resource strain. Ideally, the client should be lightweight and resource-efficient. HTMX was exactly
-what I’d been seeking—a way to develop without the bulk and redundancy. For years, I struggled to
-resonate with REST, until I began reading Hypermedia Systems and traced the evolution of the web. I
-had a revelation: modern web practices had drifted from the fundamentals, resulting in bloated and
-convoluted stacks.
+# Overview
 
-The learning curve was steep; mastering HTMX meant rewriting the entire application multiple times.
-Impatience cost me initially, as I hadn’t yet grounded myself in the basics of the hypermedia
-approach.
+My personal attempt to implement a todo application and learn new technologies along the way. This project sheds light on how to build a
+slim and efficient hypermedia-driven web application backed by the reactive Quarkus framework.
 
-Oh, I almost forgot—the core idea behind this project was to create a simple but effective to-do
-application. I’ve used plenty of note-taking apps, calendars, and other tools, but I wanted
-something I could deploy on my Raspberry Pi and rely on daily for managing life’s tasks. Inspired by
-the elegance of Vim, I aimed for simplicity and high functionality, with a similar minimalist vibe.
-The application even includes a command-line interface to manage tasks and other functions, which
-was a fun challenge to implement.
+Hexagon architecture is used as a fundament, I really like the way how it allows me to split application in distinct layers and keep system
+decoupled. Additionally, it very easy to scale and maintain.
 
-To build the command-line interface, I learned how to create a parser using a state machine, and I
-added real-time updates with Server-Sent Events (SSE), a technology that allows the server to push
-updates to clients asynchronously—a feature I’m thrilled with! I’m not a designer, but I’m really
-happy with the final look; it’s simple, functional, and fits my needs, and that’s what matters.
+For the UI I chose a TUI-like interface implemented with the help of a [webtui](https://github.com/webtui/webtui) library.
 
-Now, I’m thrilled to finally launch this project and share it with the community. The journey taught
-me so much, taking over a year—but it was worth every moment.
+## Project Structure
 
-## Getting Started
+```
+.
+├── adapters
+│   ├── inbound
+│   │   └── rest-adapter
+│   └── outbound
+│       └── jpa-adapter
+├── app
+├── boot
+├── core
+├── docs
+├── e2e
+├── framework
+└── library
+```
 
-### Prerequisites
+### Adapters
+
+Adapters are implementations of the port interfaces defined in the core layer. Like ports, there are two kinds of adapters: inbound and
+outbound. Inbound adapters describe how external systems communicate with the domain, while outbound adapters describe how the domain
+interacts with external systems.
+
+#### rest-adapter
+
+An inbound REST adapter that provides HTTP endpoints for interacting with the todo application. It uses htmx and Qute templates to render
+the UI and handle user interactions.
+
+#### jpa-adapter
+
+An outbound adapter that provides JPA repositories for interacting with the database.
+
+### App
+
+The application and business logic layer. It defines handlers for inbound calls and relies on outbound adapters to interact with the
+database.
+
+### Boot
+
+The bootstrapping layer is responsible for starting the Quarkus application. It also contains application configuration.
+
+### Core
+
+The core layer that defines domain models and interfaces, also known as ports.
+
+### Docs
+
+Project documentation.
+
+### E2E
+
+Integration tests.
+
+### Framework
+
+A custom framework implementation is used to reduce the amount of boilerplate code.
+
+### Library
+
+A simple helper library that contains my custom implementations, such as Option and Tuple, inspired by Rust.
+
+# Getting Started
+
+## Prerequisites
 
 * maven 3.8.6+
-* java 23+
-* docker (database, identity-provider)
+* java 25+
+* docker
 
-### Installation
+## Installation
 
-1. Clone the repo
-   ```shell
-   git clone git@github.com:nanobreaker/htmx-qute-quarkus.git
-   ```
-
-## Usage
-
-### Build
+Since I don't provide any binary distribution, you need to clone the repository and build the app yourself.
 
 ```shell
-./mvnw clean install -Pmonolith
+git clone git@github.com:nanobreaker/htmx-qute-quarkus.git
 ```
 
-### Run
+## Testing
+
+Running the tests requires Docker, because the integration tests start database and identity provider containers.
 
 ```shell
-./mvnw quarkus:dev -Pmonolith 
+mvn verify
 ```
 
-### Roadmap
+## Building
 
-* Add calendar functionality
-    * Calendar domain model
-    * Calendar repository
-    * Calendar commands & queries
-    * Calendar command & queries handlers
-    * Calendar resource (REST)
-* Integrate with Debezium & Apache Pulsar
-    * Build Outbox implementation to update User, Todo and Calendar based on domain events
-    * Domain events will be generated by Debezium
-    * Apache Pulsar (similar to Kafka) to use as transport layer for events delivery
-* Split monolith into microservices
-    * User microservice
-    * Todo microservice
-    * Calendar microservice
-* Create script to set up local development cluster
-* Create GitHub actions
-    * Run E2E tests
-    * Build project artifacts and publish to public nexus repository
-    * Build docker images and publish to public repository
-    * Deploy application to dev cluster
+```shell
+mvn clean install
+```
 
-### Spikes
+## Running
 
-* Is it worth implementing Aggregate Root pattern for the domain layer?
-* Is it worth using Apache Pulsar with Debezium for such small project?
-* Good practices for handling authentication/authorization in micro-service cluster
+For local development, you can rely on Quarkus dev mode. It automatically starts all required Docker containers and runs the application.
 
-### Ports & Adapters Diagram
+```shell
+./mvnw quarkus:dev
+```
 
-##### Simplified structure
+To run the jar binary, you need to set up the database and identity provider first, then start the application.
 
-* **Primary Adapters**
-    * REST
-    * Messaging System
-* **Primary Ports**
-    * Commands (change domain model state)
-        * User Commands
-        * Todo Commands
-        * Calendar Commands
-    * Queries (query models)
-        * User Queries
-        * Todo Queries
-        * Calendar Queries
+```shell
+java -jar boot/target/quarkus-app/quarkus-run.jar
+```
 
-* **Domain**
-    * Domain Models
-        * User Model
-        * Todo Model
-        * Calendar Model
-    * Command Handlers
-        * User Command Handlers
-        * Todo Command Handlers
-        * Calendar Command Handlers
-    * Query Handlers
-        * User Query Handlers
-        * Todo Query Handlers
-        * Calendar Query Handlers
+# Licensing
 
-* **Secondary Adapters**
-    * Database drivers
-        * postgresql
-* **Secondary Ports**
-    * Repositories
-        * User Repository
-        * Todo Repository
-        * Calendar Repository
-
-#### High level overview
-
-![P&A High Level](documentation/diagrams/ports-adapters-high-level.png)
-
-#### Adding project specific details
-
-![P&A Details](documentation/diagrams/ports-adapters-details.png)
-
-### Change-Data-Capture Flow Diagram
-
-![CDC Diagram](documentation/diagrams/cdc.png)
-
-## Licensing
-
-The code in this project is licensed under MIT license. Check [LICENSE](LICENSE) for further
-details.
+The code in this project is licensed under MIT license. Check [LICENSE](LICENSE) for further details.
