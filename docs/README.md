@@ -29,8 +29,8 @@ This project is my playground for exploring how to build a hypermedia-driven web
 My personal attempt to implement a todo application and learn new technologies along the way. This project sheds light on how to build a
 slim and efficient hypermedia-driven web application backed by the reactive Quarkus framework.
 
-Hexagon architecture is used as a fundament, I really like the way how it allows me to split application in distinct layers and keep system
-decoupled. Additionally, it very easy to scale and maintain.
+Hexagonal architecture is used as the foundation of the project. I like how it allows me to split the application into distinct layers and
+keep the system decoupled. It also makes the application easier to scale and maintain.
 
 For the UI I chose a TUI-like interface implemented with the help of a [webtui](https://github.com/webtui/webtui) library.
 
@@ -137,7 +137,7 @@ To select CLI from anywhere just press `Shift+:`.
 Since I don't provide any binary distribution, you need to clone the repository and build the app yourself.
 
 ```shell
-git clone git@github.com:nanobreaker/htmx-qute-quarkus.git
+git clone https://github.com/thatwhichisdev/htmx-qute-quarkus.git
 ```
 
 ## Testing
